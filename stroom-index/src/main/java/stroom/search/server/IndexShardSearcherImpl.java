@@ -110,7 +110,7 @@ public class IndexShardSearcherImpl implements IndexShardSearcher {
     }
 
     private IndexReader openWithWriter(final IndexWriter indexWriter) throws IOException {
-        final IndexReader indexReader = DirectoryReader.open(indexWriter, false);
+        final IndexReader indexReader = DirectoryReader.open(indexWriter);
 
         // Check the document count in the index matches the DB. We are using
         // the writer so chances are there is a mismatch.

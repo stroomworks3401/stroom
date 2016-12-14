@@ -17,19 +17,15 @@
 package stroom.index.server;
 
 import org.apache.lucene.document.FieldType;
-import org.apache.lucene.document.FieldType.NumericType;
 import org.apache.lucene.index.IndexOptions;
 import stroom.query.shared.IndexField;
-import stroom.query.shared.IndexFieldType;
 
-public final class FieldTypeFactory {
-    private static final int DEFAULT_PRECISION_STEP = 4;
-
+final class FieldTypeFactory {
     private FieldTypeFactory() {
         // Utility.
     }
 
-    public static FieldType createBasic() {
+    static FieldType createBasic() {
         final FieldType fieldType = new FieldType();
         fieldType.setIndexOptions(IndexOptions.DOCS);
         fieldType.setTokenized(true);
@@ -42,7 +38,7 @@ public final class FieldTypeFactory {
         return fieldType;
     }
 
-    public static FieldType create(final IndexField indexField) {
+    static FieldType create(final IndexField indexField) {
         final FieldType fieldType = new FieldType();
 
         // Set the index options.
@@ -67,17 +63,6 @@ public final class FieldTypeFactory {
         fieldType.setStoreTermVectorOffsets(false);
         fieldType.setStoreTermVectorPositions(indexField.isTermPositions());
         fieldType.setStoreTermVectorPayloads(false);
-
-        if (IndexFieldType.ID.equals(indexField.getFieldType())) {
-            fieldType.setNumericPrecisionStep(Integer.MAX_VALUE);
-            fieldType.setNumericType(NumericType.LONG);
-        } else if (IndexFieldType.NUMERIC_FIELD.equals(indexField.getFieldType())) {
-            fieldType.setNumericPrecisionStep(DEFAULT_PRECISION_STEP);
-            fieldType.setNumericType(NumericType.LONG);
-        } else if (IndexFieldType.DATE_FIELD.equals(indexField.getFieldType())) {
-            fieldType.setNumericPrecisionStep(DEFAULT_PRECISION_STEP);
-            fieldType.setNumericType(NumericType.LONG);
-        }
 
         // We never do scoring.
         fieldType.setOmitNorms(true);

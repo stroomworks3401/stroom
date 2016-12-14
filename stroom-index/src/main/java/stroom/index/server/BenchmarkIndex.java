@@ -18,7 +18,7 @@ package stroom.index.server;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.LongField;
+import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
@@ -107,8 +107,8 @@ public class BenchmarkIndex extends AbstractCommandLineTool {
     private Document buildDocument(final long id) {
         final Document doc = new Document();
 
-        final LongField streamId = FieldFactory.create(getIndexField(IndexConstants.STREAM_ID), id);
-        final LongField eventId = FieldFactory.create(getIndexField(IndexConstants.EVENT_ID), id);
+        final Field streamId = FieldFactory.create(getIndexField(IndexConstants.STREAM_ID), id);
+        final Field eventId = FieldFactory.create(getIndexField(IndexConstants.EVENT_ID), id);
 
         doc.add(streamId);
         doc.add(eventId);

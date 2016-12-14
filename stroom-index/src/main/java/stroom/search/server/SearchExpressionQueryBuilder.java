@@ -24,7 +24,7 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.BooleanQuery.Builder;
-import org.apache.lucene.search.NumericRangeQuery;
+import org.apache.lucene.search.LegacyNumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
@@ -237,21 +237,21 @@ class SearchExpressionQueryBuilder {
             switch (condition) {
             case EQUALS:
                 final Long num1 = getNumber(fieldName, value);
-                return NumericRangeQuery.newLongRange(fieldName, num1, num1, true, true);
+                return LegacyNumericRangeQuery.newLongRange(fieldName, num1, num1, true, true);
             case CONTAINS:
                 final Long num2 = getNumber(fieldName, value);
-                return NumericRangeQuery.newLongRange(fieldName, num2, num2, true, true);
+                return LegacyNumericRangeQuery.newLongRange(fieldName, num2, num2, true, true);
             case GREATER_THAN:
-                return NumericRangeQuery.newLongRange(fieldName, getNumber(fieldName, value), Long.MAX_VALUE, false,
+                return LegacyNumericRangeQuery.newLongRange(fieldName, getNumber(fieldName, value), Long.MAX_VALUE, false,
                         true);
             case GREATER_THAN_OR_EQUAL_TO:
-                return NumericRangeQuery.newLongRange(fieldName, getNumber(fieldName, value), Long.MAX_VALUE, true,
+                return LegacyNumericRangeQuery.newLongRange(fieldName, getNumber(fieldName, value), Long.MAX_VALUE, true,
                         true);
             case LESS_THAN:
-                return NumericRangeQuery.newLongRange(fieldName, Long.MIN_VALUE, getNumber(fieldName, value), true,
+                return LegacyNumericRangeQuery.newLongRange(fieldName, Long.MIN_VALUE, getNumber(fieldName, value), true,
                         false);
             case LESS_THAN_OR_EQUAL_TO:
-                return NumericRangeQuery.newLongRange(fieldName, Long.MIN_VALUE, getNumber(fieldName, value), true,
+                return LegacyNumericRangeQuery.newLongRange(fieldName, Long.MIN_VALUE, getNumber(fieldName, value), true,
                         true);
             case BETWEEN:
                 final long[] between = getNumbers(fieldName, value);
@@ -261,7 +261,7 @@ class SearchExpressionQueryBuilder {
                 if (between[0] >= between[1]) {
                     throw new SearchException("From number must lower than to number");
                 }
-                return NumericRangeQuery.newLongRange(fieldName, between[0], between[1], true, true);
+                return LegacyNumericRangeQuery.newLongRange(fieldName, between[0], between[1], true, true);
             case IN:
                 return getNumericIn(fieldName, value);
             case IN_DICTIONARY:
@@ -274,21 +274,21 @@ class SearchExpressionQueryBuilder {
             switch (condition) {
             case EQUALS:
                 final Long date1 = getDate(fieldName, value);
-                return NumericRangeQuery.newLongRange(fieldName, date1, date1, true, true);
+                return LegacyNumericRangeQuery.newLongRange(fieldName, date1, date1, true, true);
             case CONTAINS:
                 final Long date2 = getDate(fieldName, value);
-                return NumericRangeQuery.newLongRange(fieldName, date2, date2, true, true);
+                return LegacyNumericRangeQuery.newLongRange(fieldName, date2, date2, true, true);
             case GREATER_THAN:
-                return NumericRangeQuery.newLongRange(fieldName, 8, getDate(fieldName, value), Long.MAX_VALUE, false,
+                return LegacyNumericRangeQuery.newLongRange(fieldName, 8, getDate(fieldName, value), Long.MAX_VALUE, false,
                         true);
             case GREATER_THAN_OR_EQUAL_TO:
-                return NumericRangeQuery.newLongRange(fieldName, 8, getDate(fieldName, value), Long.MAX_VALUE, true,
+                return LegacyNumericRangeQuery.newLongRange(fieldName, 8, getDate(fieldName, value), Long.MAX_VALUE, true,
                         true);
             case LESS_THAN:
-                return NumericRangeQuery.newLongRange(fieldName, 8, Long.MIN_VALUE, getDate(fieldName, value), true,
+                return LegacyNumericRangeQuery.newLongRange(fieldName, 8, Long.MIN_VALUE, getDate(fieldName, value), true,
                         false);
             case LESS_THAN_OR_EQUAL_TO:
-                return NumericRangeQuery.newLongRange(fieldName, 8, Long.MIN_VALUE, getDate(fieldName, value), true,
+                return LegacyNumericRangeQuery.newLongRange(fieldName, 8, Long.MIN_VALUE, getDate(fieldName, value), true,
                         true);
             case BETWEEN:
                 final long[] between = getDates(fieldName, value);
@@ -298,7 +298,7 @@ class SearchExpressionQueryBuilder {
                 if (between[0] >= between[1]) {
                     throw new SearchException("From date must occur before to date");
                 }
-                return NumericRangeQuery.newLongRange(fieldName, 8, between[0], between[1], true, true);
+                return LegacyNumericRangeQuery.newLongRange(fieldName, 8, between[0], between[1], true, true);
             case IN:
                 return getDateIn(fieldName, value);
             case IN_DICTIONARY:
@@ -329,11 +329,11 @@ class SearchExpressionQueryBuilder {
         if (in != null && in.length > 0) {
             if (in.length == 1) {
                 final long num = in[0];
-                return NumericRangeQuery.newLongRange(fieldName, num, num, true, true);
+                return LegacyNumericRangeQuery.newLongRange(fieldName, num, num, true, true);
             } else {
                 final Builder builder = new Builder();
                 for (final long num : in) {
-                    final Query q = NumericRangeQuery.newLongRange(fieldName, num, num, true, true);
+                    final Query q = LegacyNumericRangeQuery.newLongRange(fieldName, num, num, true, true);
                     builder.add(q, Occur.SHOULD);
                 }
                 return builder.build();
@@ -348,11 +348,11 @@ class SearchExpressionQueryBuilder {
         if (in != null && in.length > 0) {
             if (in.length == 1) {
                 final long date = in[0];
-                return NumericRangeQuery.newLongRange(fieldName, date, date, true, true);
+                return LegacyNumericRangeQuery.newLongRange(fieldName, date, date, true, true);
             } else {
                 final Builder builder = new Builder();
                 for (final long date : in) {
-                    final Query q = NumericRangeQuery.newLongRange(fieldName, date, date, true, true);
+                    final Query q = LegacyNumericRangeQuery.newLongRange(fieldName, date, date, true, true);
                     builder.add(q, Occur.SHOULD);
                 }
                 return builder.build();
