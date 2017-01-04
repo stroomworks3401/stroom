@@ -16,15 +16,13 @@
 
 package stroom.explorer.client.presenter;
 
+import com.google.inject.Inject;
 import stroom.cell.dropdowntree.client.DropDownCell;
 import stroom.data.client.event.DataSelectionEvent;
 import stroom.data.client.event.DataSelectionEvent.DataSelectionHandler;
 import stroom.entity.shared.DocRef;
 import stroom.explorer.shared.EntityData;
 import stroom.explorer.shared.ExplorerData;
-import com.google.inject.Inject;
-
-import java.util.Set;
 
 public class EntityDropDownCell extends DropDownCell<DocRef> {
     private final ExplorerDropDownTreePresenter explorerDropDownTreePresenter;
@@ -44,15 +42,15 @@ public class EntityDropDownCell extends DropDownCell<DocRef> {
         });
     }
 
+    @Override
+    protected String getUnselectedText() {
+        return unselectedText;
+    }
+
     public void setUnselectedText(final String unselectedText) {
         this.unselectedText = unselectedText;
         explorerDropDownTreePresenter.setUnselectedText(unselectedText);
         changeSelection(null);
-    }
-
-    @Override
-    protected String getUnselectedText() {
-        return unselectedText;
     }
 
     public void setIncludedTypes(final String... includedTypes) {

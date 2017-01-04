@@ -17,6 +17,7 @@
 package stroom.search.server;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
@@ -237,21 +238,21 @@ public class SearchExpressionQueryBuilder {
             switch (condition) {
             case EQUALS:
                 final Long num1 = getNumber(fieldName, value);
-                return LegacyNumericRangeQuery.newLongRange(fieldName, num1, num1, true, true);
+                return getNumericRangeQuery(matchVersion, fieldName, num1, num1, true, true);
             case CONTAINS:
                 final Long num2 = getNumber(fieldName, value);
-                return LegacyNumericRangeQuery.newLongRange(fieldName, num2, num2, true, true);
+                return getNumericRangeQuery(matchVersion, fieldName, num2, num2, true, true);
             case GREATER_THAN:
-                return LegacyNumericRangeQuery.newLongRange(fieldName, getNumber(fieldName, value), Long.MAX_VALUE, false,
+                return getNumericRangeQuery(matchVersion, fieldName, getNumber(fieldName, value), Long.MAX_VALUE, false,
                         true);
             case GREATER_THAN_OR_EQUAL_TO:
-                return LegacyNumericRangeQuery.newLongRange(fieldName, getNumber(fieldName, value), Long.MAX_VALUE, true,
+                return getNumericRangeQuery(matchVersion, fieldName, getNumber(fieldName, value), Long.MAX_VALUE, true,
                         true);
             case LESS_THAN:
-                return LegacyNumericRangeQuery.newLongRange(fieldName, Long.MIN_VALUE, getNumber(fieldName, value), true,
+                return getNumericRangeQuery(matchVersion, fieldName, Long.MIN_VALUE, getNumber(fieldName, value), true,
                         false);
             case LESS_THAN_OR_EQUAL_TO:
-                return LegacyNumericRangeQuery.newLongRange(fieldName, Long.MIN_VALUE, getNumber(fieldName, value), true,
+                return getNumericRangeQuery(matchVersion, fieldName, Long.MIN_VALUE, getNumber(fieldName, value), true,
                         true);
             case BETWEEN:
                 final long[] between = getNumbers(fieldName, value);
@@ -261,11 +262,11 @@ public class SearchExpressionQueryBuilder {
                 if (between[0] >= between[1]) {
                     throw new SearchException("From number must lower than to number");
                 }
-                return LegacyNumericRangeQuery.newLongRange(fieldName, between[0], between[1], true, true);
+                return getNumericRangeQuery(matchVersion, fieldName, between[0], between[1], true, true);
             case IN:
-                return getNumericIn(fieldName, value);
+                return getNumericIn(matchVersion, fieldName, value);
             case IN_DICTIONARY:
-                return getDictionary(fieldName, dictionary, indexField, matchVersion, terms);
+                return getDictionary(matchVersion, fieldName, dictionary, indexField, terms);
             default:
                 throw new SearchException("Unexpected condition '" + condition.getDisplayValue() + "' for "
                         + indexField.getFieldType().getDisplayValue() + " field type");
@@ -274,21 +275,21 @@ public class SearchExpressionQueryBuilder {
             switch (condition) {
             case EQUALS:
                 final Long date1 = getDate(fieldName, value);
-                return LegacyNumericRangeQuery.newLongRange(fieldName, date1, date1, true, true);
+                return getNumericRangeQuery(matchVersion, fieldName, date1, date1, true, true);
             case CONTAINS:
                 final Long date2 = getDate(fieldName, value);
-                return LegacyNumericRangeQuery.newLongRange(fieldName, date2, date2, true, true);
+                return getNumericRangeQuery(matchVersion, fieldName, date2, date2, true, true);
             case GREATER_THAN:
-                return LegacyNumericRangeQuery.newLongRange(fieldName, 8, getDate(fieldName, value), Long.MAX_VALUE, false,
+                return getNumericRangeQuery(matchVersion, fieldName, getDate(fieldName, value), Long.MAX_VALUE, false,
                         true);
             case GREATER_THAN_OR_EQUAL_TO:
-                return LegacyNumericRangeQuery.newLongRange(fieldName, 8, getDate(fieldName, value), Long.MAX_VALUE, true,
+                return getNumericRangeQuery(matchVersion, fieldName, getDate(fieldName, value), Long.MAX_VALUE, true,
                         true);
             case LESS_THAN:
-                return LegacyNumericRangeQuery.newLongRange(fieldName, 8, Long.MIN_VALUE, getDate(fieldName, value), true,
+                return getNumericRangeQuery(matchVersion, fieldName, Long.MIN_VALUE, getDate(fieldName, value), true,
                         false);
             case LESS_THAN_OR_EQUAL_TO:
-                return LegacyNumericRangeQuery.newLongRange(fieldName, 8, Long.MIN_VALUE, getDate(fieldName, value), true,
+                return getNumericRangeQuery(matchVersion, fieldName, Long.MIN_VALUE, getDate(fieldName, value), true,
                         true);
             case BETWEEN:
                 final long[] between = getDates(fieldName, value);
@@ -298,11 +299,11 @@ public class SearchExpressionQueryBuilder {
                 if (between[0] >= between[1]) {
                     throw new SearchException("From date must occur before to date");
                 }
-                return LegacyNumericRangeQuery.newLongRange(fieldName, 8, between[0], between[1], true, true);
+                return getNumericRangeQuery(matchVersion, fieldName, between[0], between[1], true, true);
             case IN:
-                return getDateIn(fieldName, value);
+                return getDateIn(matchVersion, fieldName, value);
             case IN_DICTIONARY:
-                return getDictionary(fieldName, dictionary, indexField, matchVersion, terms);
+                return getDictionary(matchVersion, fieldName, dictionary, indexField, terms);
             default:
                 throw new SearchException("Unexpected condition '" + condition.getDisplayValue() + "' for "
                         + indexField.getFieldType().getDisplayValue() + " field type");
@@ -312,11 +313,11 @@ public class SearchExpressionQueryBuilder {
             case EQUALS:
                 return getSubQuery(matchVersion, indexField, value, terms, false);
             case CONTAINS:
-                return getContains(fieldName, value, indexField, matchVersion, terms);
+                return getContains(matchVersion, fieldName, value, indexField, terms);
             case IN:
-                return getIn(fieldName, value, indexField, matchVersion, terms);
+                return getIn(matchVersion, fieldName, value, indexField, terms);
             case IN_DICTIONARY:
-                return getDictionary(fieldName, dictionary, indexField, matchVersion, terms);
+                return getDictionary(matchVersion, fieldName, dictionary, indexField, terms);
             default:
                 throw new SearchException("Unexpected condition '" + condition.getDisplayValue() + "' for "
                         + indexField.getFieldType().getDisplayValue() + " field type");
@@ -324,16 +325,31 @@ public class SearchExpressionQueryBuilder {
         }
     }
 
-    private Query getNumericIn(final String fieldName, final String value) {
+    private Query getNumericRangeQuery(final Version matchVersion, final String fieldName, Long min, Long max, final boolean minInclusive, final boolean maxInclusive) {
+        if (matchVersion.onOrAfter(Version.LUCENE_6_3_0)) {
+            if (!minInclusive) {
+                min = Math.addExact(min, 1);
+            }
+            if (!maxInclusive) {
+                max = Math.addExact(min, -1);
+            }
+            return LongPoint.newRangeQuery(fieldName, min, max);
+        }
+
+        return LegacyNumericRangeQuery.newLongRange(fieldName, 8, min, max, minInclusive,
+                maxInclusive);
+    }
+
+    private Query getNumericIn(final Version matchVersion, final String fieldName, final String value) {
         final long[] in = getNumbers(fieldName, value);
         if (in != null && in.length > 0) {
             if (in.length == 1) {
                 final long num = in[0];
-                return LegacyNumericRangeQuery.newLongRange(fieldName, num, num, true, true);
+                return getNumericRangeQuery(matchVersion, fieldName, num, num, true, true);
             } else {
                 final Builder builder = new Builder();
                 for (final long num : in) {
-                    final Query q = LegacyNumericRangeQuery.newLongRange(fieldName, num, num, true, true);
+                    final Query q = getNumericRangeQuery(matchVersion, fieldName, num, num, true, true);
                     builder.add(q, Occur.SHOULD);
                 }
                 return builder.build();
@@ -343,16 +359,16 @@ public class SearchExpressionQueryBuilder {
         return null;
     }
 
-    private Query getDateIn(final String fieldName, final String value) {
+    private Query getDateIn(final Version matchVersion, final String fieldName, final String value) {
         final long[] in = getDates(fieldName, value);
         if (in != null && in.length > 0) {
             if (in.length == 1) {
                 final long date = in[0];
-                return LegacyNumericRangeQuery.newLongRange(fieldName, date, date, true, true);
+                return getNumericRangeQuery(matchVersion, fieldName, date, date, true, true);
             } else {
                 final Builder builder = new Builder();
                 for (final long date : in) {
-                    final Query q = LegacyNumericRangeQuery.newLongRange(fieldName, date, date, true, true);
+                    final Query q = getNumericRangeQuery(matchVersion, fieldName, date, date, true, true);
                     builder.add(q, Occur.SHOULD);
                 }
                 return builder.build();
@@ -362,14 +378,14 @@ public class SearchExpressionQueryBuilder {
         return null;
     }
 
-    private Query getContains(final String fieldName, final String value, final IndexField indexField,
-            final Version matchVersion, final Set<String> terms) {
+    private Query getContains(final Version matchVersion, final String fieldName, final String value, final IndexField indexField,
+                              final Set<String> terms) {
         final Query query = getSubQuery(matchVersion, indexField, value, terms, false);
         return modifyOccurrence(query, Occur.MUST);
     }
 
-    private Query getIn(final String fieldName, final String value, final IndexField indexField,
-            final Version matchVersion, final Set<String> terms) {
+    private Query getIn(final Version matchVersion, final String fieldName, final String value, final IndexField indexField,
+                        final Set<String> terms) {
         final Query query = getSubQuery(matchVersion, indexField, value, terms, true);
         return modifyOccurrence(query, Occur.SHOULD);
     }
@@ -388,8 +404,8 @@ public class SearchExpressionQueryBuilder {
         return query;
     }
 
-    private Query getDictionary(final String fieldName, final DocRef docRef,
-            final IndexField indexField, final Version matchVersion, final Set<String> terms) {
+    private Query getDictionary(final Version matchVersion, final String fieldName, final DocRef docRef,
+                                final IndexField indexField, final Set<String> terms) {
         final String[] wordArr = loadWords(docRef);
         if (wordArr != null) {
             final Builder builder = new Builder();
@@ -397,9 +413,9 @@ public class SearchExpressionQueryBuilder {
                 Query query;
 
                 if (indexField.getFieldType().isNumeric()) {
-                    query = getNumericIn(fieldName, val);
+                    query = getNumericIn(matchVersion, fieldName, val);
                 } else if (IndexFieldType.DATE_FIELD.equals(indexField.getFieldType())) {
-                    query = getDateIn(fieldName, val);
+                    query = getDateIn(matchVersion, fieldName, val);
                 } else {
                     query = getSubQuery(matchVersion, indexField, val, terms, false);
                 }

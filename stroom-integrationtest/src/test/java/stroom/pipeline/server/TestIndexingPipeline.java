@@ -16,7 +16,11 @@
 
 package stroom.pipeline.server;
 
+import org.apache.lucene.document.Document;
+import org.junit.Assert;
+import org.junit.Test;
 import stroom.AbstractProcessIntegrationTest;
+import stroom.index.server.DocumentUtil;
 import stroom.index.server.IndexShardWriter;
 import stroom.index.server.MockIndexShardWriter;
 import stroom.index.server.MockIndexShardWriterCache;
@@ -39,11 +43,9 @@ import stroom.query.shared.IndexField;
 import stroom.query.shared.IndexField.AnalyzerType;
 import stroom.query.shared.IndexFields;
 import stroom.streamstore.shared.Stream;
-import stroom.test.StroomProcessTestFileUtil;
 import stroom.test.PipelineTestUtil;
+import stroom.test.StroomProcessTestFileUtil;
 import stroom.util.io.StreamUtil;
-import org.junit.Assert;
-import org.junit.Test;
 
 import javax.annotation.Resource;
 import java.io.InputStream;
@@ -133,9 +135,10 @@ public class TestIndexingPipeline extends AbstractProcessIntegrationTest {
         Assert.assertEquals("Process", writer.getDocuments().get(3).getField("Action").stringValue());
 
         for (int i = 0; i < 4; i++) {
-            final String streamId = writer.getDocuments().get(i).getField("StreamId").stringValue();
-            final String eventId = writer.getDocuments().get(i).getField("EventId").stringValue();
-            final String userId = writer.getDocuments().get(i).getField("UserId").stringValue();
+            final Document document = writer.getDocuments().get(i);
+            final String streamId = DocumentUtil.getStringValue(document, "StreamId");
+            final String eventId = DocumentUtil.getStringValue(document, "EventId");
+            final String userId = DocumentUtil.getStringValue(document, "UserId");
 
             System.out.println(streamId + ":" + eventId);
 

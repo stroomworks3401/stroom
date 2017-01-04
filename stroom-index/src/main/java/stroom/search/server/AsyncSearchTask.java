@@ -23,7 +23,6 @@ import stroom.util.shared.VoidResult;
 import stroom.util.task.ServerTask;
 
 import java.io.Serializable;
-import java.time.ZonedDateTime;
 import java.util.Map;
 
 public class AsyncSearchTask extends ServerTask<VoidResult>implements Serializable {

@@ -22,7 +22,7 @@ import stroom.util.logging.StroomLogger;
 import java.text.ParseException;
 
 public final class LuceneVersionUtil {
-    public static final Version CURRENT_LUCENE_VERSION = Version.LUCENE_5_5_3;
+    public static final Version CURRENT_LUCENE_VERSION = Version.LUCENE_6_3_0;
     private static final StroomLogger LOGGER = StroomLogger.getLogger(LuceneVersionUtil.class);
 
     private LuceneVersionUtil() {

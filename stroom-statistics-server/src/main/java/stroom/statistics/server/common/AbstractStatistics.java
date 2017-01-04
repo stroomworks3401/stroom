@@ -21,18 +21,37 @@ import stroom.entity.shared.Period;
 import stroom.entity.shared.Range;
 import stroom.node.server.StroomPropertyService;
 import stroom.query.DateExpressionParser;
-import stroom.query.shared.*;
+import stroom.query.shared.Condition;
+import stroom.query.shared.ExpressionItem;
+import stroom.query.shared.ExpressionOperator;
 import stroom.query.shared.ExpressionOperator.Op;
-import stroom.statistics.common.*;
+import stroom.query.shared.ExpressionTerm;
+import stroom.query.shared.IndexFields;
+import stroom.query.shared.Search;
+import stroom.statistics.common.CommonStatisticConstants;
+import stroom.statistics.common.FilterTermsTree;
+import stroom.statistics.common.FilterTermsTreeBuilder;
+import stroom.statistics.common.FindEventCriteria;
+import stroom.statistics.common.RolledUpStatisticEvent;
+import stroom.statistics.common.StatisticDataSet;
+import stroom.statistics.common.StatisticEvent;
+import stroom.statistics.common.StatisticStoreCache;
+import stroom.statistics.common.StatisticStoreValidator;
+import stroom.statistics.common.StatisticTag;
+import stroom.statistics.common.Statistics;
 import stroom.statistics.common.rollup.RollUpBitMask;
 import stroom.statistics.shared.CustomRollUpMask;
 import stroom.statistics.shared.StatisticRollUpType;
 import stroom.statistics.shared.StatisticStoreEntity;
 import stroom.util.logging.StroomLogger;
 
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Component
 public abstract class AbstractStatistics implements Statistics {

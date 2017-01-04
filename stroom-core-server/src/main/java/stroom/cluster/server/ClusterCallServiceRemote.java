@@ -16,17 +16,17 @@
 
 package stroom.cluster.server;
 
-import stroom.node.server.NodeCache;
-import stroom.node.shared.Node;
-import stroom.remote.StroomHessianProxyFactory;
-import stroom.util.logging.StroomLogger;
-import stroom.util.logging.LogExecutionTime;
-import stroom.util.shared.ModelStringUtil;
-import stroom.util.spring.StroomBeanStore;
-import stroom.util.thread.ThreadScopeContextHolder;
 import com.caucho.hessian.client.HessianProxyFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import stroom.node.server.NodeCache;
+import stroom.node.shared.Node;
+import stroom.remote.StroomHessianProxyFactory;
+import stroom.util.logging.LogExecutionTime;
+import stroom.util.logging.StroomLogger;
+import stroom.util.shared.ModelStringUtil;
+import stroom.util.spring.StroomBeanStore;
+import stroom.util.thread.ThreadScopeContextHolder;
 
 import javax.inject.Inject;
 import java.lang.reflect.Method;

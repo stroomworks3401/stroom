@@ -56,9 +56,9 @@ public class TestIndexShardIO extends StroomUnitTest {
 
     private Document buildDocument(final int id) {
         final Document d = new Document();
-        d.add(FieldFactory.create(IndexField.createIdField("Id"), id));
-        d.add(FieldFactory.create(IndexField.createField("Test"), "Test"));
-        d.add(FieldFactory.create(IndexField.createIdField("Id2"), id));
+        DocumentUtil.add(d, IndexField.createIdField("Id"), id);
+        DocumentUtil.add(d, IndexField.createField("Test"), "Test");
+        DocumentUtil.add(d, IndexField.createIdField("Id2"), id);
 
         return d;
     }

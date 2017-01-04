@@ -18,7 +18,6 @@ package stroom.index.server;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
@@ -107,23 +106,20 @@ public class BenchmarkIndex extends AbstractCommandLineTool {
     private Document buildDocument(final long id) {
         final Document doc = new Document();
 
-        final Field streamId = FieldFactory.create(getIndexField(IndexConstants.STREAM_ID), id);
-        final Field eventId = FieldFactory.create(getIndexField(IndexConstants.EVENT_ID), id);
-
-        doc.add(streamId);
-        doc.add(eventId);
+        DocumentUtil.add(doc, getIndexField(IndexConstants.STREAM_ID), id);
+        DocumentUtil.add(doc, getIndexField(IndexConstants.EVENT_ID), id);
 
         for (final String arg : docArgs) {
             final IndexField indexField = getIndexField(arg);
-            doc.add(FieldFactory.create(indexField, "user" + getRandomSkewed()));
+            DocumentUtil.add(doc, indexField, "user" + getRandomSkewed());
         }
 
         final IndexField multifield = getIndexField("multifield");
         final IndexField dupfield = getIndexField("dupfield");
 
-        doc.add(FieldFactory.create(multifield, "user" + getRandomSkewed()));
-        doc.add(FieldFactory.create(dupfield, "user" + getRandomSkewed()));
-        doc.add(FieldFactory.create(dupfield, "user" + getRandomSkewed()));
+        DocumentUtil.add(doc, multifield, "user" + getRandomSkewed());
+        DocumentUtil.add(doc, dupfield, "user" + getRandomSkewed());
+        DocumentUtil.add(doc, dupfield, "user" + getRandomSkewed());
 
         return doc;
     }

@@ -56,6 +56,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Stream;
 
 public class IndexShardWriterImpl implements IndexShardWriter {
     public static final int DEFAULT_RAM_BUFFER_MB_SIZE = 1024;
@@ -183,13 +184,15 @@ public class IndexShardWriterImpl implements IndexShardWriter {
                 // then throw an exception
                 // as we don't want to overwrite an index.
                 if (Files.isDirectory(dir)) {
-                    // This is a workaround for lingering .nfs files.
-                    Files.list(dir).forEach(file -> {
-                        if (Files.isDirectory(file) || !file.getFileName().startsWith(".")) {
-                            throw new IndexException("Attempting to create a new index in \""
-                                    + dir.toAbsolutePath().toString() + "\" but one already exists.");
-                        }
-                    });
+                    try (final Stream<Path> stream = Files.list(dir)) {
+                        // This is a workaround for lingering .nfs files.
+                        stream.forEach(file -> {
+                            if (Files.isDirectory(file) || !file.getFileName().startsWith(".")) {
+                                throw new IndexException("Attempting to create a new index in \""
+                                        + dir.toAbsolutePath().toString() + "\" but one already exists.");
+                            }
+                        });
+                    }
                 } else {
                     // Try and make all required directories.
                     try {
@@ -314,7 +317,14 @@ public class IndexShardWriterImpl implements IndexShardWriter {
                 // Mark the index as closed.
                 setStatus(IndexShardStatus.CLOSED);
 
-                if (Files.isDirectory(dir) && Files.list(dir).count() > 0) {
+                long fileCount = 0;
+                if (Files.isDirectory(dir)) {
+                    try (final Stream<Path> stream = Files.list(dir)) {
+                        fileCount = stream.count();
+                    }
+                }
+
+                if (fileCount > 0) {
                     // The directory exists and contains files so make sure it
                     // is unlocked.
                     try {
@@ -723,9 +733,12 @@ public class IndexShardWriterImpl implements IndexShardWriter {
             // Update the size of the index.
             if (dir != null) {
                 final AtomicLong totalSize = new AtomicLong();
-                Files.list(dir).forEach(file -> {
-                    totalSize.addAndGet(file.toFile().length());
-                });
+                if (Files.isDirectory(dir)) {
+                    try (final Stream<Path> stream = Files.list(dir)) {
+                        stream.forEach(file -> totalSize.addAndGet(file.toFile().length()));
+                    }
+                }
+
                 indexShard.setFileSize(totalSize.get());
             }
 

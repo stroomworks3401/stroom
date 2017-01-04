@@ -16,6 +16,7 @@
 
 package stroom.cluster.server;
 
+import org.springframework.context.annotation.Scope;
 import stroom.node.server.NodeCache;
 import stroom.node.shared.FindNodeCriteria;
 import stroom.node.shared.Node;
@@ -28,7 +29,6 @@ import stroom.util.logging.StroomLogger;
 import stroom.util.shared.VoidResult;
 import stroom.util.spring.StroomScope;
 import stroom.util.thread.ThreadUtil;
-import org.springframework.context.annotation.Scope;
 
 import javax.inject.Inject;
 import java.util.HashSet;

@@ -16,13 +16,7 @@
 
 package stroom.search;
 
-import java.io.IOException;
-import java.util.List;
-
-import javax.annotation.Resource;
-
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.MultiReader;
@@ -31,8 +25,9 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.TermQuery;
 import org.junit.Assert;
 import org.junit.Test;
-
-import stroom.index.server.FieldFactory;
+import stroom.AbstractCoreIntegrationTest;
+import stroom.CommonTestScenarioCreator;
+import stroom.index.server.DocumentUtil;
 import stroom.index.server.IndexShardKeyUtil;
 import stroom.index.server.IndexShardWriter;
 import stroom.index.server.IndexShardWriterCache;
@@ -47,8 +42,10 @@ import stroom.query.shared.IndexFields;
 import stroom.search.server.IndexShardSearcher;
 import stroom.search.server.IndexShardSearcherImpl;
 import stroom.search.server.MaxHitCollector;
-import stroom.AbstractCoreIntegrationTest;
-import stroom.CommonTestScenarioCreator;
+
+import javax.annotation.Resource;
+import java.io.IOException;
+import java.util.List;
 
 public class TestBasicSearch extends AbstractCoreIntegrationTest {
     @Resource
@@ -78,14 +75,10 @@ public class TestBasicSearch extends AbstractCoreIntegrationTest {
 
         // Do some work.
         for (int i = 1; i <= indexTestSize; i++) {
-            final Field idFld = FieldFactory.create(idField, i + ":" + i);
-            final Field testFld = FieldFactory.create(testField, "test");
-            final Field nonStoredFld = FieldFactory.create(nonStoreField, "test");
-
             final Document document = new Document();
-            document.add(idFld);
-            document.add(testFld);
-            document.add(nonStoredFld);
+            DocumentUtil.add(document, idField, i + ":" + i);
+            DocumentUtil.add(document, testField, "test");
+            DocumentUtil.add(document, nonStoreField, "test");
 
             // final PoolItem<IndexShardKey, IndexShardWriter> poolItem =
             // .borrowObject(indexShardKey, true);

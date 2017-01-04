@@ -29,8 +29,6 @@ import stroom.util.spring.StroomScope;
 import stroom.util.thread.ThreadUtil;
 
 import javax.inject.Inject;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 

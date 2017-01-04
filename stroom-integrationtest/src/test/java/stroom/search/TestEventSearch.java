@@ -171,7 +171,7 @@ public class TestEventSearch extends AbstractCoreIntegrationTest {
             searchResultCollector.destroy();
         }
 
-        final Map<String, List<Row>> rows = new HashMap<String, List<Row>>();
+        final Map<String, List<Row>> rows = new HashMap<>();
         if (result != null) {
             for (final Entry<String, SharedObject> entry : results.entrySet()) {
                 final String componentId = entry.getKey();
@@ -183,7 +183,7 @@ public class TestEventSearch extends AbstractCoreIntegrationTest {
                     for (int i = range.getOffset(); i < range.getLength(); i++) {
                         List<Row> values = rows.get(componentId);
                         if (values == null) {
-                            values = new ArrayList<Row>();
+                            values = new ArrayList<>();
                             rows.put(componentId, values);
                         }
                         values.add(tableResult.getRows().get(i));

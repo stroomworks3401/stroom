@@ -16,17 +16,22 @@
 
 package stroom.task.cluster;
 
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 import stroom.cluster.server.ClusterCallService;
 import stroom.node.shared.Node;
 import stroom.task.server.GenericServerTask;
 import stroom.task.server.TaskManager;
-import stroom.util.logging.StroomLogger;
 import stroom.util.logging.LogExecutionTime;
-import stroom.util.shared.*;
+import stroom.util.logging.StroomLogger;
+import stroom.util.shared.ModelStringUtil;
+import stroom.util.shared.SharedObject;
+import stroom.util.shared.SimpleThreadPool;
+import stroom.util.shared.Task;
+import stroom.util.shared.TaskId;
+import stroom.util.shared.ThreadPool;
 import stroom.util.task.TaskScopeContextHolder;
 import stroom.util.thread.ThreadUtil;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -38,14 +43,12 @@ import java.util.Set;
 @Component(ClusterDispatchAsyncImpl.BEAN_NAME)
 @Lazy
 public class ClusterDispatchAsyncImpl implements ClusterDispatchAsync {
-    private static final StroomLogger LOGGER = StroomLogger.getLogger(ClusterDispatchAsyncImpl.class);
-
     public static final String BEAN_NAME = "clusterDispatchAsync";
     public static final String RECEIVE_RESULT_METHOD = "receiveResult";
+    public static final ThreadPool THREAD_POOL = new SimpleThreadPool(5);
     static final Class<?>[] RECEIVE_RESULT_METHOD_ARGS = { ClusterTask.class, Node.class, TaskId.class,
             CollectorId.class, SharedObject.class, Throwable.class, Boolean.class };
-
-    public static final ThreadPool THREAD_POOL = new SimpleThreadPool(5);
+    private static final StroomLogger LOGGER = StroomLogger.getLogger(ClusterDispatchAsyncImpl.class);
     private static final String RECEIVE_RESULT = "receiveResult";
     private static final Long DEBUG_REQUEST_DELAY = null;
 

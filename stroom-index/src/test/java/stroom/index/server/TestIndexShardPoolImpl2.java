@@ -17,7 +17,6 @@
 package stroom.index.server;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -113,9 +112,8 @@ public class TestIndexShardPoolImpl2 extends StroomUnitTest {
                             final IndexShardWriter writer = indexShardPoolImpl.get(indexShardKey);
 
                             // Do some work.
-                            final Field field = FieldFactory.create(indexField, "test");
                             final Document document = new Document();
-                            document.add(field);
+                            DocumentUtil.add(document, indexField, "test");
 
                             writer.addDocument(document);
                         }

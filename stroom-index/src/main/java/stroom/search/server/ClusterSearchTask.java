@@ -22,7 +22,6 @@ import stroom.query.shared.IndexField;
 import stroom.query.shared.Search;
 import stroom.task.cluster.ClusterTask;
 
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 

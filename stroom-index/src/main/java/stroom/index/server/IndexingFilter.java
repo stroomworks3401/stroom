@@ -16,23 +16,15 @@
 
 package stroom.index.server;
 
-import javax.annotation.Resource;
-
-import stroom.util.spring.StroomScope;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
-
 import stroom.index.server.CachedIndexService.CachedIndex;
 import stroom.index.shared.Index;
 import stroom.index.shared.IndexShardKey;
-import stroom.query.shared.IndexField;
-import stroom.query.shared.IndexFieldType;
-import stroom.query.shared.IndexFieldsMap;
 import stroom.pipeline.server.LocationFactoryProxy;
 import stroom.pipeline.server.errorhandler.ErrorReceiverProxy;
 import stroom.pipeline.server.errorhandler.ErrorStatistics;
@@ -44,10 +36,14 @@ import stroom.pipeline.server.filter.AbstractXMLFilter;
 import stroom.pipeline.shared.data.PipelineElementType;
 import stroom.pipeline.shared.data.PipelineElementType.Category;
 import stroom.pipeline.state.StreamHolder;
+import stroom.query.shared.IndexField;
+import stroom.query.shared.IndexFieldsMap;
 import stroom.util.CharBuffer;
-import stroom.util.date.DateUtil;
 import stroom.util.logging.StroomLogger;
 import stroom.util.shared.Severity;
+import stroom.util.spring.StroomScope;
+
+import javax.annotation.Resource;
 
 /**
  * The index filter... takes the index XML and builds the LUCENE documents
@@ -63,7 +59,7 @@ public class IndexingFilter extends AbstractXMLFilter {
     private static final String DATA = "data";
     private static final String NAME = "name";
     private static final String VALUE = "value";
-
+    private final CharBuffer debugBuffer = new CharBuffer(10);
     @Resource
     private StreamHolder streamHolder;
     @Resource
@@ -74,15 +70,10 @@ public class IndexingFilter extends AbstractXMLFilter {
     private ErrorReceiverProxy errorReceiverProxy;
     @Resource
     private CachedIndexService cachedIndexService;
-
     private IndexFieldsMap indexFieldsMap;
-
     private Index index;
     private IndexShardKey indexShardKey;
     private IndexShardWriter indexShardWriter;
-
-    private final CharBuffer debugBuffer = new CharBuffer(10);
-
     private Document document;
 
     private int fieldsIndexed = 0;
@@ -214,43 +205,25 @@ public class IndexingFilter extends AbstractXMLFilter {
 
     private void processIndexContent(final IndexField indexField, final String value) {
         try {
-            Field field = null;
+            final int added = DocumentUtil.add(document, indexField, value);
 
-            if (indexField.getFieldType().isNumeric()) {
-                final long val = Long.parseLong(value);
-                field = FieldFactory.create(indexField, val);
+            // Output some debug.
+            if (LOGGER.isDebugEnabled() && added > 0) {
+                debugBuffer.append("endElement() - Adding index indexName=");
+                debugBuffer.append(index);
+                debugBuffer.append(" name=");
+                debugBuffer.append(indexField.getFieldName());
+                debugBuffer.append(" value=");
+                debugBuffer.append(value);
 
-            } else if (IndexFieldType.DATE_FIELD.equals(indexField.getFieldType())) {
-                try {
-                    final long val = DateUtil.parseUnknownString(value);
-                    field = FieldFactory.create(indexField, val);
-                } catch (final Exception e) {
-                    LOGGER.trace(e.getMessage(), e);
-                }
-            } else {
-                field = FieldFactory.create(indexField, value);
+                final String debug = debugBuffer.toString();
+                debugBuffer.clear();
+
+                LOGGER.debug(debug);
             }
 
-            // Add the current field to the document if it is not null.
-            if (field != null) {
-                // Output some debug.
-                if (LOGGER.isDebugEnabled()) {
-                    debugBuffer.append("endElement() - Adding index indexName=");
-                    debugBuffer.append(index);
-                    debugBuffer.append(" name=");
-                    debugBuffer.append(indexField.getFieldName());
-                    debugBuffer.append(" value=");
-                    debugBuffer.append(value);
+            fieldsIndexed += added;
 
-                    final String debug = debugBuffer.toString();
-                    debugBuffer.clear();
-
-                    LOGGER.debug(debug);
-                }
-
-                fieldsIndexed++;
-                document.add(field);
-            }
         } catch (final RuntimeException e) {
             log(Severity.ERROR, e.getMessage(), e);
         }
