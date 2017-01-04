@@ -28,6 +28,7 @@ import org.apache.lucene.search.LegacyNumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
+import org.apache.lucene.util.Version;
 import stroom.dictionary.shared.Dictionary;
 import stroom.dictionary.shared.DictionaryService;
 import stroom.entity.shared.DocRef;
@@ -42,7 +43,6 @@ import stroom.query.shared.IndexField.AnalyzerType;
 import stroom.query.shared.IndexFieldType;
 import stroom.query.shared.IndexFieldsMap;
 
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -53,7 +53,7 @@ import java.util.regex.Pattern;
 /**
  * Convert our query objects to a LUCENE query.
  */
-class SearchExpressionQueryBuilder {
+public class SearchExpressionQueryBuilder {
     private static final String DELIMITER = ",";
     private static final Pattern NON_WORD_OR_WILDCARD = Pattern.compile("[^a-zA-Z0-9+*?]");
     private static final Pattern NON_WORD = Pattern.compile("[^a-zA-Z0-9]");
@@ -62,17 +62,17 @@ class SearchExpressionQueryBuilder {
     private final IndexFieldsMap indexFieldsMap;
     private final DictionaryService dictionaryService;
     private final int maxBooleanClauseCount;
-    private final ZonedDateTime now;
+    private final long nowEpochMilli;
 
-    SearchExpressionQueryBuilder(final DictionaryService dictionaryService, final IndexFieldsMap indexFieldsMap,
-                                 final int maxBooleanClauseCount, final ZonedDateTime now) {
+    public SearchExpressionQueryBuilder(final DictionaryService dictionaryService, final IndexFieldsMap indexFieldsMap,
+                                        final int maxBooleanClauseCount, final long nowEpochMilli) {
         this.dictionaryService = dictionaryService;
         this.indexFieldsMap = indexFieldsMap;
         this.maxBooleanClauseCount = maxBooleanClauseCount;
-        this.now = now;
+        this.nowEpochMilli = nowEpochMilli;
     }
 
-    SearchExpressionQuery buildQuery(final ExpressionOperator expression) {
+    public SearchExpressionQuery buildQuery(final Version matchVersion, final ExpressionOperator expression) {
         if (expression == null) {
             throw new SearchException("No search expression has been provided!");
         }
@@ -84,16 +84,16 @@ class SearchExpressionQueryBuilder {
 
         // Build a query.
         final Set<String> terms = new HashSet<>();
-        final Query query = getQuery(expression, terms);
+        final Query query = getQuery(matchVersion, expression, terms);
         return new SearchExpressionQuery(query, terms);
     }
 
-    private Query getQuery(final ExpressionItem item, final Set<String> terms) {
+    private Query getQuery(final Version matchVersion, final ExpressionItem item, final Set<String> terms) {
         if (item.isEnabled()) {
             if (item instanceof ExpressionTerm) {
                 // Create queries for single terms.
                 final ExpressionTerm term = (ExpressionTerm) item;
-                return getTermQuery(term, terms);
+                return getTermQuery(term, matchVersion, terms);
 
             } else if (item instanceof ExpressionOperator) {
                 // Create queries for expression tree nodes.
@@ -101,7 +101,7 @@ class SearchExpressionQueryBuilder {
                 if (hasChildren(operator)) {
                     final List<Query> innerChildQueries = new ArrayList<>();
                     for (final ExpressionItem childItem : operator.getChildren()) {
-                        final Query childQuery = getQuery(childItem, terms);
+                        final Query childQuery = getQuery(matchVersion, childItem, terms);
                         if (childQuery != null) {
                             innerChildQueries.add(childQuery);
                         }
@@ -196,7 +196,7 @@ class SearchExpressionQueryBuilder {
         return null;
     }
 
-    private Query getTermQuery(final ExpressionTerm term, final Set<String> terms) {
+    private Query getTermQuery(final ExpressionTerm term, final Version matchVersion, final Set<String> terms) {
         String field = term.getField();
         final Condition condition = term.getCondition();
         String value = term.getValue();
@@ -265,7 +265,7 @@ class SearchExpressionQueryBuilder {
             case IN:
                 return getNumericIn(fieldName, value);
             case IN_DICTIONARY:
-                return getDictionary(fieldName, dictionary, indexField, terms);
+                return getDictionary(fieldName, dictionary, indexField, matchVersion, terms);
             default:
                 throw new SearchException("Unexpected condition '" + condition.getDisplayValue() + "' for "
                         + indexField.getFieldType().getDisplayValue() + " field type");
@@ -302,7 +302,7 @@ class SearchExpressionQueryBuilder {
             case IN:
                 return getDateIn(fieldName, value);
             case IN_DICTIONARY:
-                return getDictionary(fieldName, dictionary, indexField, terms);
+                return getDictionary(fieldName, dictionary, indexField, matchVersion, terms);
             default:
                 throw new SearchException("Unexpected condition '" + condition.getDisplayValue() + "' for "
                         + indexField.getFieldType().getDisplayValue() + " field type");
@@ -310,13 +310,13 @@ class SearchExpressionQueryBuilder {
         } else {
             switch (condition) {
             case EQUALS:
-                return getSubQuery(indexField, value, terms, false);
+                return getSubQuery(matchVersion, indexField, value, terms, false);
             case CONTAINS:
-                return getContains(value, indexField, terms);
+                return getContains(fieldName, value, indexField, matchVersion, terms);
             case IN:
-                return getIn(value, indexField, terms);
+                return getIn(fieldName, value, indexField, matchVersion, terms);
             case IN_DICTIONARY:
-                return getDictionary(fieldName, dictionary, indexField, terms);
+                return getDictionary(fieldName, dictionary, indexField, matchVersion, terms);
             default:
                 throw new SearchException("Unexpected condition '" + condition.getDisplayValue() + "' for "
                         + indexField.getFieldType().getDisplayValue() + " field type");
@@ -362,15 +362,15 @@ class SearchExpressionQueryBuilder {
         return null;
     }
 
-    private Query getContains(final String value, final IndexField indexField,
-                              final Set<String> terms) {
-        final Query query = getSubQuery(indexField, value, terms, false);
+    private Query getContains(final String fieldName, final String value, final IndexField indexField,
+            final Version matchVersion, final Set<String> terms) {
+        final Query query = getSubQuery(matchVersion, indexField, value, terms, false);
         return modifyOccurrence(query, Occur.MUST);
     }
 
-    private Query getIn(final String value, final IndexField indexField,
-                        final Set<String> terms) {
-        final Query query = getSubQuery(indexField, value, terms, true);
+    private Query getIn(final String fieldName, final String value, final IndexField indexField,
+            final Version matchVersion, final Set<String> terms) {
+        final Query query = getSubQuery(matchVersion, indexField, value, terms, true);
         return modifyOccurrence(query, Occur.SHOULD);
     }
 
@@ -389,7 +389,7 @@ class SearchExpressionQueryBuilder {
     }
 
     private Query getDictionary(final String fieldName, final DocRef docRef,
-                                final IndexField indexField, final Set<String> terms) {
+            final IndexField indexField, final Version matchVersion, final Set<String> terms) {
         final String[] wordArr = loadWords(docRef);
         if (wordArr != null) {
             final Builder builder = new Builder();
@@ -401,7 +401,7 @@ class SearchExpressionQueryBuilder {
                 } else if (IndexFieldType.DATE_FIELD.equals(indexField.getFieldType())) {
                     query = getDateIn(fieldName, val);
                 } else {
-                    query = getSubQuery(indexField, val, terms, false);
+                    query = getSubQuery(matchVersion, indexField, val, terms, false);
                 }
 
                 if (query != null) {
@@ -446,7 +446,7 @@ class SearchExpressionQueryBuilder {
         return Occur.MUST;
     }
 
-    private Query getSubQuery(final IndexField field, final String value,
+    private Query getSubQuery(final Version matchVersion, final IndexField field, final String value,
                               final Set<String> terms, final boolean in) {
         Query query = null;
 
@@ -531,7 +531,7 @@ class SearchExpressionQueryBuilder {
 
     private long getDate(final String fieldName, final String value) {
         try {
-            return new DateExpressionParser().parse(value, now).toInstant().toEpochMilli();
+            return new DateExpressionParser().parse(value, nowEpochMilli).toInstant().toEpochMilli();
         } catch (final Exception e) {
             throw new SearchException("Expected a standard date value for field \"" + fieldName
                     + "\" but was given string \"" + value + "\"");

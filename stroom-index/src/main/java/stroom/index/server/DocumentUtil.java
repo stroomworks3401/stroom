@@ -17,15 +17,19 @@
 package stroom.index.server;
 
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.LegacyLongField;
+import org.apache.lucene.document.LongPoint;
+import org.apache.lucene.document.StoredField;
 import stroom.query.shared.IndexField;
 
 public class FieldFactory {
-    public static Field create(final IndexField indexField, final long initialValue) {
-        return new LegacyLongField(indexField.getFieldName(), initialValue, FieldTypeFactory.create(indexField));
+    public static Field[] create(final IndexField indexField, final long initialValue) {
+        final Field[] fields = new Field[2];
+        fields[0] = new LongPoint(indexField.getFieldName(), initialValue);
+        fields[1] = new StoredField(indexField.getFieldName(), initialValue);
+        return fields;
     }
 
-    public static Field create(final IndexField indexField, final String initialValue) {
-        return new Field(indexField.getFieldName(), initialValue, FieldTypeFactory.create(indexField));
+    public static Field[] create(final IndexField indexField, final String initialValue) {
+        return new Field[] {new Field(indexField.getFieldName(), initialValue, FieldTypeFactory.create(indexField))};
     }
 }
