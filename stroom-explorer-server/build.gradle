@@ -1,4 +1,11 @@
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
+
 dependencies {
+    compile name: 'jpatreedao-1.0'
     compile project(':stroom-core-server')
 //    compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.15'
 //    compile(group: 'org.apache.hadoop', name: 'hadoop-hdfs', version: '2.6.4') { /* LATEST 2.7.3 */
