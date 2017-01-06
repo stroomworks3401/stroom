@@ -1,5 +1,6 @@
 package stroom.explorer.server;
 
+import fri.util.database.jpa.tree.closuretable.ClosureTableTreeNode;
 import stroom.entity.shared.BaseEntitySmall;
 import stroom.entity.shared.HasName;
 import stroom.entity.shared.HasUuid;
@@ -8,42 +9,37 @@ import stroom.util.shared.HasDisplayValue;
 import stroom.util.shared.HasType;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 import javax.xml.bind.annotation.XmlTransient;
 
-@MappedSuperclass
-public class ExplorerTreeNode implements Cloneable {
-    private static final long serialVersionUID = -6752927142242673318L;
-
-    // Value of a long to represent an undefined id.
-    private static final long UNDEFINED_ID = -1;
-
-    public static final String TYPE = SQLNameConstants.TYPE;
-    public static final String UUID = SQLNameConstants.UUID;
-    public static final String NAME = SQLNameConstants.NAME;
-
-    private long id = UNDEFINED_ID;
+@Entity
+@Table(name = "EXPLORER_TREE_NODE", uniqueConstraints = @UniqueConstraint(columnNames = { "TYPE", "UUID" }) )
+public class ExplorerTreeNode implements ClosureTableTreeNode {
+    private Long id;
     private String type;
     private String uuid;
     private String name;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", columnDefinition = "INT")
+    @Column(name = "ID", columnDefinition = "INT")
     @XmlTransient
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(final long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
-    @Column(name = TYPE, nullable = false)
+    @Column(name = "TYPE", nullable = false)
     public String getType() {
         return type;
     }
@@ -52,7 +48,7 @@ public class ExplorerTreeNode implements Cloneable {
         this.type = type;
     }
 
-    @Column(name = UUID, nullable = false)
+    @Column(name = "UUID", nullable = false)
     public String getUuid() {
         return uuid;
     }
@@ -61,7 +57,7 @@ public class ExplorerTreeNode implements Cloneable {
         this.uuid = uuid;
     }
 
-    @Column(name = NAME, nullable = false)
+    @Column(name = "NAME", nullable = false)
     public String getName() {
         return name;
     }

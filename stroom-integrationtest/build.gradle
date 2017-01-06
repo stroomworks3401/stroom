@@ -4,6 +4,7 @@ dependencies {
     compile project(':stroom-statistics-server')
     compile project(':stroom-dashboard-server')
     compile project(':stroom-security-server')
+    compile project(':stroom-explorer-server')
 
     // javax.el not provided as no app container in tests.
     compile group: 'javax.el', name: 'javax.el-api', version: '3.0.0'
@@ -15,6 +16,7 @@ dependencies {
     testCompile project(path: ':stroom-index-server', configuration: 'testArtifacts')
     testCompile project(path: ':stroom-dashboard-server', configuration: 'testArtifacts')
     testCompile project(path: ':stroom-security-server', configuration: 'testArtifacts')
+    testCompile project(path: ':stroom-explorer-server', configuration: 'testArtifacts')
 
     // Use default DB config.
     compile project(':stroom-config')

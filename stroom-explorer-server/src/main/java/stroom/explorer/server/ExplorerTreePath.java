@@ -1,45 +1,70 @@
 package stroom.explorer.server;
 
-import stroom.entity.shared.BaseEntitySmall;
+import fri.util.database.jpa.tree.closuretable.ClosureTableTreeNode;
+import fri.util.database.jpa.tree.closuretable.TreePath;
 
-import javax.persistence.MappedSuperclass;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
-@MappedSuperclass
-public class ExplorerTreePath extends BaseEntitySmall {
-    /**
-	 * One of the ancestor tree nodes of the descendant, or the descendant itself.
-	 * The private Java property name for this MUST BE "ancestor" in any implementation,
-	 * as that name is used in DAO queries.
-	 */
-	ClosureTableTreeNode getAncestor();
+@Entity
+@Table(name = "EXPLORER_TREE_PATH")
+@IdClass(CompositeExplorerTreePathId.class)    // has a composite primary key
+public class ExplorerTreePath implements TreePath {
+    private ClosureTableTreeNode ancestor;
+    private ClosureTableTreeNode descendant;
+    private int depth;
+    private int orderIndex;
 
-	void setAncestor(ClosureTableTreeNode ancestor);
+    @Id
+    @ManyToOne(targetEntity = ExplorerTreeNode.class)
+    @JoinColumn(name = "ANCESTOR", columnDefinition = "INT", nullable = false)    // the name of the database foreign key column
+    @Override
+    public ClosureTableTreeNode getAncestor() {
+        return ancestor;
+    }
 
-	/**
-	 * The (descendant) tree node (of the ancestor).
-	 * The private Java property name for this MUST BE "descendant" in any implementation,
-	 * as that name is used in DAO queries.
-	 */
-	ClosureTableTreeNode getDescendant();
+    @Override
+    public void setAncestor(ClosureTableTreeNode ancestor) {
+        this.ancestor = ancestor;
+    }
 
-	void setDescendant(ClosureTableTreeNode descendant);
+    @Id
+    @ManyToOne(targetEntity = ExplorerTreeNode.class)
+    @JoinColumn(name = "DESCENDANT", columnDefinition = "INT", nullable = false)    // the name of the database foreign key column
+    @Override
+    public ClosureTableTreeNode getDescendant() {
+        return descendant;
+    }
 
-	/**
-	 * The 0-n level this descendant tree node occurs, 0 is self-reference.
-	 * The private Java property name for this MUST BE "depth" in any implementation,
-	 * as that name is used in DAO queries.
-	 */
-	int getDepth();
+    @Override
+    public void setDescendant(ClosureTableTreeNode descendant) {
+        this.descendant = descendant;
+    }
 
-	void setDepth(int depth);
-	
-	/**
-	 * The 0-n child position this descendant occurs at.
-	 * The private Java property name for this MUST BE "orderIndex" in any implementation,
-	 * as that name is used in DAO queries.
-	 */
-	int getOrderIndex();
+    @Column(name = "DEPTH", columnDefinition = "INT", nullable = false)
+    @Override
+    public int getDepth() {
+        return depth;
+    }
 
-	void setOrderIndex(int orderIndex);
-	
+    @Override
+    public void setDepth(int depth) {
+        this.depth = depth;
+    }
+
+    @Column(name = "ORDER_INDEX", columnDefinition = "INT", nullable = false)
+    @Override
+    public int getOrderIndex() {
+        return orderIndex;
+    }
+
+    @Override
+    public void setOrderIndex(int position) {
+        this.orderIndex = position;
+    }
 }
