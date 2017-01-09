@@ -18,6 +18,8 @@ package stroom.test;
 
 import stroom.CommonTestControl;
 import stroom.dashboard.shared.Dashboard;
+import stroom.db.migration.mysql.V6_0_0_1__Explorer;
+import stroom.entity.server.util.ConnectionUtil;
 import stroom.entity.shared.BaseResultList;
 import stroom.feed.shared.Feed;
 import stroom.feed.shared.Feed.FeedStatus;
@@ -61,6 +63,7 @@ import org.joda.time.format.DateTimeFormatter;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -234,6 +237,12 @@ public final class SetupSampleDataBean {
                 // streamProcessor.setEnabled(true);
                 // streamProcessorService.save(streamProcessor);
             }
+        }
+
+        try (final Connection connection = ConnectionUtil.getConnection()) {
+            new V6_0_0_1__Explorer().migrate(connection);
+        } catch (final Exception e) {
+            LOGGER.error(e.getMessage());
         }
 
         if (shutdown) {
