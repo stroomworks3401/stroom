@@ -108,7 +108,7 @@ public class CreateEntityPresenter
         if (ok) {
             final DocRef folder = getFolder();
             if (!allowNullFolder && folder == null) {
-                AlertEvent.fireWarn(CreateEntityPresenter.this, "No parent group has been selected", null);
+                AlertEvent.fireWarn(CreateEntityPresenter.this, "No parent folder has been selected", null);
             } else {
                 String entityName = getView().getName();
                 if (entityName != null) {
