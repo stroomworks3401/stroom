@@ -18,7 +18,6 @@ package stroom.explorer.server;
 
 import stroom.entity.shared.DocRef;
 import stroom.entity.shared.Folder;
-import stroom.entity.shared.FolderService;
 import stroom.explorer.shared.DocumentType;
 import stroom.explorer.shared.DocumentTypes;
 import stroom.explorer.shared.EntityData;
@@ -41,15 +40,7 @@ import java.util.Set;
 @TaskHandlerBean(task = FetchExplorerPermissionsAction.class)
 class FetchExplorerPermissionsHandler
         extends AbstractTaskHandler<FetchExplorerPermissionsAction, SharedMap<ExplorerData, ExplorerPermissions>> {
-    private static final DocRef ROOT;
-
-    static {
-        final Folder folder = new Folder();
-        folder.setId(-1);
-        folder.setUuid(FolderService.ROOT);
-        folder.setName(FolderService.ROOT);
-        ROOT = DocRef.create(folder);
-    }
+    private static final DocRef ROOT = new DocRef("System", "00000000", "System");
 
     private final ExplorerService explorerService;
     private final SecurityContext securityContext;
@@ -84,15 +75,14 @@ class FetchExplorerPermissionsHandler
                 }
             }
 
-            // If no entity reference has been passed then assume special root
-            // folder.
+            // If no entity reference has been passed then assume root folder.
             if (docRef == null) {
                 docRef = ROOT;
             }
 
             // Add special permissions for folders to control creation of sub items.
             if (Folder.ENTITY_TYPE.equals(docRef.getType())) {
-                final DocumentTypes documentTypes = explorerService.getDocumentTypes();
+                final DocumentTypes documentTypes = explorerService.getAllDocumentTypes();
                 for (final DocumentType documentType : documentTypes.getAllTypes()) {
                     final String permissionName = DocumentPermissionNames.getDocumentCreatePermission(documentType.getType());
                     if (securityContext.hasDocumentPermission(docRef.getType(), docRef.getUuid(),

@@ -17,11 +17,23 @@
 package stroom.explorer.server;
 
 import stroom.explorer.shared.DocumentTypes;
-import stroom.explorer.shared.FetchExplorerDataResult;
-import stroom.explorer.shared.FindExplorerDataCriteria;
+import stroom.explorer.shared.FetchDocumentTypesAction;
+import stroom.task.server.AbstractTaskHandler;
+import stroom.task.server.TaskHandlerBean;
 
-public interface ExplorerService {
-    FetchExplorerDataResult getData(FindExplorerDataCriteria criteria);
+import javax.inject.Inject;
 
-    DocumentTypes getDocumentTypes();
+@TaskHandlerBean(task = FetchDocumentTypesAction.class)
+class FetchDocumentTypesHandler extends AbstractTaskHandler<FetchDocumentTypesAction, DocumentTypes> {
+    private final ExplorerService explorerService;
+
+    @Inject
+    FetchDocumentTypesHandler(final ExplorerService explorerService) {
+        this.explorerService = explorerService;
+    }
+
+    @Override
+    public DocumentTypes exec(final FetchDocumentTypesAction action) {
+        return explorerService.getAllDocumentTypes();
+    }
 }

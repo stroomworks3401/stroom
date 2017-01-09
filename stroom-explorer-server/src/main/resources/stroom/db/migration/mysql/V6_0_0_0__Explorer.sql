@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-CREATE TABLE EXPLORER_TREE_NODE (
-  ID 				int(11) NOT NULL AUTO_INCREMENT,
-  TYPE 				varchar(255) NOT NULL,
-  UUID 				varchar(255) NOT NULL,
-  NAME				varchar(255) NOT NULL,
-  PRIMARY KEY       (ID),
-  UNIQUE 			(TYPE, UUID)
+CREATE TABLE explorerTreeNode (
+  id 				int(11) NOT NULL AUTO_INCREMENT,
+  type 				varchar(255) NOT NULL,
+  uuid 				varchar(255) NOT NULL,
+  name				varchar(255) NOT NULL,
+  tags				varchar(255) DEFAULT NULL,
+  PRIMARY KEY       (id),
+  UNIQUE 			(type, uuid)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE EXPLORER_TREE_PATH (
-  ANCESTOR 			int(11) NOT NULL,
-  DESCENDANT 		int(11) NOT NULL,
-  DEPTH 			int(11) NOT NULL,
-  ORDER_INDEX		int(11) NOT NULL,
-  PRIMARY KEY       (ANCESTOR, DESCENDANT)
+CREATE TABLE explorerTreePath (
+  ancestor 			int(11) NOT NULL,
+  descendant 		int(11) NOT NULL,
+  depth 			int(11) NOT NULL,
+  orderIndex		int(11) NOT NULL,
+  PRIMARY KEY       (ancestor, descendant)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

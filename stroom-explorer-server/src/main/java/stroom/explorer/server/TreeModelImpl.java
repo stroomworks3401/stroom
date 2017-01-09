@@ -14,13 +14,7 @@ public class TreeModelImpl implements TreeModel {
     @Override
     public void add(final ExplorerData parent, final ExplorerData child) {
         parentMap.put(child, parent);
-
-        List<ExplorerData> children = childMap.get(parent);
-        if (children == null) {
-            children = new ArrayList<>();
-            childMap.put(parent, children);
-        }
-        children.add(child);
+        childMap.computeIfAbsent(parent, k -> new ArrayList<>()).add(child);
     }
 
     @Override

@@ -66,6 +66,13 @@ public class EntityData implements ExplorerData, SharedObject {
         return new EntityData(iconUrl, docRef, nodeState);
     }
 
+    public static EntityData create(final String iconUrl, final DocRef docRef) {
+        if (docRef == null) {
+            return null;
+        }
+        return create(iconUrl, docRef, NodeState.LEAF);
+    }
+
     public static EntityData create(final DocRef docRef) {
         if (docRef == null) {
             return null;

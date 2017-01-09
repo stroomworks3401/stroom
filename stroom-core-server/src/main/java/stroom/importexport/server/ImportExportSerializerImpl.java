@@ -203,12 +203,12 @@ public class ImportExportSerializerImpl implements ImportExportSerializer {
                       final boolean ignoreErrors, final List<String> messageList) {
         init();
 
-        final EntityIdSet<Folder> entityIdSet = folderService
-                .buildNestedFolderList(findFolderCriteria.getFolderIdSet());
-        // Export
-        for (final String entityType : classTypeMap.getEntityTypeList()) {
-            performExport(dir, entityIdSet, entityType, omitAuditFields, ignoreErrors, messageList);
-        }
+//        final EntityIdSet<Folder> entityIdSet = folderService
+//                .buildNestedFolderList(findFolderCriteria.getFolderIdSet());
+//        // Export
+//        for (final String entityType : classTypeMap.getEntityTypeList()) {
+//            performExport(dir, entityIdSet, entityType, omitAuditFields, ignoreErrors, messageList);
+//        }
     }
 
     /**

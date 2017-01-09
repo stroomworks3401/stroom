@@ -59,7 +59,7 @@ public class FolderRootPlugin extends Plugin implements TabData {
                     final SelectionType selectionType = event.getSelectionType();
                     if (!selectionType.isRightClick() && !selectionType.isMultiSelect()) {
                         final ExplorerData selected = event.getSelectionModel().getSelected();
-                        if (selected != null && FolderService.ROOT.equals(selected.getType())) {
+                        if (selected != null && "System".equals(selected.getType())) {
                             if (presenter == null && selectionType.isDoubleSelect()) {
                                 // If the presenter is null then we haven't got
                                 // this tab open.
@@ -93,7 +93,7 @@ public class FolderRootPlugin extends Plugin implements TabData {
 
     @Override
     public String getLabel() {
-        return FolderService.ROOT;
+        return "System";
     }
 
     @Override

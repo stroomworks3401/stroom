@@ -61,10 +61,10 @@ public class FolderServiceImpl extends DocumentEntityServiceImpl<Folder, FindFol
         return Folder.class;
     }
 
-    @Override
-    public EntityIdSet<Folder> buildNestedFolderList(final FolderIdSet queryFolderIdSet) {
-        return UserManagerQueryUtil.buildNestedFolderList(getEntityManager(), queryFolderIdSet);
-    }
+//    @Override
+//    public EntityIdSet<Folder> buildNestedFolderList(final FolderIdSet queryFolderIdSet) {
+//        return UserManagerQueryUtil.buildNestedFolderList(getEntityManager(), queryFolderIdSet);
+//    }
 
     @Override
     public FindFolderCriteria createCriteria() {

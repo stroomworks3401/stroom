@@ -55,7 +55,7 @@ public class V6_0_0_1__Explorer implements JdbcMigration {
         List<Long> ancestorIdList;
 
         if (nodeId == null) {
-            createExplorerTreeNode(connection, root);
+            createExplorerTreeNode(connection, root, null);
             nodeId = getExplorerTreeNodeId(connection, root);
             ancestorIdList = Collections.singletonList(nodeId);
 
@@ -73,8 +73,8 @@ public class V6_0_0_1__Explorer implements JdbcMigration {
 
 
         // Migrate other document types.
-        addOtherNodes(connection, "STAT_DAT_SRC", "StatisticStore");
-        addOtherNodes(connection, "IDX", "Index");
+        addOtherNodes(connection, "STAT_DAT_SRC", "StatisticStore", "DataSource");
+        addOtherNodes(connection, "IDX", "Index", "DataSource");
         addOtherNodes(connection, "FD", "Feed");
         addOtherNodes(connection, "XML_SCHEMA", "XMLSchema");
         addOtherNodes(connection, "VIS", "Visualisation");
@@ -87,6 +87,10 @@ public class V6_0_0_1__Explorer implements JdbcMigration {
     }
 
     private void addOtherNodes(final Connection connection, final String tableName, final String type) throws SQLException {
+        addOtherNodes(connection, tableName, type, null);
+    }
+
+    private void addOtherNodes(final Connection connection, final String tableName, final String type, final String tags) throws SQLException {
         final Map<Long, Set<DocRef>> feedMap = createDocRefMap(connection, tableName, type);
         for (final Map.Entry<Long, Set<DocRef>> entry : feedMap.entrySet()) {
             final long folderId = entry.getKey();
@@ -97,7 +101,7 @@ public class V6_0_0_1__Explorer implements JdbcMigration {
                 Long nodeId = getExplorerTreeNodeId(connection, docRef);
 
                 if (nodeId == null) {
-                    createExplorerTreeNode(connection, docRef);
+                    createExplorerTreeNode(connection, docRef, tags);
                     nodeId = getExplorerTreeNodeId(connection, docRef);
 
                     final List<Long> ancestorIdList = new ArrayList<>(parentAncestorIdList);
@@ -110,6 +114,20 @@ public class V6_0_0_1__Explorer implements JdbcMigration {
         }
     }
 
+    private String makeTagString(final String... tags) {
+        String tagString = null;
+        if (tags != null && tags.length > 0) {
+            final StringBuilder sb = new StringBuilder();
+            for (final String tag : tags) {
+                sb.append(tag);
+                sb.append(":");
+            }
+            sb.setLength(sb.length() - 1);
+            tagString = sb.toString();
+        }
+        return tagString;
+    }
+
     private void addFolderNodes(final Connection connection, final Long parentId, final List<Long> parentAncestorIdList, final Map<Long, Set<DocRef>> docRefMap) throws SQLException {
         final Set<DocRef> childNodes = docRefMap.get(parentId);
 
@@ -120,7 +138,7 @@ public class V6_0_0_1__Explorer implements JdbcMigration {
 
                 Long nodeId = getExplorerTreeNodeId(connection, docRef);
                 if (nodeId == null) {
-                    createExplorerTreeNode(connection, docRef);
+                    createExplorerTreeNode(connection, docRef, null);
                     nodeId = getExplorerTreeNodeId(connection, docRef);
                     ancestorIdList.add(0, nodeId);
 
@@ -166,12 +184,13 @@ public class V6_0_0_1__Explorer implements JdbcMigration {
         return docRefMap;
     }
 
-    private void createExplorerTreeNode(final Connection connection, final DocRef docRef) throws SQLException {
+    private void createExplorerTreeNode(final Connection connection, final DocRef docRef, final String tags) throws SQLException {
         // Insert node entry.
-        try (final PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO EXPLORER_TREE_NODE (TYPE, UUID, NAME) VALUES (?, ?, ?)")) {
+        try (final PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO explorerTreeNode (type, uuid, name, tags) VALUES (?, ?, ?, ?)")) {
             preparedStatement.setString(1, docRef.getType());
             preparedStatement.setString(2, docRef.getUuid());
             preparedStatement.setString(3, docRef.getName());
+            preparedStatement.setString(4, tags);
             preparedStatement.executeUpdate();
         }
     }
@@ -180,7 +199,7 @@ public class V6_0_0_1__Explorer implements JdbcMigration {
         Long nodeId = null;
 
         // Fetch id for newly inserted node entry.
-        try (final PreparedStatement preparedStatement = connection.prepareStatement("SELECT ID FROM EXPLORER_TREE_NODE WHERE TYPE = ? AND UUID = ?;")) {
+        try (final PreparedStatement preparedStatement = connection.prepareStatement("SELECT id FROM explorerTreeNode WHERE type = ? AND uuid = ?;")) {
             preparedStatement.setString(1, docRef.getType());
             preparedStatement.setString(2, docRef.getUuid());
 
@@ -204,7 +223,7 @@ public class V6_0_0_1__Explorer implements JdbcMigration {
 
     private void insertReference(final Connection connection, final Long ancestor, final Long descendant, final Long depth) throws SQLException {
         // Insert self reference.
-        try (final PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO EXPLORER_TREE_PATH (ANCESTOR, DESCENDANT, DEPTH, ORDER_INDEX) VALUES (?, ?, ?, ?)")) {
+        try (final PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO explorerTreePath (ancestor, descendant, depth, orderIndex) VALUES (?, ?, ?, ?)")) {
             preparedStatement.setLong(1, ancestor);
             preparedStatement.setLong(2, descendant);
             preparedStatement.setLong(3, depth);

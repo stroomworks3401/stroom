@@ -28,7 +28,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "EXPLORER_TREE_PATH")
+@Table(name = "explorerTreePath")
 @IdClass(CompositeExplorerTreePathId.class)    // has a composite primary key
 public class ExplorerTreePath implements TreePath {
     private ClosureTableTreeNode ancestor;
@@ -38,7 +38,7 @@ public class ExplorerTreePath implements TreePath {
 
     @Id
     @ManyToOne(targetEntity = ExplorerTreeNode.class)
-    @JoinColumn(name = "ANCESTOR", columnDefinition = "INT", nullable = false)    // the name of the database foreign key column
+    @JoinColumn(name = "ancestor", columnDefinition = "INT", nullable = false)    // the name of the database foreign key column
     @Override
     public ClosureTableTreeNode getAncestor() {
         return ancestor;
@@ -51,7 +51,7 @@ public class ExplorerTreePath implements TreePath {
 
     @Id
     @ManyToOne(targetEntity = ExplorerTreeNode.class)
-    @JoinColumn(name = "DESCENDANT", columnDefinition = "INT", nullable = false)    // the name of the database foreign key column
+    @JoinColumn(name = "descendant", columnDefinition = "INT", nullable = false)    // the name of the database foreign key column
     @Override
     public ClosureTableTreeNode getDescendant() {
         return descendant;
@@ -62,7 +62,7 @@ public class ExplorerTreePath implements TreePath {
         this.descendant = descendant;
     }
 
-    @Column(name = "DEPTH", columnDefinition = "INT", nullable = false)
+    @Column(name = "depth", columnDefinition = "INT", nullable = false)
     @Override
     public int getDepth() {
         return depth;
@@ -73,7 +73,7 @@ public class ExplorerTreePath implements TreePath {
         this.depth = depth;
     }
 
-    @Column(name = "ORDER_INDEX", columnDefinition = "INT", nullable = false)
+    @Column(name = "orderIndex", columnDefinition = "INT", nullable = false)
     @Override
     public int getOrderIndex() {
         return orderIndex;

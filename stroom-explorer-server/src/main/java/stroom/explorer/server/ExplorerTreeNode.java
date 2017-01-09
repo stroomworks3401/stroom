@@ -36,16 +36,17 @@ import javax.persistence.UniqueConstraint;
 import javax.xml.bind.annotation.XmlTransient;
 
 @Entity
-@Table(name = "EXPLORER_TREE_NODE", uniqueConstraints = @UniqueConstraint(columnNames = { "TYPE", "UUID" }) )
+@Table(name = "explorerTreeNode", uniqueConstraints = @UniqueConstraint(columnNames = { "type", "uuid" }) )
 public class ExplorerTreeNode implements ClosureTableTreeNode {
     private Long id;
     private String type;
     private String uuid;
     private String name;
+    private String tags;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "ID", columnDefinition = "INT")
+    @Column(name = "id", columnDefinition = "INT")
     @XmlTransient
     public Long getId() {
         return id;
@@ -55,7 +56,7 @@ public class ExplorerTreeNode implements ClosureTableTreeNode {
         this.id = id;
     }
 
-    @Column(name = "TYPE", nullable = false)
+    @Column(name = "type", nullable = false)
     public String getType() {
         return type;
     }
@@ -64,7 +65,7 @@ public class ExplorerTreeNode implements ClosureTableTreeNode {
         this.type = type;
     }
 
-    @Column(name = "UUID", nullable = false)
+    @Column(name = "uuid", nullable = false)
     public String getUuid() {
         return uuid;
     }
@@ -73,13 +74,22 @@ public class ExplorerTreeNode implements ClosureTableTreeNode {
         this.uuid = uuid;
     }
 
-    @Column(name = "NAME", nullable = false)
+    @Column(name = "name", nullable = false)
     public String getName() {
         return name;
     }
 
     public void setName(final String name) {
         this.name = name;
+    }
+
+    @Column(name = "tags")
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(final String tags) {
+        this.tags = tags;
     }
 
 //    @Override

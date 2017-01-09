@@ -16,14 +16,12 @@
 
 package stroom.explorer.server;
 
-import stroom.util.shared.HasType;
+import stroom.explorer.shared.DocumentTypes;
+import stroom.explorer.shared.FetchExplorerDataResult;
+import stroom.explorer.shared.FindExplorerDataCriteria;
 
-public interface ExplorerDataProvider extends HasType {
-    void addItems(TreeModel treeModel);
+public interface ExplorerService {
+    FetchExplorerDataResult getData(FindExplorerDataCriteria criteria);
 
-    String getDisplayType();
-
-    int getPriority();
-
-    String getIconUrl();
+    DocumentTypes getAllDocumentTypes();
 }

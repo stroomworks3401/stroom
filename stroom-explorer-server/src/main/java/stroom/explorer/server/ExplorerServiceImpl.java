@@ -16,9 +16,9 @@
 
 package stroom.explorer.server;
 
+import net.sf.saxon.functions.Collection;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import stroom.entity.shared.FolderService;
 import stroom.explorer.shared.DocumentType;
 import stroom.explorer.shared.DocumentTypes;
 import stroom.explorer.shared.EntityData;
@@ -26,7 +26,6 @@ import stroom.explorer.shared.ExplorerData;
 import stroom.explorer.shared.ExplorerTreeFilter;
 import stroom.explorer.shared.FetchExplorerDataResult;
 import stroom.explorer.shared.FindExplorerDataCriteria;
-import stroom.folder.server.FolderRootExplorerDataProvider;
 import stroom.security.SecurityContext;
 import stroom.security.shared.DocumentPermissionNames;
 import stroom.util.shared.HasNodeState;
@@ -34,15 +33,15 @@ import stroom.util.spring.StroomScope;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @Scope(StroomScope.THREAD)
 class ExplorerServiceImpl implements ExplorerService {
+    private final AllDocumentTypes allDocumentTypes = new AllDocumentTypes();
     private final SecurityContext securityContext;
     private final ExplorerTreeModel explorerTreeModel;
 
@@ -63,11 +62,14 @@ class ExplorerServiceImpl implements ExplorerService {
         final Set<ExplorerData> forcedOpen = getForcedOpenItems(masterTreeModel, criteria);
 
         final TreeModel filteredModel = new TreeModelImpl();
-        addDescendants(FolderRootExplorerDataProvider.ROOT, masterTreeModel, filteredModel, criteria.getFilter());
+        final List<ExplorerData> roots = masterTreeModel.getChildMap().get(null);
+        for (final ExplorerData root : roots) {
+            addDescendants(root, masterTreeModel, filteredModel, criteria.getFilter());
 
-        // Add root node.
-        result.getTreeStructure().add(null, FolderRootExplorerDataProvider.ROOT);
-        addChildren(FolderRootExplorerDataProvider.ROOT, filteredModel, criteria.getOpenItems(), forcedOpen, criteria.getMinDepth(), 0, result);
+            // Add root node.
+            result.getTreeStructure().add(null, root);
+            addChildren(root, filteredModel, criteria.getOpenItems(), forcedOpen, criteria.getMinDepth(), 0, result);
+        }
 
         return result;
     }
@@ -136,7 +138,7 @@ class ExplorerServiceImpl implements ExplorerService {
     }
 
     private boolean checkType(final ExplorerData explorerData, final Set<String> types) {
-        return types == null || types.contains(explorerData.getType()) || FolderService.ROOT.equals(explorerData.getType());
+        return types == null || types.contains(explorerData.getType()) || "System".equals(explorerData.getType());
     }
 
     private boolean checkTags(final ExplorerData explorerData, final Set<String> tags) {
@@ -183,9 +185,8 @@ class ExplorerServiceImpl implements ExplorerService {
         }
     }
 
-    @Override
-    public DocumentTypes getDocumentTypes() {
-        final List<DocumentType> allTypes = getAllTypes();
+    public DocumentTypes getAllDocumentTypes() {
+        final List<DocumentType> allTypes = allDocumentTypes.getAllTypes();
         final List<DocumentType> visibleTypes = getVisibleTypes();
         return new DocumentTypes(allTypes, visibleTypes);
     }
@@ -199,9 +200,14 @@ class ExplorerServiceImpl implements ExplorerService {
         requiredPermissions.add(DocumentPermissionNames.READ);
 
         final Set<String> visibleTypes = new HashSet<>();
-        addTypes(FolderRootExplorerDataProvider.ROOT, masterTreeModel, visibleTypes, requiredPermissions);
+        final List<ExplorerData> roots = masterTreeModel.getChildMap().get(null);
+        for (final ExplorerData root : roots) {
+            addTypes(root, masterTreeModel, visibleTypes, requiredPermissions);
+        }
 
-        return getDocumentTypes(visibleTypes);
+        final List<DocumentType> documentTypes = allDocumentTypes.getAllTypes();
+        final List<DocumentType> filtered = documentTypes.stream().filter(documentType -> visibleTypes.contains(documentType.getType())).collect(Collectors.toList());
+        return filtered;
     }
 
     private boolean addTypes(final ExplorerData parent, final TreeModel treeModel, final Set<String> types, final Set<String> requiredPermissions) {
@@ -223,35 +229,5 @@ class ExplorerServiceImpl implements ExplorerService {
         }
 
         return added;
-    }
-
-    private List<DocumentType> getAllTypes() {
-        final Collection<String> types = explorerTreeModel.getTypes();
-        return getDocumentTypes(types);
-    }
-
-    private List<DocumentType> getDocumentTypes(final Collection<String> types) {
-        final List<DocumentType> documentTypes = new ArrayList<>(types.size());
-        for (final String type : types) {
-            final ExplorerDataProvider provider = explorerTreeModel.getProvider(type);
-            if (!(provider instanceof FolderRootExplorerDataProvider)) {
-                final String displayType = provider.getDisplayType();
-                final int priority = provider.getPriority();
-                final String iconUrl = provider.getIconUrl();
-                documentTypes.add(new DocumentType(priority, type, displayType, iconUrl));
-            }
-        }
-
-        // Sort types by priority.
-        Collections.sort(documentTypes, (o1, o2) -> {
-            final int comparison = Integer.compare(o1.getPriority(), o2.getPriority());
-            if (comparison != 0) {
-                return comparison;
-            }
-
-            return o1.getType().compareTo(o2.getType());
-        });
-
-        return documentTypes;
     }
 }
