@@ -16,7 +16,6 @@
 
 package stroom.explorer.server;
 
-import net.sf.saxon.functions.Collection;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import stroom.explorer.shared.DocumentType;
@@ -32,7 +31,6 @@ import stroom.util.shared.HasNodeState;
 import stroom.util.spring.StroomScope;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
