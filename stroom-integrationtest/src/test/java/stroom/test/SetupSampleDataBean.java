@@ -38,10 +38,10 @@ import stroom.node.shared.Volume;
 import stroom.node.shared.VolumeService;
 import stroom.pipeline.shared.FindPipelineEntityCriteria;
 import stroom.pipeline.shared.PipelineEntity;
-import stroom.pipeline.shared.PipelineEntityService;
+import stroom.pipeline.shared.PipelineService;
 import stroom.security.server.DBRealm;
 import stroom.statistics.common.FindStatisticsEntityCriteria;
-import stroom.statistics.common.StatisticStoreEntityService;
+import stroom.statistics.common.StatisticStoreService;
 import stroom.statistics.shared.StatisticStore;
 import stroom.statistics.shared.StatisticStoreEntity;
 import stroom.streamstore.server.StreamStore;
@@ -98,7 +98,7 @@ public final class SetupSampleDataBean {
     @Resource
     private StreamProcessorService streamProcessorService;
     @Resource
-    private PipelineEntityService pipelineEntityService;
+    private PipelineService pipelineEntityService;
     @Resource
     private VolumeService volumeService;
     @Resource
@@ -109,7 +109,7 @@ public final class SetupSampleDataBean {
     private JobNodeService jobNodeService;
 
     @Resource
-    private StatisticStoreEntityService statisticsDataSourceService;
+    private StatisticStoreService statisticsDataSourceService;
 
     public SetupSampleDataBean() {
     }

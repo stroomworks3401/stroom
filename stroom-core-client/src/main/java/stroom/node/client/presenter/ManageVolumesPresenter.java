@@ -18,6 +18,7 @@ package stroom.node.client.presenter;
 
 import stroom.data.grid.client.DoubleClickEvent;
 import stroom.entity.shared.DocRef;
+import stroom.entity.shared.EntityServiceDeleteAction;
 import stroom.entity.shared.EntityServiceLoadAction;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -33,7 +34,7 @@ import stroom.alert.client.event.ConfirmEvent;
 import stroom.alert.client.presenter.ConfirmCallback;
 import stroom.dispatch.client.AsyncCallbackAdaptor;
 import stroom.dispatch.client.ClientDispatchAsync;
-import stroom.entity.shared.EntityServiceDeleteAction;
+import stroom.explorer.shared.ExplorerDeleteAction;
 import stroom.node.client.view.WrapperView;
 import stroom.node.shared.FlushVolumeStatusAction;
 import stroom.node.shared.Volume;

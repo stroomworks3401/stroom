@@ -16,12 +16,17 @@
 
 package stroom.explorer.server;
 
+import stroom.entity.shared.DocRef;
 import stroom.explorer.shared.DocumentTypes;
 import stroom.explorer.shared.FetchExplorerDataResult;
 import stroom.explorer.shared.FindExplorerDataCriteria;
+
+import java.util.List;
 
 public interface ExplorerService {
     FetchExplorerDataResult getData(FindExplorerDataCriteria criteria);
 
     DocumentTypes getAllDocumentTypes();
+
+    List<DocRef> getDescendants(DocRef ancestor);
 }

@@ -16,21 +16,21 @@
 
 package stroom.entity.client.event;
 
-import stroom.entity.shared.DocRef;
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HasHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
+import stroom.explorer.shared.ExplorerNode;
 
 public class CopyEntityEvent extends GwtEvent<CopyEntityEvent.Handler> {
     private static Type<Handler> TYPE;
     private final PresenterWidget<?> presenter;
-    private final DocRef document;
-    private final DocRef folder;
+    private final ExplorerNode document;
+    private final ExplorerNode folder;
     private final String name;
 
-    private CopyEntityEvent(final PresenterWidget<?> presenter, final DocRef document,
-            final DocRef folder, final String name) {
+    private CopyEntityEvent(final PresenterWidget<?> presenter, final ExplorerNode document,
+            final ExplorerNode folder, final String name) {
         this.presenter = presenter;
         this.document = document;
         this.folder = folder;
@@ -38,13 +38,13 @@ public class CopyEntityEvent extends GwtEvent<CopyEntityEvent.Handler> {
     }
 
     public static void fire(final HasHandlers handlers, final PresenterWidget<?> presenter,
-                            final DocRef document, final DocRef folder, final String name) {
+                            final ExplorerNode document, final ExplorerNode folder, final String name) {
         handlers.fireEvent(new CopyEntityEvent(presenter, document, folder, name));
     }
 
     public static Type<Handler> getType() {
         if (TYPE == null) {
-            TYPE = new Type<Handler>();
+            TYPE = new Type<>();
         }
         return TYPE;
     }
@@ -63,11 +63,11 @@ public class CopyEntityEvent extends GwtEvent<CopyEntityEvent.Handler> {
         return presenter;
     }
 
-    public DocRef getDocument() {
+    public ExplorerNode getDocument() {
         return document;
     }
 
-    public DocRef getFolder() {
+    public ExplorerNode getFolder() {
         return folder;
     }
 

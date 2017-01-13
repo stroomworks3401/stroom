@@ -20,11 +20,8 @@ import stroom.cell.dropdowntree.client.DropDownCell;
 import stroom.data.client.event.DataSelectionEvent;
 import stroom.data.client.event.DataSelectionEvent.DataSelectionHandler;
 import stroom.entity.shared.DocRef;
-import stroom.explorer.shared.EntityData;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 import com.google.inject.Inject;
-
-import java.util.Set;
 
 public class EntityDropDownCell extends DropDownCell<DocRef> {
     private final ExplorerDropDownTreePresenter explorerDropDownTreePresenter;
@@ -36,9 +33,9 @@ public class EntityDropDownCell extends DropDownCell<DocRef> {
         this.explorerDropDownTreePresenter = explorerDropDownTreePresenter;
         setUnselectedText("None");
 
-        explorerDropDownTreePresenter.addDataSelectionHandler(new DataSelectionHandler<ExplorerData>() {
+        explorerDropDownTreePresenter.addDataSelectionHandler(new DataSelectionHandler<ExplorerNode>() {
             @Override
-            public void onSelection(final DataSelectionEvent<ExplorerData> event) {
+            public void onSelection(final DataSelectionEvent<ExplorerNode> event) {
                 changeSelection(event.getSelectedItem());
             }
         });
@@ -77,11 +74,11 @@ public class EntityDropDownCell extends DropDownCell<DocRef> {
         explorerDropDownTreePresenter.show();
     }
 
-    private void changeSelection(final ExplorerData selection) {
-        if (selection == null || !(selection instanceof EntityData)) {
+    private void changeSelection(final ExplorerNode selection) {
+        if (selection == null) {
             setValue(null);
         } else {
-            setValue(((EntityData)selection).getDocRef());
+            setValue(selection.getDocRef());
         }
     }
 }

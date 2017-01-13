@@ -17,7 +17,11 @@
 package stroom.dashboard.shared;
 
 import stroom.entity.shared.DocumentEntityService;
+import stroom.entity.shared.DocumentService;
+import stroom.entity.shared.EntityService;
 import stroom.entity.shared.FindService;
+import stroom.query.shared.QueryData;
 
-public interface QueryService extends DocumentEntityService<Query>, FindService<Query, FindQueryCriteria> {
+public interface QueryService extends DocumentEntityService<Query, FindQueryCriteria> {
+//    void create(String name, Dashboard dashboard, QueryData queryData);
 }

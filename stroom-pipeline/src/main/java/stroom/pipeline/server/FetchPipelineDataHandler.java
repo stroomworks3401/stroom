@@ -21,7 +21,7 @@ import stroom.pipeline.server.factory.PipelineStackLoader;
 import stroom.pipeline.shared.FetchPipelineDataAction;
 import stroom.pipeline.shared.PipelineDataMerger;
 import stroom.pipeline.shared.PipelineEntity;
-import stroom.pipeline.shared.PipelineEntityService;
+import stroom.pipeline.shared.PipelineService;
 import stroom.pipeline.shared.data.PipelineData;
 import stroom.pipeline.shared.data.PipelineElementType;
 import stroom.pipeline.shared.data.SourcePipeline;
@@ -35,12 +35,12 @@ import java.util.Map;
 
 @TaskHandlerBean(task = FetchPipelineDataAction.class)
 public class FetchPipelineDataHandler extends AbstractTaskHandler<FetchPipelineDataAction, SharedList<PipelineData>> {
-    private final PipelineEntityService pipelineEntityService;
+    private final PipelineService pipelineEntityService;
     private final PipelineStackLoader pipelineStackLoader;
     private final PipelineDataValidator pipelineDataValidator;
 
     @Inject
-    public FetchPipelineDataHandler(final PipelineEntityService pipelineEntityService,
+    public FetchPipelineDataHandler(final PipelineService pipelineEntityService,
             final PipelineStackLoader pipelineStackLoader, final PipelineDataValidator pipelineDataValidator) {
         this.pipelineEntityService = pipelineEntityService;
         this.pipelineStackLoader = pipelineStackLoader;

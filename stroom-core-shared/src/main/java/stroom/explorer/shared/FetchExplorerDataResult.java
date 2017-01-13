@@ -19,15 +19,13 @@ package stroom.explorer.shared;
 import stroom.util.shared.SharedObject;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class FetchExplorerDataResult implements SharedObject {
     private static final long serialVersionUID = 6474393620176001063L;
 
     private TreeStructure treeStructure = new TreeStructure();
-    private List<ExplorerData> openedItems = new ArrayList<>();
+    private List<ExplorerNode> openedItems = new ArrayList<>();
 
     public FetchExplorerDataResult() {
         // Default constructor necessary for GWT serialisation.
@@ -37,7 +35,7 @@ public class FetchExplorerDataResult implements SharedObject {
         return treeStructure;
     }
 
-    public List<ExplorerData> getOpenedItems() {
+    public List<ExplorerNode> getOpenedItems() {
         return openedItems;
     }
 }

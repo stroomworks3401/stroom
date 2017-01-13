@@ -31,7 +31,7 @@ import stroom.pipeline.server.factory.PipelineFactory;
 import stroom.pipeline.server.filter.IdEnrichmentFilter;
 import stroom.pipeline.server.filter.XMLFilter;
 import stroom.pipeline.shared.PipelineEntity;
-import stroom.pipeline.shared.PipelineEntityService;
+import stroom.pipeline.shared.PipelineService;
 import stroom.pipeline.shared.data.PipelineData;
 import stroom.pipeline.state.CurrentUserHolder;
 import stroom.pipeline.state.FeedHolder;
@@ -70,7 +70,7 @@ public class ExtractionTaskHandler extends AbstractTaskHandler<ExtractionTask, V
     private final PipelineHolder pipelineHolder;
     private final ErrorReceiverProxy errorReceiverProxy;
     private final PipelineFactory pipelineFactory;
-    private final PipelineEntityService pipelineEntityService;
+    private final PipelineService pipelineEntityService;
     private final PipelineDataCache pipelineDataCache;
     private final TaskMonitor taskMonitor;
     private final SecurityContext securityContext;
@@ -82,7 +82,7 @@ public class ExtractionTaskHandler extends AbstractTaskHandler<ExtractionTask, V
             final FeedHolder feedHolder, final CurrentUserHolder currentUserHolder, final StreamHolder streamHolder,
             final PipelineHolder pipelineHolder, final ErrorReceiverProxy errorReceiverProxy,
             final PipelineFactory pipelineFactory,
-            @Named("cachedPipelineEntityService") final PipelineEntityService pipelineEntityService,
+            @Named("cachedPipelineEntityService") final PipelineService pipelineEntityService,
             final PipelineDataCache pipelineDataCache, final TaskMonitor taskMonitor, final SecurityContext securityContext) {
         this.streamStore = streamStore;
         this.feedService = feedService;

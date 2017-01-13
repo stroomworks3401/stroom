@@ -20,6 +20,7 @@ import event.logging.BaseAdvancedQueryItem;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import stroom.dashboard.shared.Dashboard;
 import stroom.dashboard.shared.FindQueryCriteria;
 import stroom.dashboard.shared.Query;
 import stroom.dashboard.shared.QueryService;
@@ -31,13 +32,14 @@ import stroom.entity.server.util.SQLBuilder;
 import stroom.entity.server.util.SQLUtil;
 import stroom.entity.server.util.StroomEntityManager;
 import stroom.entity.shared.DocRef;
-import stroom.entity.shared.EntityServiceException;
+import stroom.entity.shared.DocumentType;
+import stroom.logging.EntityEventLog;
+import stroom.query.shared.QueryData;
 import stroom.security.SecurityContext;
 import stroom.util.spring.StroomSpringProfiles;
 
 import javax.inject.Inject;
 import java.util.List;
-import java.util.UUID;
 
 @Profile(StroomSpringProfiles.PROD)
 @Component("queryService")
@@ -47,9 +49,14 @@ public class QueryServiceImpl extends DocumentEntityServiceImpl<Query, FindQuery
     private final SecurityContext securityContext;
 
     @Inject
-    QueryServiceImpl(final StroomEntityManager entityManager, final SecurityContext securityContext) {
-        super(entityManager, securityContext);
+    QueryServiceImpl(final StroomEntityManager entityManager, final SecurityContext securityContext, final EntityEventLog entityEventLog) {
+        super(entityManager, securityContext, entityEventLog);
         this.securityContext = securityContext;
+    }
+
+    @Override
+    public DocumentType getDocumentType() {
+        return null;
     }
 
     @Override
@@ -62,29 +69,23 @@ public class QueryServiceImpl extends DocumentEntityServiceImpl<Query, FindQuery
         return new FindQueryCriteria();
     }
 
-    // TODO : Remove this when document entities no longer reference a folder.
-    // Don't do any create permission checking as a query doesn't live in a folder and all users are allowed to create queries.
     @Override
-    public Query create(final DocRef folder, final String name) throws RuntimeException {
-        // Create a new entity instance.
-        Query entity;
-        try {
-            entity = getEntityClass().newInstance();
-        } catch (final IllegalAccessException | InstantiationException e) {
-            throw new EntityServiceException(e.getMessage());
-        }
-
-        entity.setName(name);
-        if (entity.getUuid() == null) {
-            entity.setUuid(UUID.randomUUID().toString());
-        }
-        entity = super.create(entity);
-
-        // Create the initial user permissions for this new document.
-        securityContext.createInitialDocumentPermissions(entity.getType(), entity.getUuid(), null);
-
-        return entity;
+    protected void checkCreatePermission(final DocRef folder) {
+        // Do nothing as users can always create queries because they don't belong in a folder.
     }
+
+//    @Override
+//    public Query create(final DocRef folder, final String name) {
+//        return super.create(folder, name);
+//    }
+//
+//    @Override
+//    public void create(final String name, final Dashboard dashboard, final QueryData queryData) {
+//        final Query query = internalCreate(null, name);
+//        query.setDashboard(dashboard);
+//        query.setQueryData(queryData);
+//        internalSave(query);
+//    }
 
     @Override
     public void appendCriteria(final List<BaseAdvancedQueryItem> items, final FindQueryCriteria criteria) {

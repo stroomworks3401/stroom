@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Configuration;
 import stroom.entity.shared.FolderService;
 import stroom.feed.shared.FeedService;
 import stroom.node.shared.NodeService;
-import stroom.pipeline.shared.PipelineEntityService;
+import stroom.pipeline.shared.PipelineService;
 import stroom.streamstore.shared.StreamTypeService;
 import stroom.streamtask.shared.StreamProcessorFilterService;
 import stroom.streamtask.shared.StreamProcessorService;
@@ -73,7 +73,7 @@ public class CachedServiceConfiguration {
 
     @Bean
     public ProxyFactoryBean cachedPipelineEntityService() throws ClassNotFoundException {
-        return getProxyFactoryBean(PipelineEntityService.class, "pipelineEntityService", "serviceCacheInterceptor");
+        return getProxyFactoryBean(PipelineService.class, "pipelineEntityService", "serviceCacheInterceptor");
     }
 
     private ProxyFactoryBean getProxyFactoryBean(final Class<?> clazz, final String targetName,

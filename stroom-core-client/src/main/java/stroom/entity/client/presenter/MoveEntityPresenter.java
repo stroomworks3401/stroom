@@ -27,7 +27,7 @@ import stroom.entity.client.event.MoveEntityEvent;
 import stroom.entity.client.event.ShowMoveEntityDialogEvent;
 import stroom.entity.shared.Folder;
 import stroom.explorer.client.presenter.EntityTreePresenter;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 import stroom.security.shared.DocumentPermissionNames;
 import stroom.widget.popup.client.event.HidePopupEvent;
 import stroom.widget.popup.client.event.ShowPopupEvent;
@@ -41,7 +41,7 @@ public class MoveEntityPresenter
         extends MyPresenter<MoveEntityPresenter.MoveEntityView, MoveEntityPresenter.MoveEntityProxy>
         implements ShowMoveEntityDialogEvent.Handler, PopupUiHandlers {
     private final EntityTreePresenter entityTreePresenter;
-    private List<ExplorerData> explorerDataList;
+    private List<ExplorerNode> explorerNodeList;
 
     @Inject
     public MoveEntityPresenter(final EventBus eventBus, final MoveEntityView view, final MoveEntityProxy proxy,
@@ -57,11 +57,11 @@ public class MoveEntityPresenter
     @ProxyEvent
     @Override
     public void onMove(final ShowMoveEntityDialogEvent event) {
-        this.explorerDataList = event.getExplorerDataList();
+        this.explorerNodeList = event.getExplorerNodeList();
 
         entityTreePresenter.setSelectedItem(null);
 
-        final ExplorerData firstChild = event.getExplorerDataList().get(0);
+        final ExplorerNode firstChild = event.getExplorerNodeList().get(0);
         entityTreePresenter.setSelectedItem(firstChild);
         entityTreePresenter.getModel().reset();
         entityTreePresenter.getModel().setEnsureVisible(firstChild);
@@ -73,8 +73,8 @@ public class MoveEntityPresenter
     @Override
     protected void revealInParent() {
         String caption = "Move Multiple Items";
-        if (explorerDataList.size() == 1) {
-            caption = "Move " + explorerDataList.get(0).getDisplayValue();
+        if (explorerNodeList.size() == 1) {
+            caption = "Move " + explorerNodeList.get(0).getDisplayValue();
         }
 
         final PopupSize popupSize = new PopupSize(350, 400, 350, 350, 2000, 2000, true);
@@ -84,8 +84,8 @@ public class MoveEntityPresenter
     @Override
     public void onHideRequest(final boolean autoClose, final boolean ok) {
         if (ok) {
-            final ExplorerData folder = entityTreePresenter.getSelectedItem();
-            MoveEntityEvent.fire(MoveEntityPresenter.this, MoveEntityPresenter.this, folder, explorerDataList);
+            final ExplorerNode folder = entityTreePresenter.getSelectedItem();
+            MoveEntityEvent.fire(MoveEntityPresenter.this, MoveEntityPresenter.this, folder, explorerNodeList);
         } else {
             HidePopupEvent.fire(MoveEntityPresenter.this, MoveEntityPresenter.this, autoClose, ok);
         }

@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import stroom.entity.shared.DocumentType;
 import stroom.util.client.ImageUtil;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.SafeImageCell;
@@ -44,7 +45,6 @@ import stroom.data.client.event.HasDataSelectionHandlers;
 import stroom.data.table.client.CellTableView;
 import stroom.data.table.client.CellTableViewImpl;
 import stroom.data.table.client.CellTableViewImpl.BasicResources;
-import stroom.explorer.shared.DocumentType;
 import stroom.explorer.shared.DocumentTypes;
 
 public class TypeFilterPresenter extends MyPresenterWidget<CellTableView<DocumentType>>

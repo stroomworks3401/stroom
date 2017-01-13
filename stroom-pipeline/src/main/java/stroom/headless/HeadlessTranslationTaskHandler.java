@@ -22,6 +22,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import stroom.pipeline.shared.PipelineService;
 import stroom.util.spring.StroomScope;
 import org.springframework.context.annotation.Scope;
 
@@ -47,7 +48,6 @@ import stroom.pipeline.server.filter.XSLTFilter;
 import stroom.pipeline.server.xsltfunctions.Lookup;
 import stroom.pipeline.shared.FindPipelineEntityCriteria;
 import stroom.pipeline.shared.PipelineEntity;
-import stroom.pipeline.shared.PipelineEntityService;
 import stroom.pipeline.shared.data.PipelineData;
 import stroom.pipeline.state.FeedHolder;
 import stroom.pipeline.state.MetaData;
@@ -110,7 +110,7 @@ public class HeadlessTranslationTaskHandler extends AbstractTaskHandler<Headless
     @Resource(name = "cachedStreamTypeService")
     private StreamTypeService streamTypeService;
     @Resource(name = "cachedPipelineEntityService")
-    private PipelineEntityService pipelineEntityService;
+    private PipelineService pipelineEntityService;
     @Resource
     private ContextDataLoader contextDataLoader;
     @Resource

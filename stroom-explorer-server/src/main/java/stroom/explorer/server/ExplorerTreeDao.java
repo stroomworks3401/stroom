@@ -14,22 +14,9 @@
  * limitations under the License.
  */
 
-package stroom.entity.shared;
+package stroom.explorer.server;
 
-public class EntityServiceMoveAction<E extends Entity> extends AbstractEntityAction<E> {
-    private static final long serialVersionUID = 800905016214418723L;
-    private DocRef folder;
+import fri.util.database.jpa.tree.TreeDao;
 
-    public EntityServiceMoveAction() {
-        // Default constructor necessary for GWT serialisation.
-    }
-
-    public EntityServiceMoveAction(final E entity, final DocRef folder) {
-        super(entity, "Move: " + entity);
-        this.folder = folder;
-    }
-
-    public DocRef getFolder() {
-        return folder;
-    }
+public interface ExplorerTreeDao extends TreeDao<ExplorerTreeNode> {
 }

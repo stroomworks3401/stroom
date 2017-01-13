@@ -38,7 +38,7 @@ import stroom.index.shared.Index;
 import stroom.index.shared.IndexService;
 import stroom.pipeline.shared.FindPipelineEntityCriteria;
 import stroom.pipeline.shared.PipelineEntity;
-import stroom.pipeline.shared.PipelineEntityService;
+import stroom.pipeline.shared.PipelineService;
 import stroom.query.shared.Condition;
 import stroom.query.shared.ExpressionOperator;
 import stroom.query.shared.ExpressionOperator.Op;
@@ -68,7 +68,7 @@ public class TestImportExportDashboards extends AbstractCoreIntegrationTest {
     @Resource
     private FolderService folderService;
     @Resource
-    private PipelineEntityService pipelineEntityService;
+    private PipelineService pipelineEntityService;
     @Resource
     private FeedService feedService;
     @Resource

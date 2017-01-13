@@ -69,17 +69,17 @@ public class BasicEventInfoProvider implements EventInfoProvider {
                     group.setId(getId(folder));
                     group.setName(folder.getName());
 
-                    // Add groups.
-                    try {
-                        final Folder parentGroup = folder.getFolder();
-                        if (parentGroup != null) {
-                            final Groups groups = new Groups();
-                            group.setGroups(groups);
-                            appendGroup(groups, parentGroup);
-                        }
-                    } catch (final Exception ex) {
-                        LOGGER.error(ex, ex);
-                    }
+//                    // Add groups.
+//                    try {
+//                        final Folder parentGroup = folder.getFolder();
+//                        if (parentGroup != null) {
+//                            final Groups groups = new Groups();
+//                            group.setGroups(groups);
+//                            appendGroup(groups, parentGroup);
+//                        }
+//                    } catch (final Exception ex) {
+//                        LOGGER.error(ex, ex);
+//                    }
 
                     return group;
                 } catch (final Exception ex) {
@@ -120,18 +120,18 @@ public class BasicEventInfoProvider implements EventInfoProvider {
                 object.setName(name);
                 object.setDescription(description);
 
-                // Add groups.
-                if (entity instanceof HasFolder) {
-                    try {
-                        final HasFolder hasFolder = (HasFolder) entity;
-                        final Folder folder = hasFolder.getFolder();
-                        final Groups groups = new Groups();
-                        object.setGroups(groups);
-                        appendGroup(groups, folder);
-                    } catch (final Exception ex) {
-                        LOGGER.error(ex, ex);
-                    }
-                }
+//                // Add groups.
+//                if (entity instanceof HasFolder) {
+//                    try {
+//                        final HasFolder hasFolder = (HasFolder) entity;
+//                        final Folder folder = hasFolder.getFolder();
+//                        final Groups groups = new Groups();
+//                        object.setGroups(groups);
+//                        appendGroup(groups, folder);
+//                    } catch (final Exception ex) {
+//                        LOGGER.error(ex, ex);
+//                    }
+//                }
 
                 // Add unknown but useful data items.
                 if (entity instanceof Feed) {
@@ -176,21 +176,21 @@ public class BasicEventInfoProvider implements EventInfoProvider {
         return null;
     }
 
-    private void appendGroup(final Groups groups, final Folder folder) {
-        try {
-            if (folder != null) {
-                final Folder loaded = folderService.load(folder);
-
-                final Group group = new Group();
-                group.setType("Folder");
-                group.setId(getId(loaded));
-                group.setName(loaded.getName());
-                groups.getGroup().add(group);
-            }
-        } catch (final Exception e) {
-            LOGGER.debug(e.getMessage(), e);
-        }
-    }
+//    private void appendGroup(final Groups groups, final Folder folder) {
+//        try {
+//            if (folder != null) {
+//                final Folder loaded = folderService.load(folder);
+//
+//                final Group group = new Group();
+//                group.setType("Folder");
+//                group.setId(getId(loaded));
+//                group.setName(loaded.getName());
+//                groups.getGroup().add(group);
+//            }
+//        } catch (final Exception e) {
+//            LOGGER.debug(e.getMessage(), e);
+//        }
+//    }
 
     private String getId(final BaseEntity entity) {
         if (entity == null) {

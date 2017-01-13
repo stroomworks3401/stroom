@@ -16,7 +16,8 @@
 
 package stroom.pipeline.server;
 
-import stroom.entity.server.MockDocumentEntityService;
+import stroom.entity.server.MockDocumentService;
+import stroom.entity.shared.DocumentType;
 import stroom.pipeline.shared.FindTextConverterCriteria;
 import stroom.pipeline.shared.TextConverter;
 import stroom.pipeline.shared.TextConverterService;
@@ -35,8 +36,13 @@ import org.springframework.stereotype.Component;
  */
 @Profile(StroomSpringProfiles.TEST)
 @Component
-public class MockTextConverterService extends MockDocumentEntityService<TextConverter, FindTextConverterCriteria>
+public class MockTextConverterService extends MockDocumentService<TextConverter, FindTextConverterCriteria>
         implements TextConverterService {
+    @Override
+    public DocumentType getDocumentType() {
+        return getDocumentType(4, "TextConverter", "Text Converter");
+    }
+
     @Override
     public Class<TextConverter> getEntityClass() {
         return TextConverter.class;

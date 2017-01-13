@@ -17,7 +17,7 @@
 package stroom.process.server;
 
 import stroom.pipeline.shared.PipelineEntity;
-import stroom.pipeline.shared.PipelineEntityService;
+import stroom.pipeline.shared.PipelineService;
 import stroom.process.shared.CreateProcessorAction;
 import stroom.security.Secured;
 import stroom.streamtask.shared.StreamProcessor;
@@ -34,7 +34,7 @@ public class CreateProcessorHandler extends AbstractTaskHandler<CreateProcessorA
     @Resource
     private StreamProcessorFilterService streamProcessorFilterService;
     @Resource
-    private PipelineEntityService pipelineEntityService;
+    private PipelineService pipelineEntityService;
 
     @Override
     public StreamProcessorFilter exec(final CreateProcessorAction action) {

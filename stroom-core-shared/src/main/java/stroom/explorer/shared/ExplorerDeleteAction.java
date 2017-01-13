@@ -14,28 +14,33 @@
  * limitations under the License.
  */
 
-package stroom.entity.shared;
+package stroom.explorer.shared;
 
-public class EntityServiceCopyAction<E extends Entity> extends AbstractEntityAction<E> {
+import stroom.entity.shared.AbstractEntityAction;
+import stroom.entity.shared.Action;
+import stroom.entity.shared.DocRef;
+import stroom.entity.shared.Entity;
+import stroom.util.shared.VoidResult;
+
+public class ExplorerDeleteAction extends Action<VoidResult> {
     private static final long serialVersionUID = 800905016214418723L;
-    private DocRef folder;
-    private String name;
 
-    public EntityServiceCopyAction() {
+    private ExplorerNode document;
+
+    public ExplorerDeleteAction() {
         // Default constructor necessary for GWT serialisation.
     }
 
-    public EntityServiceCopyAction(final E entity, final DocRef folder, final String name) {
-        super(entity, "Copy: " + entity + " - " + name);
-        this.folder = folder;
-        this.name = name;
+    public ExplorerDeleteAction(final ExplorerNode document) {
+        this.document = document;
     }
 
-    public DocRef getFolder() {
-        return folder;
+    public ExplorerNode getDocument() {
+        return document;
     }
 
-    public String getName() {
-        return name;
+    @Override
+    public String getTaskName() {
+        return "Delete: '" + document.getType() + " " + document.getName() + "'";
     }
 }

@@ -16,17 +16,16 @@
 
 package stroom.explorer.client.presenter;
 
-import stroom.data.client.event.DataSelectionEvent;
 import stroom.data.client.event.DataSelectionEvent.DataSelectionHandler;
 import stroom.data.client.event.HasDataSelectionHandlers;
 import stroom.entity.shared.DocRef;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 import stroom.widget.dropdowntree.client.presenter.DropDownPresenter;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 
-public class EntityDropDownPresenter extends DropDownPresenter implements HasDataSelectionHandlers<ExplorerData> {
+public class EntityDropDownPresenter extends DropDownPresenter implements HasDataSelectionHandlers<ExplorerNode> {
     private final ExplorerDropDownTreePresenter explorerDropDownTreePresenter;
 
     private String unselectedText;
@@ -82,11 +81,11 @@ public class EntityDropDownPresenter extends DropDownPresenter implements HasDat
     }
 
     @Override
-    public HandlerRegistration addDataSelectionHandler(final DataSelectionHandler<ExplorerData> handler) {
+    public HandlerRegistration addDataSelectionHandler(final DataSelectionHandler<ExplorerNode> handler) {
         return explorerDropDownTreePresenter.addDataSelectionHandler(handler);
     }
 
-    private void changeSelection(final ExplorerData selection) {
+    private void changeSelection(final ExplorerNode selection) {
         if (selection == null) {
             if (unselectedText == null) {
                 getView().setText("");

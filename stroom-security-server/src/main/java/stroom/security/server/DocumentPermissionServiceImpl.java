@@ -18,13 +18,11 @@ package stroom.security.server;
 
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import stroom.entity.server.GenericEntityService;
 import stroom.entity.server.util.SQLBuilder;
 import stroom.entity.server.util.StroomEntityManager;
-import stroom.entity.shared.BaseEntity;
 import stroom.entity.shared.DocRef;
-import stroom.entity.shared.DocumentEntityService;
-import stroom.entity.shared.EntityService;
+import stroom.entity.shared.DocumentService;
+import stroom.entity.shared.DocumentServiceLocator;
 import stroom.security.shared.DocumentPermissionKey;
 import stroom.security.shared.DocumentPermissionKeySet;
 import stroom.security.shared.DocumentPermissions;
@@ -166,13 +164,13 @@ public class DocumentPermissionServiceImpl implements DocumentPermissionService 
     }
 
     protected final StroomEntityManager entityManager;
-    private final GenericEntityService genericEntityService;
+    private final DocumentServiceLocator documentServiceLocator;
 
     @Inject
     DocumentPermissionServiceImpl(final StroomEntityManager entityManager,
-                                  final GenericEntityService genericEntityService) {
+                                  final DocumentServiceLocator documentServiceLocator) {
         this.entityManager = entityManager;
-        this.genericEntityService = genericEntityService;
+        this.documentServiceLocator = documentServiceLocator;
     }
 
     @Override
@@ -204,9 +202,8 @@ public class DocumentPermissionServiceImpl implements DocumentPermissionService 
             throw e;
         }
 
-        final EntityService<BaseEntity> entityService = genericEntityService
-                .getEntityService(document.getType());
-        final DocumentEntityService<?> documentService = (DocumentEntityService<?>) entityService;
+        final DocumentService documentService = documentServiceLocator
+                .locate(document.getType());
         final String[] permissions = documentService.getPermissions();
         return new DocumentPermissions(document, permissions, userPermissions);
     }

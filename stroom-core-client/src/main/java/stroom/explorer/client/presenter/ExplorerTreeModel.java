@@ -17,11 +17,8 @@
 package stroom.explorer.client.presenter;
 
 import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.HasData;
-import com.google.gwt.view.client.SelectionModel;
 import stroom.dispatch.client.AsyncCallbackAdaptor;
 import stroom.dispatch.client.ClientDispatchAsync;
 import stroom.explorer.shared.*;
@@ -30,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class ExplorerTreeModel extends TreeNodeModel<ExplorerData> {
+public class ExplorerTreeModel extends TreeNodeModel<ExplorerNode> {
     private final NameFilterTimer timer = new NameFilterTimer();
     private final ExplorerTreeFilterBuilder explorerTreeFilterBuilder = new ExplorerTreeFilterBuilder();
     private final AbstractExporerTree exporerTree;
@@ -38,7 +35,7 @@ public class ExplorerTreeModel extends TreeNodeModel<ExplorerData> {
     private final ClientDispatchAsync dispatcher;
 
     private Integer minDepth = 1;
-    private Set<ExplorerData> ensureVisible;
+    private Set<ExplorerNode> ensureVisible;
 
     private FindExplorerDataCriteria currentCriteria;
     private FetchExplorerDataResult currentResult;
@@ -72,13 +69,13 @@ public class ExplorerTreeModel extends TreeNodeModel<ExplorerData> {
         explorerTreeFilterBuilder.setRequiredPermissions(requiredPermissions);
     }
 
-    public void setEnsureVisible(final ExplorerData... ensureVisible) {
+    public void setEnsureVisible(final ExplorerNode... ensureVisible) {
         this.ensureVisible = SetUtil.toSet(ensureVisible);
     }
 
     public void refresh() {
         final ExplorerTreeFilter explorerTreeFilter = explorerTreeFilterBuilder.build();
-        final Set<ExplorerData> openItems = getOpenItems();
+        final Set<ExplorerNode> openItems = getOpenItems();
         if (explorerTreeFilter != null) {
             // Fetch a list of data items that belong to this parent.
             currentCriteria = new FindExplorerDataCriteria(openItems, explorerTreeFilter, minDepth, ensureVisible);
@@ -94,7 +91,7 @@ public class ExplorerTreeModel extends TreeNodeModel<ExplorerData> {
                             public void onSuccess(final FetchExplorerDataResult result) {
                                 fetching = false;
 
-                                //                    final Set<ExplorerData> currentOpenItems = getOpenItems();
+                                //                    final Set<ExplorerNode> currentOpenItems = getOpenItems();
                                 //                    final ExplorerTreeFilter currentFilter = explorerTreeFilterBuilder.build();
 
                                 // Check if the filter settings have changed
@@ -107,7 +104,7 @@ public class ExplorerTreeModel extends TreeNodeModel<ExplorerData> {
                                     onDataChanged(result);
 
                                     // Build the row list from the tree structure.
-                                    final List<ExplorerData> rows = new ArrayList<>();
+                                    final List<ExplorerNode> rows = new ArrayList<>();
                                     if (result != null && result.getTreeStructure() != null) {
                                         addToRows(result.getTreeStructure().getRoot(), result.getTreeStructure(), rows);
                                     }
@@ -121,14 +118,14 @@ public class ExplorerTreeModel extends TreeNodeModel<ExplorerData> {
                                     // that try and select one of the folders that has been forced open in an attempt to
                                     // make the requested item visible.
                                     if (criteria.getEnsureVisible() != null && criteria.getEnsureVisible().size() > 0) {
-                                        ExplorerData nextSelection = criteria.getEnsureVisible().iterator().next();
+                                        ExplorerNode nextSelection = criteria.getEnsureVisible().iterator().next();
                                         int index = rows.indexOf(nextSelection);
                                         if (index == -1) {
                                             nextSelection = null;
 
                                             if (result.getOpenedItems() != null) {
                                                 for (int i = result.getOpenedItems().size() - 1; i >= 0 && nextSelection == null; i--) {
-                                                    final ExplorerData item = result.getOpenedItems().get(i);
+                                                    final ExplorerNode item = result.getOpenedItems().get(i);
                                                     if (rows.contains(item)) {
                                                         nextSelection = item;
                                                     }
@@ -149,7 +146,7 @@ public class ExplorerTreeModel extends TreeNodeModel<ExplorerData> {
                                     // folders these were so we can add them to the set of open folders to ensure they
                                     // aren't immediately closed on the next refresh.
                                     if (result.getOpenedItems() != null) {
-                                        for (final ExplorerData openedItem : result.getOpenedItems()) {
+                                        for (final ExplorerNode openedItem : result.getOpenedItems()) {
                                             addOpenItem(openedItem);
                                         }
                                     }
@@ -171,17 +168,17 @@ public class ExplorerTreeModel extends TreeNodeModel<ExplorerData> {
         currentResult = result;
     }
 
-    private void addToRows(final ExplorerData parent, final TreeStructure treeStructure, final List<ExplorerData> rows) {
+    private void addToRows(final ExplorerNode parent, final TreeStructure treeStructure, final List<ExplorerNode> rows) {
         rows.add(parent);
-        final List<ExplorerData> children = treeStructure.getChildren(parent);
+        final List<ExplorerNode> children = treeStructure.getChildren(parent);
         if (children != null) {
-            for (final ExplorerData child : children) {
+            for (final ExplorerNode child : children) {
                 addToRows(child, treeStructure, rows);
             }
         }
     }
 
-//    public void refresh(final Set<ExplorerData> openItems, final Integer depth) {
+//    public void refresh(final Set<ExplorerNode> openItems, final Integer depth) {
 //        Scheduler.get().scheduleDeferred(new ScheduledCommand() {
 //            @Override
 //            public void execute() {

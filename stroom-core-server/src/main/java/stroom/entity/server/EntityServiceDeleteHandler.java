@@ -17,7 +17,10 @@
 package stroom.entity.server;
 
 import stroom.entity.shared.BaseEntity;
+import stroom.entity.shared.EntityService;
 import stroom.entity.shared.EntityServiceDeleteAction;
+import stroom.entity.shared.EntityServiceException;
+import stroom.entity.shared.EntityServiceSaveAction;
 import stroom.logging.EntityEventLog;
 import stroom.task.server.AbstractTaskHandler;
 import stroom.task.server.TaskHandlerBean;
@@ -26,27 +29,34 @@ import javax.inject.Inject;
 
 @TaskHandlerBean(task = EntityServiceDeleteAction.class)
 class EntityServiceDeleteHandler extends AbstractTaskHandler<EntityServiceDeleteAction<BaseEntity>, BaseEntity> {
-    private final GenericEntityService entityService;
+    private final EntityServiceBeanRegistry beanRegistry;
     private final EntityEventLog entityEventLog;
 
     @Inject
-    EntityServiceDeleteHandler(final GenericEntityService entityService, final EntityEventLog entityEventLog) {
-        this.entityService = entityService;
+    EntityServiceDeleteHandler(final EntityServiceBeanRegistry beanRegistry, final EntityEventLog entityEventLog) {
+        this.beanRegistry = beanRegistry;
         this.entityEventLog = entityEventLog;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public BaseEntity exec(final EntityServiceDeleteAction<BaseEntity> action) {
+        final Object bean = beanRegistry.getEntityService(action.getEntity().getClass());
+        if (bean == null) {
+            throw new EntityServiceException("No entity service can be found");
+        }
+        if (!(bean instanceof EntityService<?>)) {
+            throw new EntityServiceException("Bean is not an entity service");
+        }
+
+        final EntityService<BaseEntity> entityService = (EntityService<BaseEntity>) bean;
         final BaseEntity entity = action.getEntity();
+
         try {
             entityService.delete(entity);
-            if (entity != null) {
                 entityEventLog.delete(entity);
-            }
         } catch (final RuntimeException e) {
-            if (entity != null) {
                 entityEventLog.delete(entity, e);
-            }
             throw e;
         }
 

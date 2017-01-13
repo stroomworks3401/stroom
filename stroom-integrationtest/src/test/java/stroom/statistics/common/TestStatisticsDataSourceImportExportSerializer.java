@@ -44,7 +44,7 @@ public class TestStatisticsDataSourceImportExportSerializer extends AbstractCore
     @Resource
     private FolderService folderService;
     @Resource
-    private StatisticStoreEntityService statisticsDataSourceService;
+    private StatisticStoreService statisticsDataSourceService;
     @Resource
     private StatisticsDataSourceProvider statisticsDataSourceProvider;
 

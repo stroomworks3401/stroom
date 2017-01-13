@@ -55,7 +55,7 @@ public class CachedIndexService implements Clearable, InitializingBean, EntityEv
         cache = new Cache(cacheConfiguration);
         selfPopulatingCache = new SelfPopulatingCache(cache, key -> {
             Index index = (Index) key;
-            index = indexService.load(index);
+            index = indexService.loadByUuid(index.getUuid());
             if (index != null) {
                 // Create a map of index fields keyed by name.
                 final IndexFields indexFields = index.getIndexFieldsObject();

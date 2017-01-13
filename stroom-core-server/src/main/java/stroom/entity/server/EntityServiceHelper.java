@@ -40,23 +40,23 @@ public class EntityServiceHelper<E extends Entity> {
         this.queryAppender = queryAppender;
     }
 
-    public E create(E entity) throws RuntimeException {
-        if (entity.isPersistent()) {
-            throw new EntityServiceException("Entity is already persistent");
-        }
-
-        if (entity != null) {
-            queryAppender.preSave(entity);
-        }
-
-        entity = entityManager.saveEntity(entity);
-
-        if (entity != null) {
-            queryAppender.postLoad(entity);
-        }
-
-        return entity;
-    }
+//    public E create(E entity) throws RuntimeException {
+//        if (entity.isPersistent()) {
+//            throw new EntityServiceException("Entity is already persistent");
+//        }
+//
+//        if (entity != null) {
+//            queryAppender.preSave(entity);
+//        }
+//
+//        entity = entityManager.saveEntity(entity);
+//
+//        if (entity != null) {
+//            queryAppender.postLoad(entity);
+//        }
+//
+//        return entity;
+//    }
 
     public E load(final E entity) throws RuntimeException {
         return load(entity, Collections.emptySet());

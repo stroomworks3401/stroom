@@ -8,22 +8,22 @@ import java.util.List;
 import java.util.Map;
 
 public class TreeStructure implements SharedObject {
-    private ExplorerData root;
-    private Map<ExplorerData, ExplorerData> parentMap = new HashMap<>();
-    private Map<ExplorerData, List<ExplorerData>> childMap = new HashMap<>();
+    private ExplorerNode root;
+    private Map<ExplorerNode, ExplorerNode> parentMap = new HashMap<>();
+    private Map<ExplorerNode, List<ExplorerNode>> childMap = new HashMap<>();
 
     public TreeStructure() {
         // Default constructor necessary for GWT serialisation.
     }
 
-    public void add(final ExplorerData parent, final ExplorerData child) {
+    public void add(final ExplorerNode parent, final ExplorerNode child) {
         if (parent == null) {
             root = child;
         }
 
         parentMap.put(child, parent);
 
-        List<ExplorerData> children = childMap.get(parent);
+        List<ExplorerNode> children = childMap.get(parent);
         if (children == null) {
             children = new ArrayList<>();
             childMap.put(parent, children);
@@ -31,15 +31,15 @@ public class TreeStructure implements SharedObject {
         children.add(child);
     }
 
-    public ExplorerData getRoot() {
+    public ExplorerNode getRoot() {
         return root;
     }
 
-    public ExplorerData getParent(final ExplorerData child) {
+    public ExplorerNode getParent(final ExplorerNode child) {
         return parentMap.get(child);
     }
 
-    public List<ExplorerData> getChildren(final ExplorerData parent) {
+    public List<ExplorerNode> getChildren(final ExplorerNode parent) {
         return childMap.get(parent);
     }
 }

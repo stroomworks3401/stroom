@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package stroom.statistics.common;
+package stroom.entity.shared;
 
-import stroom.entity.shared.DocumentEntityService;
-import stroom.entity.shared.FindService;
-import stroom.statistics.shared.StatisticStoreEntity;
+import java.util.List;
 
-public interface StatisticStoreEntityService
-        extends DocumentEntityService<StatisticStoreEntity>, FindService<StatisticStoreEntity, FindStatisticsEntityCriteria> {
-    String FIELD_NAME_DATE_TIME = "Date Time";
-    String FIELD_NAME_VALUE = "Value";
+public interface DocumentServiceLocator {
+    DocumentService locate(String type);
+
+    List<DocumentType> getTypes();
 }

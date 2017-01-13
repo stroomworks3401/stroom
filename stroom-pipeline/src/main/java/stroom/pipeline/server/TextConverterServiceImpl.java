@@ -21,15 +21,14 @@ import org.springframework.transaction.annotation.Transactional;
 import stroom.entity.server.DocumentEntityServiceImpl;
 import stroom.entity.server.util.StroomDatabaseInfo;
 import stroom.entity.server.util.StroomEntityManager;
+import stroom.entity.shared.DocumentType;
+import stroom.logging.EntityEventLog;
 import stroom.pipeline.shared.FindTextConverterCriteria;
-import stroom.pipeline.shared.PipelineEntity;
 import stroom.pipeline.shared.TextConverter;
 import stroom.pipeline.shared.TextConverterService;
 import stroom.security.SecurityContext;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 @Transactional
@@ -38,9 +37,14 @@ public class TextConverterServiceImpl extends DocumentEntityServiceImpl<TextConv
     private final StroomDatabaseInfo stroomDatabaseInfo;
 
     @Inject
-    TextConverterServiceImpl(final StroomEntityManager entityManager, final SecurityContext securityContext, final StroomDatabaseInfo stroomDatabaseInfo) {
-        super(entityManager, securityContext);
+    TextConverterServiceImpl(final StroomEntityManager entityManager, final SecurityContext securityContext, final EntityEventLog entityEventLog, final StroomDatabaseInfo stroomDatabaseInfo) {
+        super(entityManager, securityContext, entityEventLog);
         this.stroomDatabaseInfo = stroomDatabaseInfo;
+    }
+
+    @Override
+    public DocumentType getDocumentType() {
+        return getDocumentType(4, "TextConverter", "Text Converter");
     }
 
     @Override
@@ -48,25 +52,25 @@ public class TextConverterServiceImpl extends DocumentEntityServiceImpl<TextConv
         return TextConverter.class;
     }
 
-    @Override
-    protected List<EntityReferenceQuery> getReferenceTableList() {
-        final boolean mySql = stroomDatabaseInfo.isMysql();
-        final ArrayList<EntityReferenceQuery> rtnList = new ArrayList<>();
-        if (mySql) {
-            rtnList.add(new EntityReferenceQuery(PipelineEntity.ENTITY_TYPE, PipelineEntity.TABLE_NAME,
-                    PipelineEntity.DATA + " regexp '<type>@TYPE@</type>[[:space:]]*<id>@ID@</id>'"));
-        } else {
-            // This won't work too well as we really need to match with a regex
-            // that we can only do in MySQL
-            rtnList.add(new EntityReferenceQuery(PipelineEntity.ENTITY_TYPE, PipelineEntity.TABLE_NAME,
-                    "(locate('<type>@TYPE@</type>', CAST(" + PipelineEntity.DATA
-                            + " AS LONGVARCHAR)) <> 0 AND locate('<id>@ID@</id>', CAST(" + PipelineEntity.DATA
-                            + " AS LONGVARCHAR)) <> 0)"));
-
-        }
-
-        return rtnList;
-    }
+//    @Override
+//    protected List<EntityReferenceQuery> getReferenceTableList() {
+//        final boolean mySql = stroomDatabaseInfo.isMysql();
+//        final ArrayList<EntityReferenceQuery> rtnList = new ArrayList<>();
+//        if (mySql) {
+//            rtnList.add(new EntityReferenceQuery(PipelineEntity.ENTITY_TYPE, PipelineEntity.TABLE_NAME,
+//                    PipelineEntity.DATA + " regexp '<type>@TYPE@</type>[[:space:]]*<id>@ID@</id>'"));
+//        } else {
+//            // This won't work too well as we really need to match with a regex
+//            // that we can only do in MySQL
+//            rtnList.add(new EntityReferenceQuery(PipelineEntity.ENTITY_TYPE, PipelineEntity.TABLE_NAME,
+//                    "(locate('<type>@TYPE@</type>', CAST(" + PipelineEntity.DATA
+//                            + " AS LONGVARCHAR)) <> 0 AND locate('<id>@ID@</id>', CAST(" + PipelineEntity.DATA
+//                            + " AS LONGVARCHAR)) <> 0)"));
+//
+//        }
+//
+//        return rtnList;
+//    }
 
     @Override
     public FindTextConverterCriteria createCriteria() {

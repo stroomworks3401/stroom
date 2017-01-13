@@ -36,7 +36,7 @@ import stroom.explorer.client.event.RefreshExplorerTreeEvent;
 import stroom.explorer.client.event.SelectionType;
 import stroom.explorer.client.event.ShowNewMenuEvent;
 import stroom.explorer.shared.DocumentTypes;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 import stroom.security.client.event.CurrentUserChangedEvent;
 import stroom.security.client.event.CurrentUserChangedEvent.CurrentUserChangedHandler;
 import stroom.security.shared.DocumentPermissionNames;
@@ -70,7 +70,7 @@ public class ExplorerTreePresenter
 
         explorerTree = new ExplorerTree(dispatcher, true) {
             @Override
-            protected void doSelect(final ExplorerData selection, final SelectionType selectionType) {
+            protected void doSelect(final ExplorerNode selection, final SelectionType selectionType) {
                 super.doSelect(selection, selectionType);
                 getView().setDeleteEnabled(explorerTree.getSelectionModel().getSelectedItems().size() > 0);
             }

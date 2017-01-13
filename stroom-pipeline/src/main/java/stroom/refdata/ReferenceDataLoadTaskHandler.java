@@ -29,7 +29,7 @@ import stroom.pipeline.server.factory.Pipeline;
 import stroom.pipeline.server.factory.PipelineDataCache;
 import stroom.pipeline.server.factory.PipelineFactory;
 import stroom.pipeline.shared.PipelineEntity;
-import stroom.pipeline.shared.PipelineEntityService;
+import stroom.pipeline.shared.PipelineService;
 import stroom.pipeline.shared.data.PipelineData;
 import stroom.pipeline.state.FeedHolder;
 import stroom.pipeline.state.PipelineHolder;
@@ -70,7 +70,7 @@ public class ReferenceDataLoadTaskHandler extends AbstractTaskHandler<ReferenceD
     @Resource(name = "cachedFeedService")
     private FeedService feedService;
     @Resource(name = "cachedPipelineEntityService")
-    private PipelineEntityService pipelineEntityService;
+    private PipelineService pipelineEntityService;
     @Resource
     private PipelineHolder pipelineHolder;
     @Resource

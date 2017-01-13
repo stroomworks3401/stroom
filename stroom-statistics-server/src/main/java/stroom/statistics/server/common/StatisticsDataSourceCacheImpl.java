@@ -23,7 +23,7 @@ import stroom.entity.shared.DocRef;
 import stroom.entity.shared.EntityAction;
 import stroom.statistics.common.FindStatisticsEntityCriteria;
 import stroom.statistics.common.StatisticStoreCache;
-import stroom.statistics.common.StatisticStoreEntityService;
+import stroom.statistics.common.StatisticStoreService;
 import stroom.statistics.shared.StatisticStoreEntity;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -39,14 +39,14 @@ public class StatisticsDataSourceCacheImpl implements StatisticStoreCache, Entit
     private static final String STATISTICS_DATA_SOURCE_CACHE_NAME_BY_ID = "StatisticDataSourceCacheById";
     private static final String STATISTICS_DATA_SOURCE_CACHE_NAME_BY_NAME_ENGINE = "StatisticDataSourceCacheByNameEngine";
 
-    private final StatisticStoreEntityService statisticsDataSourceService;
+    private final StatisticStoreService statisticsDataSourceService;
     private final CacheManager cacheManager;
 
     private volatile Cache cacheByRef;
     private volatile Cache cacheByNameEngine;
 
     @Inject
-    public StatisticsDataSourceCacheImpl(final StatisticStoreEntityService statisticsDataSourceService,
+    public StatisticsDataSourceCacheImpl(final StatisticStoreService statisticsDataSourceService,
                                          final CacheManager cacheManager) {
         this.statisticsDataSourceService = statisticsDataSourceService;
         this.cacheManager = cacheManager;

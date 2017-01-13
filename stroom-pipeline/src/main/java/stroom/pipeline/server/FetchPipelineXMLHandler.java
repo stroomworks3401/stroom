@@ -19,7 +19,7 @@ package stroom.pipeline.server;
 import stroom.entity.server.MarshalOptions;
 import stroom.pipeline.shared.FetchPipelineXMLAction;
 import stroom.pipeline.shared.PipelineEntity;
-import stroom.pipeline.shared.PipelineEntityService;
+import stroom.pipeline.shared.PipelineService;
 import stroom.task.server.AbstractTaskHandler;
 import stroom.task.server.TaskHandlerBean;
 import stroom.util.shared.SharedString;
@@ -29,7 +29,7 @@ import javax.annotation.Resource;
 @TaskHandlerBean(task = FetchPipelineXMLAction.class)
 public class FetchPipelineXMLHandler extends AbstractTaskHandler<FetchPipelineXMLAction, SharedString> {
     @Resource
-    private PipelineEntityService pipelineEntityService;
+    private PipelineService pipelineEntityService;
     @Resource
     private MarshalOptions marshalOptions;
 
@@ -39,7 +39,7 @@ public class FetchPipelineXMLHandler extends AbstractTaskHandler<FetchPipelineXM
 
         marshalOptions.setDisabled(true);
 
-        final PipelineEntity pipelineEntity = pipelineEntityService.loadById(action.getPipelineId());
+        final PipelineEntity pipelineEntity = pipelineEntityService.loadByUuid(action.getPipeline().getUuid());
 
         if (pipelineEntity != null) {
             result = SharedString.wrap(pipelineEntity.getData());

@@ -25,7 +25,6 @@ import stroom.entity.server.util.XMLUtil;
 import stroom.entity.shared.BaseEntity;
 import stroom.entity.shared.DocRef;
 import stroom.entity.shared.DocumentEntity;
-import stroom.entity.shared.DocumentEntityService;
 import stroom.entity.shared.EntityAction;
 import stroom.entity.shared.EntityActionConfirmation;
 import stroom.entity.shared.EntityDependencyServiceException;
@@ -38,9 +37,7 @@ import stroom.entity.shared.FolderService;
 import stroom.entity.shared.NamedEntity;
 import stroom.entity.shared.Res;
 import stroom.pipeline.shared.ExtensionProvider;
-import stroom.pipeline.shared.PipelineEntity;
 import stroom.streamstore.server.fs.FileSystemUtil;
-import stroom.streamstore.shared.StreamType;
 import stroom.util.date.DateUtil;
 import stroom.util.io.StreamUtil;
 import stroom.util.logging.StroomLogger;
@@ -107,66 +104,66 @@ public class ImportExportSerializerImpl implements ImportExportSerializer {
         this.genericEntityMarshaller = genericEntityMarshaller;
     }
 
-    /**
-     * Registers all the entities in the ClassTypeMap if they have not already
-     * been registered.
-     */
-    private void init() {
-        if (!entitiesInitialised) {
-            synchronized (this) {
-                if (!entitiesInitialised) {
-                    registerEntities();
-                    entitiesInitialised = true;
-                }
-            }
-        }
-    }
-
-    /**
-     * Use the spring registered instances of DocumentEntityServiceImpl to work
-     * out which GroupedEntities to register into the ClassTypeMap The order we
-     * register them in is important as some are dependent on others.
-     */
-    private void registerEntities() {
-        // Stream type is a special case so explicitly register it first.
-        classTypeMap.registerEntityReference(StreamType.class);
-
-        // get all the spring grouped entity service beans.
-        final Collection<DocumentEntityService<?>> services = genericEntityService.findAll();
-
-        final ArrayList<Class<? extends DocumentEntity>> entityClasses = new ArrayList<>(services.size());
-        for (final DocumentEntityService<?> service : services) {
-            final Class<? extends DocumentEntity> clazz = service.getEntityClass();
-            if (clazz == null) {
-                throw new NullPointerException("No entity class provided");
-            } else {
-                entityClasses.add(clazz);
-            }
-        }
-
-        // Sort the list of entity classes to ensure consistent behaviour.
-        Collections.sort(entityClasses, new EntityClassComparator());
-        // Make sure folders are first
-        entityClasses.remove(Folder.class);
-        entityClasses.add(0, Folder.class);
-        // Make sure pipelines are last.
-        entityClasses.remove(PipelineEntity.class);
-        entityClasses.add(PipelineEntity.class);
-
-        // Keep repeating the services loop to ensure all dependencies are
-        // loaded.
-        for (int i = 0; i < entityClasses.size(); i++) {
-            // No dependencies and not already registered.
-            entityClasses.stream().filter(entityClass -> classTypeMap.getEntityType(entityClass) == null)
-                    .forEach(classTypeMap::registerEntity);
-        }
-    }
+//    /**
+//     * Registers all the entities in the ClassTypeMap if they have not already
+//     * been registered.
+//     */
+//    private void init() {
+//        if (!entitiesInitialised) {
+//            synchronized (this) {
+//                if (!entitiesInitialised) {
+//                    registerEntities();
+//                    entitiesInitialised = true;
+//                }
+//            }
+//        }
+//    }
+//
+//    /**
+//     * Use the spring registered instances of DocumentEntityServiceImpl to work
+//     * out which GroupedEntities to register into the ClassTypeMap The order we
+//     * register them in is important as some are dependent on others.
+//     */
+//    private void registerEntities() {
+//        // Stream type is a special case so explicitly register it first.
+//        classTypeMap.registerEntityReference(StreamType.class);
+//
+//        // get all the spring grouped entity service beans.
+//        final Collection<DocumentService<?>> services = genericEntityService.findAll();
+//
+//        final ArrayList<Class<? extends DocumentEntity>> entityClasses = new ArrayList<>(services.size());
+//        for (final DocumentService<?> service : services) {
+//            final Class<? extends DocumentEntity> clazz = service.getEntityClass();
+//            if (clazz == null) {
+//                throw new NullPointerException("No entity class provided");
+//            } else {
+//                entityClasses.add(clazz);
+//            }
+//        }
+//
+//        // Sort the list of entity classes to ensure consistent behaviour.
+//        Collections.sort(entityClasses, new EntityClassComparator());
+//        // Make sure folders are first
+//        entityClasses.remove(Folder.class);
+//        entityClasses.add(0, Folder.class);
+//        // Make sure pipelines are last.
+//        entityClasses.remove(PipelineEntity.class);
+//        entityClasses.add(PipelineEntity.class);
+//
+//        // Keep repeating the services loop to ensure all dependencies are
+//        // loaded.
+//        for (int i = 0; i < entityClasses.size(); i++) {
+//            // No dependencies and not already registered.
+//            entityClasses.stream().filter(entityClass -> classTypeMap.getEntityType(entityClass) == null)
+//                    .forEach(classTypeMap::registerEntity);
+//        }
+//    }
 
     @SuppressWarnings("unchecked")
     @Override
     public void read(final File dir, List<EntityActionConfirmation> entityActionConfirmationList,
                      final ImportMode importMode) {
-        init();
+//        init();
 
         if (importMode == ImportMode.IGNORE_CONFIRMATION) {
             entityActionConfirmationList = new ArrayList<>();
@@ -201,8 +198,8 @@ public class ImportExportSerializerImpl implements ImportExportSerializer {
     @Override
     public void write(final File dir, final FindFolderCriteria findFolderCriteria, final boolean omitAuditFields,
                       final boolean ignoreErrors, final List<String> messageList) {
-        init();
-
+//        init();
+//
 //        final EntityIdSet<Folder> entityIdSet = folderService
 //                .buildNestedFolderList(findFolderCriteria.getFolderIdSet());
 //        // Export
@@ -217,7 +214,7 @@ public class ImportExportSerializerImpl implements ImportExportSerializer {
     public <E extends DocumentEntity> void performImport(final File dir, final Class<E> entityClass,
                                                          final String entityType, final Map<String, EntityActionConfirmation> confirmMap,
                                                          final ImportMode importMode) {
-        init();
+//        init();
 
         if (!dir.isDirectory()) {
             throw new EntityServiceException("Dir \"" + dir.getAbsolutePath() + "\" not found");
@@ -289,15 +286,18 @@ public class ImportExportSerializerImpl implements ImportExportSerializer {
                     final String folderPath = path.substring(0, index);
                     final String[] folderNames = folderPath.split("/");
                     for (final String folderName : folderNames) {
-                        Folder folder = folderService.loadByName(DocRef.create(parentFolder), folderName);
-                        // Stub it out.
-                        if (folder == null) {
-                            folder = new Folder();
-                            folder.setFolder(parentFolder);
-                            folder.setName(folderName);
-                        }
 
-                        parentFolder = folder;
+                        // TODO : FIX THIS
+
+//                        Folder folder = folderService.loadByName(DocRef.create(parentFolder), folderName);
+//                        // Stub it out.
+//                        if (folder == null) {
+//                            folder = new Folder();
+//                            folder.setFolder(parentFolder);
+//                            folder.setName(folderName);
+//                        }
+//
+//                        parentFolder = folder;
                     }
                 }
 
@@ -342,7 +342,7 @@ public class ImportExportSerializerImpl implements ImportExportSerializer {
     private <E extends DocumentEntity> void performExport(final File dir, final EntityIdSet<Folder> entityIdSet,
                                                           final Folder folder, final Class<E> entityClass, final String entityType, final List<Property> propertyList,
                                                           final boolean ignoreErrors, final List<String> messageList) {
-        init();
+//        init();
 
         doPerformExport(dir, entityIdSet, folder, entityClass, entityType, propertyList, ignoreErrors, messageList);
     }
@@ -376,25 +376,27 @@ public class ImportExportSerializerImpl implements ImportExportSerializer {
                 }
             }
         } else {
-            // Otherwise just check the parent is in the group we are supposed
-            // to export.
-            if (folder != null && entityIdSet.isMatch(folder.getId())) {
-                try {
-                    final List<E> list = genericEntityService.findByFolder(entityType, DocRef.create(folder), RESOURCE_FETCH_SET);
+//            // Otherwise just check the parent is in the group we are supposed
+//            // to export.
+//            if (folder != null && entityIdSet.isMatch(folder.getId())) {
+//                try {
+//                    final List<E> list = genericEntityService.findByFolder(entityType, DocRef.create(folder), RESOURCE_FETCH_SET);
+//
+//                    for (final E entity : list) {
+//                        performExport(dir, folder, entityClass, entityType, propertyList, entity, ignoreErrors,
+//                                messageList);
+//                        exportedSomething = true;
+//                    }
+//                } catch (final Exception ex) {
+//                    if (ignoreErrors) {
+//                        messageList.add(EntityServiceExceptionUtil.getDefaultMessage(ex, ex));
+//                    } else {
+//                        throw EntityServiceExceptionUtil.create(ex);
+//                    }
+//                }
+//            }
 
-                    for (final E entity : list) {
-                        performExport(dir, folder, entityClass, entityType, propertyList, entity, ignoreErrors,
-                                messageList);
-                        exportedSomething = true;
-                    }
-                } catch (final Exception ex) {
-                    if (ignoreErrors) {
-                        messageList.add(EntityServiceExceptionUtil.getDefaultMessage(ex, ex));
-                    } else {
-                        throw EntityServiceExceptionUtil.create(ex);
-                    }
-                }
-            }
+            // FIXME : FIX ME
         }
 
         // Now step into sub folders
@@ -438,7 +440,7 @@ public class ImportExportSerializerImpl implements ImportExportSerializer {
             return;
         }
 
-        init();
+//        init();
 
         LOGGER.info("performExport() - %s %s", entityType, entity);
         try {
@@ -589,7 +591,7 @@ public class ImportExportSerializerImpl implements ImportExportSerializer {
     private <E extends DocumentEntity> void performImport(final File file, final Folder folder,
                                                           final Class<E> entityClass, final String entityType, final List<Property> propertyList, final String name,
                                                           final Map<String, EntityActionConfirmation> confirmMap, final ImportMode importMode) {
-        init();
+//        init();
 
         LOGGER.info("performImport() - %s %s", entityType, file);
 
@@ -821,17 +823,19 @@ public class ImportExportSerializerImpl implements ImportExportSerializer {
                     // unsupported.
                     if (entityType != null) {
                         for (final Object obj : values) {
-                            if (obj instanceof String) {
-                                final String string = (String) obj;
-                                if (StringUtils.hasText(string)) {
-                                    final BaseEntity entity = resolveEntityByPath(beanWrapper, clazz, string);
-                                    newSet.add(entity);
-                                }
-                            } else if (obj instanceof DocRef) {
-                                final DocRef docRef = (DocRef) obj;
-                                final BaseEntity entity = resolveEntityByDocRef(beanWrapper, docRef);
-                                newSet.add(entity);
-                            }
+//                            if (obj instanceof String) {
+//                                final String string = (String) obj;
+//                                if (StringUtils.hasText(string)) {
+//                                    final BaseEntity entity = resolveEntityByPath(beanWrapper, clazz, string);
+//                                    newSet.add(entity);
+//                                }
+//                            } else if (obj instanceof DocRef) {
+//                                final DocRef docRef = (DocRef) obj;
+//                                final BaseEntity entity = resolveEntityByDocRef(beanWrapper, docRef);
+//                                newSet.add(entity);
+//                            }
+
+                            // FIXME
                         }
                     }
                 }
@@ -909,15 +913,17 @@ public class ImportExportSerializerImpl implements ImportExportSerializer {
             }
 
         } else {
-            // This property is an entity so get the referenced
-            // entity if we can.
-            final BaseEntity entity = resolveEntityByPath(beanWrapper, clazz, value);
-            if (importMode == ImportMode.CREATE_CONFIRMATION) {
-                if (!entity.equals(beanWrapper.getPropertyValue(propertyName))) {
-                    entityActionConfirmation.getUpdatedFieldList().add(propertyName);
-                }
-            }
-            beanWrapper.setPropertyValue(propertyName, entity);
+//            // This property is an entity so get the referenced
+//            // entity if we can.
+//            final BaseEntity entity = resolveEntityByPath(beanWrapper, clazz, value);
+//            if (importMode == ImportMode.CREATE_CONFIRMATION) {
+//                if (!entity.equals(beanWrapper.getPropertyValue(propertyName))) {
+//                    entityActionConfirmation.getUpdatedFieldList().add(propertyName);
+//                }
+//            }
+//            beanWrapper.setPropertyValue(propertyName, entity);
+
+            // FIXME
         }
     }
 
@@ -935,25 +941,25 @@ public class ImportExportSerializerImpl implements ImportExportSerializer {
         beanWrapper.setPropertyValue(propertyName, entity);
     }
 
-    private BaseEntity resolveEntityByPath(final BaseEntityBeanWrapper beanWrapper, final Class<? extends NamedEntity> clazz,
-                                           final String val) {
-        NamedEntity entity;
-//        if (DocumentEntity.class.isAssignableFrom(clazz)) {
-//            entity = entityPathResolver.getEntity(classTypeMap.getEntityType(clazz), beanWrapper.getBaseEntity(), val,
-//                    null);
-//        } else {
-            entity = genericEntityService.loadByName(classTypeMap.getEntityType(clazz), val);
+//    private BaseEntity resolveEntityByPath(final BaseEntityBeanWrapper beanWrapper, final Class<? extends NamedEntity> clazz,
+//                                           final String val) {
+//        NamedEntity entity;
+////        if (DocumentEntity.class.isAssignableFrom(clazz)) {
+////            entity = entityPathResolver.getEntity(classTypeMap.getEntityType(clazz), beanWrapper.getBaseEntity(), val,
+////                    null);
+////        } else {
+//            entity = genericEntityService.loadByName(classTypeMap.getEntityType(clazz), val);
+////        }
+//
+//        if (entity == null) {
+//            // If we couldn't find the referenced entity then throw an entity
+//            // dependency exception. We might get the dependency added later in
+//            // this import and be able to add this entity again later.
+//            throw new EntityDependencyServiceException(classTypeMap.getEntityType(clazz), val);
 //        }
-
-        if (entity == null) {
-            // If we couldn't find the referenced entity then throw an entity
-            // dependency exception. We might get the dependency added later in
-            // this import and be able to add this entity again later.
-            throw new EntityDependencyServiceException(classTypeMap.getEntityType(clazz), val);
-        }
-
-        return entity;
-    }
+//
+//        return entity;
+//    }
 
     private BaseEntity resolveEntityByDocRef(final BaseEntityBeanWrapper beanWrapper, final DocRef docRef) {
         NamedEntity entity = genericEntityService.loadByUuid(docRef.getType(), docRef.getUuid());

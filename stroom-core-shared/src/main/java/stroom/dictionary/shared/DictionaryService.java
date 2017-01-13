@@ -17,8 +17,11 @@
 package stroom.dictionary.shared;
 
 import stroom.entity.shared.DocumentEntityService;
+import stroom.entity.shared.DocumentService;
+import stroom.entity.shared.EntityService;
 import stroom.entity.shared.FindService;
+import stroom.entity.shared.HasLoadByUuid;
 
 public interface DictionaryService
-        extends DocumentEntityService<Dictionary>, FindService<Dictionary, FindDictionaryCriteria> {
+        extends DocumentEntityService<Dictionary, FindDictionaryCriteria> {
 }

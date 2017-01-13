@@ -26,7 +26,7 @@ import stroom.entity.shared.FolderService;
 import stroom.feed.shared.Feed;
 import stroom.feed.shared.FeedService;
 import stroom.pipeline.shared.PipelineEntity;
-import stroom.pipeline.shared.PipelineEntityService;
+import stroom.pipeline.shared.PipelineService;
 import stroom.resource.server.ResourceStore;
 import stroom.util.shared.ResourceKey;
 import stroom.util.test.FileSystemTestUtil;
@@ -44,7 +44,7 @@ public class TestImportExportServiceImpl extends AbstractCoreIntegrationTest {
     @Resource
     private FolderService folderService;
     @Resource
-    private PipelineEntityService pipelineEntityService;
+    private PipelineService pipelineEntityService;
     @Resource
     private FeedService feedService;
     @Resource

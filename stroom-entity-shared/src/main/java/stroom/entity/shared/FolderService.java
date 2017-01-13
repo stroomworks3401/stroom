@@ -16,5 +16,5 @@
 
 package stroom.entity.shared;
 
-public interface FolderService extends DocumentEntityService<Folder>, FindService<Folder, FindFolderCriteria> {
+public interface FolderService extends DocumentEntityService<Folder, FindFolderCriteria> {
 }

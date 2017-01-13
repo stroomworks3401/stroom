@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package stroom.explorer.shared;
+package stroom.entity.shared;
 
 import stroom.util.shared.SharedObject;
 

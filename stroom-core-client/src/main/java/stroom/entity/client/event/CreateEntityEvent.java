@@ -21,6 +21,7 @@ import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HasHandlers;
 import com.gwtplatform.mvp.client.MyPresenter;
+import stroom.explorer.shared.ExplorerNode;
 
 public class CreateEntityEvent extends GwtEvent<CreateEntityEvent.Handler> {
     public interface Handler extends EventHandler {
@@ -31,10 +32,10 @@ public class CreateEntityEvent extends GwtEvent<CreateEntityEvent.Handler> {
 
     private final MyPresenter<?, ?> presenter;
     private final String entityType;
-    private final DocRef folder;
+    private final ExplorerNode folder;
     private final String entityName;
 
-    private CreateEntityEvent(final MyPresenter<?, ?> presenter, final String entityType, final DocRef folder,
+    private CreateEntityEvent(final MyPresenter<?, ?> presenter, final String entityType, final ExplorerNode folder,
             final String entityName) {
         this.presenter = presenter;
         this.entityType = entityType;
@@ -43,13 +44,13 @@ public class CreateEntityEvent extends GwtEvent<CreateEntityEvent.Handler> {
     }
 
     public static void fire(final HasHandlers handlers, final MyPresenter<?, ?> presenter, final String entityType,
-            final DocRef folder, final String entityName) {
+            final ExplorerNode folder, final String entityName) {
         handlers.fireEvent(new CreateEntityEvent(presenter, entityType, folder, entityName));
     }
 
     public static Type<Handler> getType() {
         if (TYPE == null) {
-            TYPE = new Type<Handler>();
+            TYPE = new Type<>();
         }
         return TYPE;
     }
@@ -72,7 +73,7 @@ public class CreateEntityEvent extends GwtEvent<CreateEntityEvent.Handler> {
         return entityType;
     }
 
-    public DocRef getFolder() {
+    public ExplorerNode getFolder() {
         return folder;
     }
 

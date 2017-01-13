@@ -22,9 +22,11 @@ import org.springframework.transaction.annotation.Transactional;
 import stroom.entity.server.AutoMarshal;
 import stroom.entity.server.DocumentEntityServiceImpl;
 import stroom.entity.server.util.StroomEntityManager;
+import stroom.entity.shared.DocumentType;
 import stroom.index.shared.FindIndexCriteria;
 import stroom.index.shared.Index;
 import stroom.index.shared.IndexService;
+import stroom.logging.EntityEventLog;
 import stroom.security.SecurityContext;
 import stroom.util.spring.StroomSpringProfiles;
 
@@ -36,8 +38,13 @@ import javax.inject.Inject;
 @AutoMarshal
 public class IndexServiceImpl extends DocumentEntityServiceImpl<Index, FindIndexCriteria> implements IndexService {
     @Inject
-    IndexServiceImpl(final StroomEntityManager entityManager, final SecurityContext securityContext) {
-        super(entityManager, securityContext);
+    IndexServiceImpl(final StroomEntityManager entityManager, final SecurityContext securityContext, final EntityEventLog entityEventLog) {
+        super(entityManager, securityContext, entityEventLog);
+    }
+
+    @Override
+    public DocumentType getDocumentType() {
+        return getDocumentType(10, "Index", "Index");
     }
 
     @Override

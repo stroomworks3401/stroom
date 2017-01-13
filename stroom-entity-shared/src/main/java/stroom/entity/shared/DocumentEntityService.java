@@ -16,37 +16,10 @@
 
 package stroom.entity.shared;
 
-import java.util.List;
-import java.util.Set;
+public interface DocumentEntityService<E extends Entity, C extends BaseCriteria> extends DocumentService, HasLoadByUuid<E>, EntityService<E>, FindService<E, C> {
+    E create(final DocRef folder, final String name);
 
-public interface DocumentEntityService<E extends DocumentEntity> extends BaseEntityService<E>, HasLoadByUuid<E>, ProvidesNamePattern {
-    E create(DocRef folder, String name) throws RuntimeException;
+    E copy(E original, DocRef folder, String name);
 
-    E loadByName(DocRef folder, String name) throws RuntimeException;
-
-    E loadByName(DocRef folder, String name, Set<String> fetchSet) throws RuntimeException;
-
-    /**
-     * Copy the entity to the specified folder with the specified name.
-     */
-    E copy(E entity, DocRef folder, String name);
-
-    /**
-     * Move the entity to the specified folder.
-     */
-    E move(E entity, DocRef folder);
-
-    List<E> findByFolder(DocRef folder, Set<String> fetchSet) throws RuntimeException;
-
-    E importEntity(E entity, DocRef folder);
-
-    E exportEntity(E entity);
-
-    /**
-     * Get a list of all possible permissions for the associated document type.
-     *
-     * @return A list of all possible permissions for the associated document
-     * type.
-     */
-    String[] getPermissions();
+    E move(E entity, DocRef folder, String name);
 }

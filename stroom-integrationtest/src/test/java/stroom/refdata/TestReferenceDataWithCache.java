@@ -25,7 +25,7 @@ import stroom.feed.shared.FeedService;
 import stroom.pipeline.server.errorhandler.ErrorReceiver;
 import stroom.pipeline.server.errorhandler.FatalErrorReceiver;
 import stroom.pipeline.shared.PipelineEntity;
-import stroom.pipeline.shared.PipelineEntityService;
+import stroom.pipeline.shared.PipelineService;
 import stroom.pipeline.shared.data.PipelineReference;
 import stroom.streamstore.shared.StreamType;
 import stroom.util.date.DateUtil;
@@ -52,7 +52,7 @@ public class TestReferenceDataWithCache extends AbstractCoreIntegrationTest {
     @Resource
     private FeedService feedService;
     @Resource
-    private PipelineEntityService pipelineEntityService;
+    private PipelineService pipelineEntityService;
     @Resource
     private StroomBeanStore beanStore;
 

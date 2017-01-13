@@ -16,13 +16,10 @@
 
 package stroom.security.server;
 
-import stroom.entity.server.GenericEntityService;
-import stroom.entity.shared.BaseEntity;
 import stroom.entity.shared.DocRef;
-import stroom.entity.shared.DocumentEntity;
-import stroom.entity.shared.DocumentEntityService;
 import stroom.entity.shared.EntityServiceException;
 import stroom.entity.shared.Folder;
+import stroom.explorer.server.ExplorerService;
 import stroom.security.Insecure;
 import stroom.security.SecurityContext;
 import stroom.security.shared.ChangeDocumentPermissionsAction;
@@ -38,8 +35,6 @@ import stroom.util.logging.StroomLogger;
 import stroom.util.shared.VoidResult;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -56,17 +51,16 @@ public class ChangeDocumentPermissionsHandler
     private final UserService userService;
     private final UserPermissionsCache userPermissionsCache;
     private final SecurityContext securityContext;
-    private final GenericEntityService genericEntityService;
-    private volatile List<String> typeList;
+    private final ExplorerService explorerService;
 
     @Inject
-    public ChangeDocumentPermissionsHandler(final DocumentPermissionService documentPermissionService, final DocumentPermissionsCache documentPermissionsCache, final UserService userService, final UserPermissionsCache userPermissionsCache, final SecurityContext securityContext, final GenericEntityService genericEntityService) {
+    public ChangeDocumentPermissionsHandler(final DocumentPermissionService documentPermissionService, final DocumentPermissionsCache documentPermissionsCache, final UserService userService, final UserPermissionsCache userPermissionsCache, final SecurityContext securityContext, final ExplorerService explorerService) {
         this.documentPermissionService = documentPermissionService;
         this.documentPermissionsCache = documentPermissionsCache;
         this.userService = userService;
         this.userPermissionsCache = userPermissionsCache;
         this.securityContext = securityContext;
-        this.genericEntityService = genericEntityService;
+        this.explorerService = explorerService;
     }
 
     @Override
@@ -79,7 +73,7 @@ public class ChangeDocumentPermissionsHandler
             final Set<DocRef> affectedDocRefs = new HashSet<>();
             final Set<UserRef> affectedUserRefs = new HashSet<>();
 
-            // Change the permissions of teh document.
+            // Change the permissions of the document.
             final ChangeSet<UserPermission> changeSet = action.getChangeSet();
             changeDocPermissions(docRef, changeSet, affectedDocRefs, affectedUserRefs, false);
 
@@ -100,8 +94,8 @@ public class ChangeDocumentPermissionsHandler
             }
 
             // Force refresh of cached permissions.
-            affectedDocRefs.stream().forEach(documentPermissionsCache::remove);
-            affectedUsers.stream().forEach(userPermissionsCache::remove);
+            affectedDocRefs.forEach(documentPermissionsCache::remove);
+            affectedUsers.forEach(userPermissionsCache::remove);
 
             return VoidResult.INSTANCE;
         }
@@ -163,72 +157,47 @@ public class ChangeDocumentPermissionsHandler
     }
 
     private void cascadeChanges(final DocRef docRef, final ChangeSet<UserPermission> changeSet, final Set<DocRef> affectedDocRefs, final Set<UserRef> affectedUserRefs, final ChangeDocumentPermissionsAction.Cascade cascade) {
-        final BaseEntity entity = genericEntityService.loadByUuid(docRef.getType(), docRef.getUuid());
-        if (entity != null) {
-            if (entity instanceof Folder) {
-                final Folder folder = (Folder) entity;
+        if ("System".equals(docRef.getType()) || "Folder".equals(docRef.getType())) {
+            switch (cascade) {
+                case CHANGES_ONLY:
+                    // We are only cascading changes so just pass on the change set.
+                    changeDescendantPermissions(docRef, changeSet, affectedDocRefs, affectedUserRefs, false);
+                    break;
 
-                switch (cascade) {
-                    case CHANGES_ONLY:
-                        // We are only cascading changes so just pass on the change set.
-                        changeChildPermissions(DocRef.create(folder), changeSet, affectedDocRefs, affectedUserRefs, false);
-                        break;
-
-                    case ALL:
-                        // We are replicating the permissions of the parent folder on all children so create a change set from the parent folder.
-                        final DocumentPermissions parentPermissions = documentPermissionService.getPermissionsForDocument(DocRef.create(folder));
-                        final ChangeSet<UserPermission> fullChangeSet = new ChangeSet<>();
-                        for (final Map.Entry<UserRef, Set<String>> entry : parentPermissions.getUserPermissions().entrySet()) {
-                            final UserRef userRef = entry.getKey();
-                            for (final String permission : entry.getValue()) {
-                                fullChangeSet.add(new UserPermission(userRef, permission));
-                            }
+                case ALL:
+                    // We are replicating the permissions of the parent folder on all children so create a change set from the parent folder.
+                    final DocumentPermissions parentPermissions = documentPermissionService.getPermissionsForDocument(docRef);
+                    final ChangeSet<UserPermission> fullChangeSet = new ChangeSet<>();
+                    for (final Map.Entry<UserRef, Set<String>> entry : parentPermissions.getUserPermissions().entrySet()) {
+                        final UserRef userRef = entry.getKey();
+                        for (final String permission : entry.getValue()) {
+                            fullChangeSet.add(new UserPermission(userRef, permission));
                         }
-
-                        // Set child permissions to that of the parent folder after clearing all permissions from child documents.
-                        changeChildPermissions(DocRef.create(folder), fullChangeSet, affectedDocRefs, affectedUserRefs, true);
-
-                        break;
-
-                    case NO:
-                        // Do nothing.
-                        break;
-                }
-            }
-        }
-    }
-
-    private void changeChildPermissions(final DocRef folder, final ChangeSet<UserPermission> changeSet, final Set<DocRef> affectedDocRefs, final Set<UserRef> affectedUserRefs, final boolean clear) {
-        final List<String> types = getTypeList();
-        for (final String type : types) {
-            final List<DocumentEntity> children = genericEntityService.findByFolder(type, folder, null);
-            if (children != null && children.size() > 0) {
-                for (final DocumentEntity child : children) {
-                    final DocRef childDocRef = DocRef.create(child);
-                    changeDocPermissions(childDocRef, changeSet, affectedDocRefs, affectedUserRefs, clear);
-
-                    if (child instanceof Folder) {
-                        changeChildPermissions(childDocRef, changeSet, affectedDocRefs, affectedUserRefs, clear);
                     }
-                }
+
+                    // Set child permissions to that of the parent folder after clearing all permissions from child documents.
+                    changeDescendantPermissions(docRef, fullChangeSet, affectedDocRefs, affectedUserRefs, true);
+
+                    break;
+
+                case NO:
+                    // Do nothing.
+                    break;
             }
         }
     }
 
-    private List<String> getTypeList() {
-        if (typeList == null) {
-            final List<String> list = new ArrayList<>();
-            try {
-                final Collection<DocumentEntityService<?>> serviceList = genericEntityService.findAll();
-                for (final DocumentEntityService<?> service : serviceList) {
-                    final BaseEntity e = service.getEntityClass().newInstance();
-                    list.add(e.getType());
+    private void changeDescendantPermissions(final DocRef folder, final ChangeSet<UserPermission> changeSet, final Set<DocRef> affectedDocRefs, final Set<UserRef> affectedUserRefs, final boolean clear) {
+        final List<DocRef> descendants = explorerService.getDescendants(folder);
+        if (descendants != null && descendants.size() > 0) {
+            for (final DocRef descendant : descendants) {
+                // Ensure that the user has permission to change the permissions of this child.
+                if (securityContext.hasDocumentPermission(descendant.getType(), descendant.getUuid(), DocumentPermissionNames.OWNER)) {
+                    changeDocPermissions(descendant, changeSet, affectedDocRefs, affectedUserRefs, clear);
+                } else {
+                    LOGGER.debug("User does not have permission to change permissions on " + descendant.toString());
                 }
-            } catch (final IllegalAccessException | InstantiationException | RuntimeException e) {
-                LOGGER.error(e.getMessage(), e);
             }
-            typeList = list;
         }
-        return typeList;
     }
 }

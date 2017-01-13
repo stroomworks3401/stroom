@@ -18,7 +18,7 @@ package stroom.pipeline.server.factory;
 
 import stroom.entity.shared.DocRef;
 import stroom.pipeline.shared.PipelineEntity;
-import stroom.pipeline.shared.PipelineEntityService;
+import stroom.pipeline.shared.PipelineService;
 import stroom.util.logging.StroomLogger;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +31,7 @@ public class PipelineStackLoaderImpl implements PipelineStackLoader {
     private static final StroomLogger LOGGER = StroomLogger.getLogger(PipelineStackLoaderImpl.class);
 
     @Resource
-    private PipelineEntityService pipelineEntityService;
+    private PipelineService pipelineEntityService;
 
     /**
      * Loads and returns a stack of pipelines representing the inheritance

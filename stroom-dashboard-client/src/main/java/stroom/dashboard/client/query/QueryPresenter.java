@@ -49,7 +49,7 @@ import stroom.entity.client.event.DirtyEvent.DirtyHandler;
 import stroom.entity.client.event.HasDirtyHandlers;
 import stroom.entity.shared.DocRef;
 import stroom.explorer.client.presenter.ExplorerDropDownTreePresenter;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 import stroom.node.client.ClientPropertyCache;
 import stroom.node.shared.ClientProperties;
 import stroom.pipeline.client.event.ChangeDataEvent;
@@ -393,9 +393,9 @@ public class QueryPresenter extends AbstractComponentPresenter<QueryPresenter.Qu
         chooser.setCaption("Choose Pipeline To Process Results With");
         chooser.setIncludedTypes(PipelineEntity.ENTITY_TYPE);
         chooser.setRequiredPermissions(DocumentPermissionNames.USE);
-        chooser.addDataSelectionHandler(new DataSelectionHandler<ExplorerData>() {
+        chooser.addDataSelectionHandler(new DataSelectionHandler<ExplorerNode>() {
             @Override
-            public void onSelection(final DataSelectionEvent<ExplorerData> event) {
+            public void onSelection(final DataSelectionEvent<ExplorerNode> event) {
                 final DocRef pipeline = chooser.getSelectedEntityReference();
                 if (pipeline != null) {
                     setProcessorLimits(queryData, pipeline);

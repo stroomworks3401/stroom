@@ -27,7 +27,7 @@ import stroom.dispatch.client.AsyncCallbackAdaptor;
 import stroom.dispatch.client.ClientDispatchAsync;
 import stroom.entity.shared.DocRef;
 import stroom.explorer.client.presenter.ExplorerDropDownTreePresenter;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 import stroom.pipeline.shared.PipelineEntity;
 import stroom.pipeline.shared.stepping.GetPipelineForStreamAction;
 import stroom.pipeline.stepping.client.event.BeginPipelineSteppingEvent;
@@ -81,9 +81,9 @@ public class PipelineSteppingPlugin extends Plugin implements BeginPipelineStepp
         chooser.setCaption("Choose Pipeline To Step With");
         chooser.setIncludedTypes(PipelineEntity.ENTITY_TYPE);
         chooser.setRequiredPermissions(DocumentPermissionNames.READ);
-        chooser.addDataSelectionHandler(new DataSelectionHandler<ExplorerData>() {
+        chooser.addDataSelectionHandler(new DataSelectionHandler<ExplorerNode>() {
             @Override
-            public void onSelection(final DataSelectionEvent<ExplorerData> event) {
+            public void onSelection(final DataSelectionEvent<ExplorerNode> event) {
                 final DocRef pipeline = chooser.getSelectedEntityReference();
                 if (pipeline != null) {
                     openEditor(pipeline, streamId, eventId, childStreamType);

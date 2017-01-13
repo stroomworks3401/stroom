@@ -32,7 +32,7 @@ import stroom.entity.shared.FindFolderCriteria;
 import stroom.entity.shared.FolderService;
 import stroom.feed.shared.Feed;
 import stroom.feed.shared.FeedService;
-import stroom.pipeline.shared.PipelineEntityService;
+import stroom.pipeline.shared.PipelineService;
 import stroom.resource.server.ResourceStore;
 import stroom.util.test.FileSystemTestUtil;
 import stroom.util.zip.ZipUtil;
@@ -45,7 +45,7 @@ public class TestImportExportServiceImpl3 extends AbstractCoreIntegrationTest {
     @Resource
     private FolderService folderService;
     @Resource
-    private PipelineEntityService pipelineEntityService;
+    private PipelineService pipelineEntityService;
     @Resource
     private FeedService feedService;
     @Resource

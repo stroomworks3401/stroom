@@ -31,11 +31,11 @@ import java.util.Map;
 
 @Component
 @Transactional
-public class ExplorerTreeServiceImpl implements ExplorerTreeService {
+public class ExplorerTreeDaoImpl implements ExplorerTreeDao {
     private final ClosureTableTreeDao dao;
 
     @Inject
-    ExplorerTreeServiceImpl(final DbSession session) {
+    ExplorerTreeDaoImpl(final DbSession session) {
         this.dao = new ClosureTableTreeDao(ExplorerTreeNode.class, ExplorerTreePath.class, false, session);
         this.dao.setRemoveReferencedNodes(true);
     }

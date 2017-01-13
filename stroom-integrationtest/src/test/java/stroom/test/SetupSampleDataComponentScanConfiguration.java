@@ -23,7 +23,7 @@ import stroom.datafeed.server.MockHeaderMapFactory;
 import stroom.datafeed.server.MockHttpServletRequest;
 import stroom.datafeed.server.MockHttpServletResponse;
 import stroom.dictionary.MockDictionaryService;
-import stroom.entity.server.MockDocumentEntityService;
+import stroom.entity.server.MockDocumentService;
 import stroom.entity.server.MockEntityService;
 import stroom.entity.server.util.StroomEntityManager;
 import stroom.feed.server.MockFeedService;
@@ -48,7 +48,7 @@ import stroom.node.server.NodeConfigForTesting;
 import stroom.node.server.NodeConfigImpl;
 import stroom.node.shared.NodeService;
 import stroom.node.shared.VolumeService;
-import stroom.pipeline.server.MockPipelineEntityService;
+import stroom.pipeline.server.MockPipelineService;
 import stroom.pipeline.server.MockTextConverterService;
 import stroom.pipeline.server.MockXSLTService;
 import stroom.pipeline.server.factory.MockPipelineElementRegistryFactory;
@@ -111,10 +111,10 @@ import org.springframework.context.annotation.FilterType;
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = MockJobService.class),
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = MockMetaDataStatistic.class),
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = MockClusterLockService.class),
-        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = MockDocumentEntityService.class),
+        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = MockDocumentService.class),
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = MockNodeService.class),
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = MockPipelineElementRegistryFactory.class),
-        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = MockPipelineEntityService.class),
+        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = MockPipelineService.class),
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = MockQueryService.class),
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = MockRecordCountService.class),
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = MockResourceStore.class),

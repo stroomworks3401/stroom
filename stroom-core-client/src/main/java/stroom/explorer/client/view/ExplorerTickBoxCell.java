@@ -14,10 +14,10 @@ import com.google.gwt.view.client.SelectionModel;
 import stroom.cell.tickbox.client.TickBoxCell;
 import stroom.cell.tickbox.shared.TickBoxState;
 import stroom.explorer.client.presenter.TickBoxSelectionModel;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 import stroom.util.client.ImageUtil;
 
-public class ExplorerTickBoxCell extends AbstractCell<ExplorerData> {
+public class ExplorerTickBoxCell extends AbstractCell<ExplorerNode> {
     public interface Style extends CssResource {
         /**
          * The path to the default CSS styles used by this resource.
@@ -75,10 +75,10 @@ public class ExplorerTickBoxCell extends AbstractCell<ExplorerData> {
     private static Template template;
     private static Resources resources;
 
-    private final SelectionModel<ExplorerData> selectionModel;
+    private final SelectionModel<ExplorerNode> selectionModel;
     private TickBoxCell tickBoxCell;
 
-    public ExplorerTickBoxCell(final SelectionModel<ExplorerData> selectionModel) {
+    public ExplorerTickBoxCell(final SelectionModel<ExplorerNode> selectionModel) {
         this.selectionModel = selectionModel;
 
         if (selectionModel != null && selectionModel instanceof TickBoxSelectionModel) {
@@ -101,7 +101,7 @@ public class ExplorerTickBoxCell extends AbstractCell<ExplorerData> {
     }
 
     @Override
-    public void render(final Context context, final ExplorerData item, final SafeHtmlBuilder sb) {
+    public void render(final Context context, final ExplorerNode item, final SafeHtmlBuilder sb) {
         if (item != null) {
             final Style style = resources.style();
 
@@ -164,7 +164,7 @@ public class ExplorerTickBoxCell extends AbstractCell<ExplorerData> {
         return image;
     }
 
-    private TickBoxState getValue(final ExplorerData item) {
+    private TickBoxState getValue(final ExplorerNode item) {
         if (selectionModel == null) {
             return TickBoxState.UNTICK;
         } else if (selectionModel instanceof TickBoxSelectionModel) {

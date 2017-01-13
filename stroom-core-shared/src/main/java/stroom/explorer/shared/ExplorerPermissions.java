@@ -16,6 +16,7 @@
 
 package stroom.explorer.shared;
 
+import stroom.entity.shared.DocumentType;
 import stroom.util.shared.SharedObject;
 
 import java.util.Set;

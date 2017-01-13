@@ -31,25 +31,23 @@ import stroom.dispatch.client.AsyncCallbackAdaptor;
 import stroom.dispatch.client.ClientDispatchAsync;
 import stroom.entity.client.presenter.EntityEditPresenter;
 import stroom.entity.shared.DocRef;
-import stroom.entity.shared.EntityServiceCopyAction;
-import stroom.entity.shared.EntityServiceCreateAction;
-import stroom.entity.shared.EntityServiceDeleteAction;
+import stroom.explorer.shared.ExplorerCopyAction;
+import stroom.explorer.shared.ExplorerCreateAction;
+import stroom.explorer.shared.ExplorerDeleteAction;
 import stroom.entity.shared.EntityServiceLoadAction;
-import stroom.entity.shared.EntityServiceMoveAction;
+import stroom.explorer.shared.ExplorerMoveAction;
 import stroom.entity.shared.EntityServiceSaveAction;
 import stroom.entity.shared.HasFolder;
 import stroom.entity.shared.NamedEntity;
-import stroom.explorer.client.event.HighlightExplorerItemEvent;
 import stroom.explorer.client.event.RefreshExplorerTreeEvent;
-import stroom.explorer.shared.EntityData;
+import stroom.explorer.shared.ExplorerNode;
 import stroom.security.client.ClientSecurityContext;
-import stroom.security.shared.DocumentPermissionNames;
 import stroom.task.client.TaskEndEvent;
 import stroom.task.client.TaskStartEvent;
+import stroom.util.shared.VoidResult;
 import stroom.widget.popup.client.event.HidePopupEvent;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -79,17 +77,17 @@ public abstract class EntityPlugin<E extends NamedEntity> extends Plugin {
     /**
      * 1. This method will create a new entity and show it in the content pane.
      */
-    public void createEntity(final Presenter<?, ?> popup, final DocRef folder, final String entityName) {
+    public void createEntity(final Presenter<?, ?> popup, final ExplorerNode folder, final String entityName) {
         create(getType(), entityName, folder, new CreateCallback() {
             @Override
-            public void onCreate(final DocRef docRef) {
+            public void onCreate(final ExplorerNode node) {
                 // Hide the create entity presenter.
                 HidePopupEvent.fire(EntityPlugin.this, popup);
 
-                highlight(docRef);
+//                highlight(docRef);
 
                 // Open the item in the content pane.
-                open(docRef, true);
+                open(node.getDocRef(), true);
             }
         });
     }
@@ -179,48 +177,48 @@ public abstract class EntityPlugin<E extends NamedEntity> extends Plugin {
         }
     }
 
-    /**
-     * 6. This method will save an entity as a copy with a different name.
-     */
-    @SuppressWarnings("unchecked")
-    public void copy(final PresenterWidget<?> dialog, final EntityTabData tabData, final String name) {
-        if (tabData != null && tabData instanceof EntityEditPresenter<?, ?>) {
-            final EntityEditPresenter<?, E> presenter = (EntityEditPresenter<?, E>) tabData;
-            final E entity = presenter.getEntity();
-            presenter.write(presenter.getEntity());
-
-            final DocRef oldEntityReference = DocRef.create(entity);
-
-            DocRef folder = null;
-            if (entity instanceof HasFolder) {
-                folder = DocRef.create(((HasFolder) entity).getFolder());
-            }
-
-            copy(entity, folder, name, new SaveCallback<E>() {
-                @Override
-                public void onSave(final E entity) {
-                    // Hide the save as presenter.
-                    HidePopupEvent.fire(EntityPlugin.this, dialog);
-
-                    // Create an entity item so we can open it in the editor and
-                    // select it in the explorer tree.
-                    final DocRef docRef = DocRef.create(entity);
-                    highlight(docRef);
-
-                    // The entity we had open before is now effectively closed
-                    // and the new one open so record this fact so that we can
-                    // open the old one again and the new one won't open twice.
-                    entityToTabDataMap.remove(oldEntityReference);
-                    entityToTabDataMap.put(docRef, tabData);
-                    tabDataToEntityMap.remove(tabData);
-                    tabDataToEntityMap.put(tabData, docRef);
-
-                    // Update the item in the content pane.
-                    presenter.read(entity);
-                }
-            });
-        }
-    }
+//    /**
+//     * 6. This method will save an entity as a copy with a different name.
+//     */
+//    @SuppressWarnings("unchecked")
+//    public void copy(final PresenterWidget<?> dialog, final EntityTabData tabData, final String name) {
+//        if (tabData != null && tabData instanceof EntityEditPresenter<?, ?>) {
+//            final EntityEditPresenter<?, E> presenter = (EntityEditPresenter<?, E>) tabData;
+//            final E entity = presenter.getEntity();
+//            presenter.write(presenter.getEntity());
+//
+//            final DocRef oldEntityReference = DocRef.create(entity);
+//
+//            DocRef folder = null;
+//            if (entity instanceof HasFolder) {
+//                folder = DocRef.create(((HasFolder) entity).getFolder());
+//            }
+//
+//            copy(entity, folder, name, new SaveCallback<E>() {
+//                @Override
+//                public void onSave(final E entity) {
+//                    // Hide the save as presenter.
+//                    HidePopupEvent.fire(EntityPlugin.this, dialog);
+//
+//                    // Create an entity item so we can open it in the editor and
+//                    // select it in the explorer tree.
+//                    final DocRef docRef = DocRef.create(entity);
+////                    highlight(docRef);
+//
+//                    // The entity we had open before is now effectively closed
+//                    // and the new one open so record this fact so that we can
+//                    // open the old one again and the new one won't open twice.
+//                    entityToTabDataMap.remove(oldEntityReference);
+//                    entityToTabDataMap.put(docRef, tabData);
+//                    tabDataToEntityMap.remove(tabData);
+//                    tabDataToEntityMap.put(tabData, docRef);
+//
+//                    // Update the item in the content pane.
+//                    presenter.read(entity);
+//                }
+//            });
+//        }
+//    }
 
     /**
      * 7. This method will save an entity as a copy with a different name.
@@ -274,92 +272,92 @@ public abstract class EntityPlugin<E extends NamedEntity> extends Plugin {
     // }
     // }
 
-    /**
-     * 8.1. This method will copy an entity.
-     */
-    public void copyEntity(final PresenterWidget<?> popup, final DocRef docRef, final DocRef folder,
-            final String name) {
-        // We need to load the entity here as it might not have been loaded yet.
-        load(docRef, new LoadCallback<E>() {
-            @Override
-            public void onLoad(final E entity) {
-                copyEntity(popup, entity, folder, name);
-            }
-        });
-    }
-
-    private void copyEntity(final PresenterWidget<?> popup, final E entity, final DocRef folder, final String name) {
-        copy(entity, folder, name, new SaveCallback<E>() {
-            @Override
-            public void onSave(final E entity) {
-                // Hide the copy entity presenter.
-                HidePopupEvent.fire(EntityPlugin.this, popup);
-
-                // Create an entity item so we can open it in the editor and
-                // select it in the explorer tree.
-                final DocRef item = DocRef.create(entity);
-                highlight(item);
-            }
-        });
-    }
-
-    /**
-     * 8.2. This method will move an entity.
-     */
-    @SuppressWarnings("unchecked")
-    public void moveEntity(final PresenterWidget<?> popup, final DocRef document, final DocRef folder) {
-        // Find out if we currently have the entity open.
-        final EntityTabData tabData = entityToTabDataMap.get(document);
-        if (tabData != null && tabData instanceof EntityEditPresenter<?, ?>) {
-            final EntityEditPresenter<?, E> editPresenter = (EntityEditPresenter<?, E>) tabData;
-            // Find out if the existing item is dirty.
-            if (editPresenter.isDirty()) {
-                ConfirmEvent.fire(EntityPlugin.this,
-                        "You must save changes to " + document.getType() + " '"
-                                + document.getDisplayValue()
-                                + "' before it can be moved. Would you like to save the current changes now?",
-                        new ConfirmCallback() {
-                            @Override
-                            public void onResult(final boolean result) {
-                                if (result) {
-                                    editPresenter.write(editPresenter.getEntity());
-                                    moveEntity(popup, editPresenter.getEntity(), folder, tabData, editPresenter);
-                                }
-                            }
-                        });
-            } else {
-                moveEntity(popup, editPresenter.getEntity(), folder, tabData, editPresenter);
-            }
-        } else {
-            // We need to load the entity here as it hasn't been loaded yet.
-            load(document, new LoadCallback<E>() {
-                @Override
-                public void onLoad(final E entity) {
-                    moveEntity(popup, entity, folder, null, null);
-                }
-            });
-        }
-    }
-
-    private void moveEntity(final PresenterWidget<?> popup, final E entity, final DocRef folder,
-            final EntityTabData tabData, final EntityEditPresenter<?, E> editPresenter) {
-        move(entity, folder, new SaveCallback<E>() {
-            @Override
-            public void onSave(final E entity) {
-                // Hide the copy entity presenter.
-                HidePopupEvent.fire(EntityPlugin.this, popup);
-
-                // Create an entity item so we can open it in the editor and
-                // select it in the explorer tree.
-                final DocRef docRef = DocRef.create(entity);
-                highlight(docRef);
-
-                if (editPresenter != null) {
-                    editPresenter.read(entity);
-                }
-            }
-        });
-    }
+//    /**
+//     * 8.1. This method will copy an entity.
+//     */
+//    public void copyEntity(final PresenterWidget<?> popup, final DocRef docRef, final DocRef folder,
+//            final String name) {
+//        // We need to load the entity here as it might not have been loaded yet.
+//        load(docRef, new LoadCallback<E>() {
+//            @Override
+//            public void onLoad(final E entity) {
+//                copyEntity(popup, entity, folder, name);
+//            }
+//        });
+//    }
+//
+//    private void copyEntity(final PresenterWidget<?> popup, final E entity, final DocRef folder, final String name) {
+//        copy(entity, folder, name, new SaveCallback<E>() {
+//            @Override
+//            public void onSave(final E entity) {
+//                // Hide the copy entity presenter.
+//                HidePopupEvent.fire(EntityPlugin.this, popup);
+//
+//                // Create an entity item so we can open it in the editor and
+//                // select it in the explorer tree.
+//                final DocRef item = DocRef.create(entity);
+////                highlight(item);
+//            }
+//        });
+//    }
+//
+//    /**
+//     * 8.2. This method will move an entity.
+//     */
+//    @SuppressWarnings("unchecked")
+//    public void moveEntity(final PresenterWidget<?> popup, final DocRef document, final DocRef folder) {
+//        // Find out if we currently have the entity open.
+//        final EntityTabData tabData = entityToTabDataMap.get(document);
+//        if (tabData != null && tabData instanceof EntityEditPresenter<?, ?>) {
+//            final EntityEditPresenter<?, E> editPresenter = (EntityEditPresenter<?, E>) tabData;
+//            // Find out if the existing item is dirty.
+//            if (editPresenter.isDirty()) {
+//                ConfirmEvent.fire(EntityPlugin.this,
+//                        "You must save changes to " + document.getType() + " '"
+//                                + document.getDisplayValue()
+//                                + "' before it can be moved. Would you like to save the current changes now?",
+//                        new ConfirmCallback() {
+//                            @Override
+//                            public void onResult(final boolean result) {
+//                                if (result) {
+//                                    editPresenter.write(editPresenter.getEntity());
+//                                    moveEntity(popup, editPresenter.getEntity(), folder, tabData, editPresenter);
+//                                }
+//                            }
+//                        });
+//            } else {
+//                moveEntity(popup, editPresenter.getEntity(), folder, tabData, editPresenter);
+//            }
+//        } else {
+//            // We need to load the entity here as it hasn't been loaded yet.
+//            load(document, new LoadCallback<E>() {
+//                @Override
+//                public void onLoad(final E entity) {
+//                    moveEntity(popup, entity, folder, null, null);
+//                }
+//            });
+//        }
+//    }
+//
+//    private void moveEntity(final PresenterWidget<?> popup, final E entity, final DocRef folder,
+//            final EntityTabData tabData, final EntityEditPresenter<?, E> editPresenter) {
+//        move(entity, folder, new SaveCallback<E>() {
+//            @Override
+//            public void onSave(final E entity) {
+//                // Hide the copy entity presenter.
+//                HidePopupEvent.fire(EntityPlugin.this, popup);
+//
+//                // Create an entity item so we can open it in the editor and
+//                // select it in the explorer tree.
+//                final DocRef docRef = DocRef.create(entity);
+////                highlight(docRef);
+//
+//                if (editPresenter != null) {
+//                    editPresenter.read(entity);
+//                }
+//            }
+//        });
+//    }
 
     /**
      * 9. This method will rename an entity.
@@ -412,7 +410,7 @@ public abstract class EntityPlugin<E extends NamedEntity> extends Plugin {
                 // Create an entity item so we can open it in the feed editor
                 // and select it in the explorer tree.
                 final DocRef docRef = DocRef.create(entity);
-                highlight(docRef);
+//                highlight(docRef);
 
                 if (editPresenter != null) {
                     editPresenter.read(entity);
@@ -421,60 +419,73 @@ public abstract class EntityPlugin<E extends NamedEntity> extends Plugin {
         });
     }
 
-    /**
-     * 10. This method will delete an entity.
-     */
-    @SuppressWarnings("unchecked")
-    public void deleteEntity(final DocRef docRef) {
-        // Find out if we currently have the entity open.
-        final EntityTabData tabData = entityToTabDataMap.get(docRef);
-        if (tabData != null && tabData instanceof EntityEditPresenter<?, ?>) {
-            final EntityEditPresenter<?, E> editPresenter = (EntityEditPresenter<?, E>) tabData;
-            // Find out if the existing item is dirty.
-            if (editPresenter.isDirty()) {
-                ConfirmEvent.fire(EntityPlugin.this,
-                        "You have unsaved changed for " + docRef.getType() + " '"
-                                + docRef.getDisplayValue() + "'.  Are you sure you want to delete it?",
-                        new ConfirmCallback() {
-                            @Override
-                            public void onResult(final boolean result) {
-                                if (result) {
-                                    deleteEntity(editPresenter.getEntity(), tabData);
-                                }
-                            }
-                        });
-            } else {
-                ConfirmEvent.fire(EntityPlugin.this,
-                        "You have " + docRef.getType() + " '" + docRef.getDisplayValue()
-                                + "' currently open for editing. Are you sure you want to delete it?",
-                        new ConfirmCallback() {
-                            @Override
-                            public void onResult(final boolean result) {
-                                if (result) {
-                                    deleteEntity(editPresenter.getEntity(), tabData);
-                                }
-                            }
-                        });
-            }
-        } else {
-            ConfirmEvent.fire(EntityPlugin.this, "Are you sure you want to delete " + docRef.getType() + " '"
-                    + docRef.getDisplayValue() + "'?", new ConfirmCallback() {
-                @Override
-                public void onResult(final boolean result) {
-                    if (result) {
-                        // We need to load the entity here as it hasn't
-                        // been loaded yet.
-                        load(docRef, new LoadCallback<E>() {
-                            @Override
-                            public void onLoad(final E entity) {
-                                deleteEntity(entity, null);
-                            }
-                        });
-                    }
-                }
-            });
-        }
-    }
+//    /**
+//     * 10. This method will delete an entity.
+//     */
+//    @SuppressWarnings("unchecked")
+//    public void deleteEntity(final DocRef docRef) {
+//        // Find out if we currently have the entity open.
+//        final EntityTabData tabData = entityToTabDataMap.get(docRef);
+//        if (tabData != null && tabData instanceof EntityEditPresenter<?, ?>) {
+//            final EntityEditPresenter<?, E> editPresenter = (EntityEditPresenter<?, E>) tabData;
+//            // Find out if the existing item is dirty.
+//            if (editPresenter.isDirty()) {
+//                ConfirmEvent.fire(EntityPlugin.this,
+//                        "You have unsaved changed for " + docRef.getType() + " '"
+//                                + docRef.getDisplayValue() + "'.  Are you sure you want to delete it?",
+//                        new ConfirmCallback() {
+//                            @Override
+//                            public void onResult(final boolean result) {
+//                                if (result) {
+//                                    deleteEntity(editPresenter.getEntity(), tabData);
+//                                }
+//                            }
+//                        });
+//            } else {
+//                ConfirmEvent.fire(EntityPlugin.this,
+//                        "You have " + docRef.getType() + " '" + docRef.getDisplayValue()
+//                                + "' currently open for editing. Are you sure you want to delete it?",
+//                        new ConfirmCallback() {
+//                            @Override
+//                            public void onResult(final boolean result) {
+//                                if (result) {
+//                                    deleteEntity(editPresenter.getEntity(), tabData);
+//                                }
+//                            }
+//                        });
+//            }
+//        } else {
+//            ConfirmEvent.fire(EntityPlugin.this, "Are you sure you want to delete " + docRef.getType() + " '"
+//                    + docRef.getDisplayValue() + "'?", new ConfirmCallback() {
+//                @Override
+//                public void onResult(final boolean result) {
+//                    if (result) {
+//                        // We need to load the entity here as it hasn't
+//                        // been loaded yet.
+//                        load(docRef, new LoadCallback<E>() {
+//                            @Override
+//                            public void onLoad(final E entity) {
+//                                deleteEntity(entity, null);
+//                            }
+//                        });
+//                    }
+//                }
+//            });
+//        }
+//    }
+//
+//    delete(entity, new DeleteCallback<E>() {
+//        @Override
+//        public void onDelete(final E entity) {
+//            if (tabData != null) {
+//                // Cleanup reference to this tab data.
+//                removeTabData(tabData);
+//                contentManager.forceClose(tabData);
+//            }
+//            // Refresh the explorer tree so the entity is marked as deleted.
+//            RefreshExplorerTreeEvent.fire(EntityPlugin.this);
+//        }
+//    });
 
     /**
      * 11. This method will reload an entity.
@@ -504,37 +515,36 @@ public abstract class EntityPlugin<E extends NamedEntity> extends Plugin {
         }
     }
 
-    private void deleteEntity(final E entity, final EntityTabData tabData) {
-        delete(entity, new DeleteCallback<E>() {
-            @Override
-            public void onDelete(final E entity) {
-                if (tabData != null) {
-                    // Cleanup reference to this tab data.
-                    removeTabData(tabData);
-                    contentManager.forceClose(tabData);
-                }
-                // Refresh the explorer tree so the entity is marked as deleted.
-                RefreshExplorerTreeEvent.fire(EntityPlugin.this);
-            }
-        });
-    }
+//    private void deleteEntity(final E entity, final EntityTabData tabData) {
+//        delete(entity, new DeleteCallback<E>() {
+//            @Override
+//            public void onDelete(final E entity) {
+//                if (tabData != null) {
+//                    // Cleanup reference to this tab data.
+//                    removeTabData(tabData);
+//                    contentManager.forceClose(tabData);
+//                }
+//                // Refresh the explorer tree so the entity is marked as deleted.
+//                RefreshExplorerTreeEvent.fire(EntityPlugin.this);
+//            }
+//        });
+//    }
 
     private void removeTabData(final EntityTabData tabData) {
         final DocRef docRef = tabDataToEntityMap.remove(tabData);
         entityToTabDataMap.remove(docRef);
     }
 
-    /**
-     * This method will highlight the supplied entity item in the explorer tree.
-     */
-    public void highlight(final DocRef docRef) {
-        final Set<String> requiredPermissions = new HashSet<>();
-        requiredPermissions.add(DocumentPermissionNames.USE);
-
-        // Open up parent items.
-        final EntityData entityData = EntityData.create(docRef);
-        HighlightExplorerItemEvent.fire(EntityPlugin.this, entityData);
-    }
+//    /**
+//     * This method will highlight the supplied explorer node in the explorer tree.
+//     */
+//    public void highlight(final ExplorerNode explorerData) {
+//        final Set<String> requiredPermissions = new HashSet<>();
+//        requiredPermissions.add(DocumentPermissionNames.USE);
+//
+//        // Open up parent items.
+//        HighlightExplorerItemEvent.fire(EntityPlugin.this, explorerData);
+//    }
 
     protected abstract EntityEditPresenter<?, ?> createEditor();
 
@@ -558,15 +568,15 @@ public abstract class EntityPlugin<E extends NamedEntity> extends Plugin {
     // }
 
 //    protected void createEntity(final String type, final String displayType) {
-//        final EntityData entityData = entityPluginEventManager.getSelectedEntityData();
-//        ShowCreateEntityDialogEvent.fire(EntityPlugin.this, entityData, type, displayType, allowNullFolder());
+//        final ExplorerNode explorerData = entityPluginEventManager.getSelectedExplorerData();
+//        ShowCreateEntityDialogEvent.fire(EntityPlugin.this, explorerData, type, displayType, allowNullFolder());
 //    }
 
-    public void create(final String type, final String name, final DocRef folder,
+    public void create(final String type, final String name, final ExplorerNode folder,
             final CreateCallback callback) {
-        dispatcher.execute(new EntityServiceCreateAction(type, name, folder), new AsyncCallbackAdaptor<DocRef>() {
+        dispatcher.execute(new ExplorerCreateAction(type, name, folder), new AsyncCallbackAdaptor<ExplorerNode>() {
             @Override
-            public void onSuccess(final DocRef result) {
+            public void onSuccess(final ExplorerNode result) {
                 callback.onCreate(result);
             }
         });
@@ -591,32 +601,32 @@ public abstract class EntityPlugin<E extends NamedEntity> extends Plugin {
         });
     }
 
-    private void copy(final E entity, final DocRef folder, final String name, final SaveCallback<E> callback) {
-        dispatcher.execute(new EntityServiceCopyAction<E>(entity, folder, name), new AsyncCallbackAdaptor<E>() {
-            @Override
-            public void onSuccess(final E result) {
-                callback.onSave(result);
-            }
-        });
-    }
-
-    private void move(final E entity, final DocRef folder, final SaveCallback<E> callback) {
-        dispatcher.execute(new EntityServiceMoveAction<E>(entity, folder), new AsyncCallbackAdaptor<E>() {
-            @Override
-            public void onSuccess(final E result) {
-                callback.onSave(result);
-            }
-        });
-    }
-
-    private void delete(final E entity, final DeleteCallback<E> callback) {
-        dispatcher.execute(new EntityServiceDeleteAction<E>(entity), new AsyncCallbackAdaptor<E>() {
-            @Override
-            public void onSuccess(final E result) {
-                callback.onDelete(result);
-            }
-        });
-    }
+//    private void copy(final ExplorerNode entity, final ExplorerNode folder, final String name, final SaveCallback<ExplorerNode> callback) {
+//        dispatcher.execute(new ExplorerCopyAction(entity, folder, name), new AsyncCallbackAdaptor<ExplorerNode>() {
+//            @Override
+//            public void onSuccess(final ExplorerNode result) {
+//                callback.onSave(result);
+//            }
+//        });
+//    }
+//
+//    private void move(final ExplorerNode entity, final ExplorerNode folder, final SaveCallback<ExplorerNode> callback) {
+//        dispatcher.execute(new ExplorerMoveAction(entity, folder, entity.getName()), new AsyncCallbackAdaptor<ExplorerNode>() {
+//            @Override
+//            public void onSuccess(final ExplorerNode result) {
+//                callback.onSave(result);
+//            }
+//        });
+//    }
+//
+//    private void delete(final ExplorerNode entity, final DeleteCallback<VoidResult> callback) {
+//        dispatcher.execute(new ExplorerDeleteAction(entity), new AsyncCallbackAdaptor<VoidResult>() {
+//            @Override
+//            public void onSuccess(final VoidResult result) {
+//                callback.onDelete(result);
+//            }
+//        });
+//    }
 
     /**
      * @return Any thing to fetch?
@@ -628,7 +638,7 @@ public abstract class EntityPlugin<E extends NamedEntity> extends Plugin {
     public abstract String getType();
 
     public interface CreateCallback {
-        void onCreate(DocRef entity);
+        void onCreate(ExplorerNode entity);
     }
 
     public interface LoadCallback<E extends NamedEntity> {

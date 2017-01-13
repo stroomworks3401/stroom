@@ -17,7 +17,10 @@
 package stroom.script.shared;
 
 import stroom.entity.shared.DocumentEntityService;
+import stroom.entity.shared.DocumentService;
+import stroom.entity.shared.EntityService;
 import stroom.entity.shared.FindService;
+import stroom.entity.shared.HasLoadByUuid;
 
-public interface ScriptService extends DocumentEntityService<Script>, FindService<Script, FindScriptCriteria> {
+public interface ScriptService extends DocumentEntityService<Script, FindScriptCriteria> {
 }

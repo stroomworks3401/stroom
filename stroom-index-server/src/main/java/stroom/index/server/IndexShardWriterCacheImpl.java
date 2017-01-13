@@ -192,7 +192,7 @@ public class IndexShardWriterCacheImpl extends AbstractCacheBean<IndexShardKey, 
         // In tests the index service is often null but normally we want to load
         // the index so we unmarshal fields.
         if (indexService != null) {
-            index = indexService.load(index);
+            index = indexService.loadByUuid(index.getUuid());
         }
 
         final int ramBufferSizeMB = getRamBufferSize();
@@ -451,7 +451,7 @@ public class IndexShardWriterCacheImpl extends AbstractCacheBean<IndexShardKey, 
             final IndexShard indexShard = entry.getKey();
             final IndexShardWriter writer = entry.getValue();
             if (indexShard != null && writer != null) {
-                final Index index = indexService.load(indexShard.getIndex());
+                final Index index = indexService.loadByUuid(indexShard.getIndex().getUuid());
                 if (index != null) {
                     writer.updateIndex(index);
                 }

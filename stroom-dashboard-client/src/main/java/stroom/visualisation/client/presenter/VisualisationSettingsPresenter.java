@@ -28,7 +28,7 @@ import stroom.data.client.event.DataSelectionEvent;
 import stroom.data.client.event.DataSelectionEvent.DataSelectionHandler;
 import stroom.entity.client.presenter.EntitySettingsPresenter;
 import stroom.explorer.client.presenter.EntityDropDownPresenter;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 import stroom.script.shared.Script;
 import stroom.security.client.ClientSecurityContext;
 import stroom.security.shared.DocumentPermissionNames;
@@ -69,9 +69,9 @@ public class VisualisationSettingsPresenter
 
     @Override
     protected void onBind() {
-        registerHandler(scriptPresenter.addDataSelectionHandler(new DataSelectionHandler<ExplorerData>() {
+        registerHandler(scriptPresenter.addDataSelectionHandler(new DataSelectionHandler<ExplorerNode>() {
             @Override
-            public void onSelection(final DataSelectionEvent<ExplorerData> event) {
+            public void onSelection(final DataSelectionEvent<ExplorerNode> event) {
                 if (!EqualsUtil.isEquals(scriptPresenter.getSelectedEntityReference(),
                         getEntity().getScriptRef())) {
                     setDirty(true);

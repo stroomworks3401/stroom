@@ -19,7 +19,7 @@ package stroom.test;
 import stroom.entity.shared.DocRef;
 import stroom.pipeline.server.PipelineMarshaller;
 import stroom.pipeline.shared.PipelineEntity;
-import stroom.pipeline.shared.PipelineEntityService;
+import stroom.pipeline.shared.PipelineService;
 
 public final class PipelineTestUtil {
     private PipelineTestUtil() {
@@ -37,12 +37,12 @@ public final class PipelineTestUtil {
     }
 
 
-    public static PipelineEntity createTestPipeline(final PipelineEntityService pipelineEntityService, final PipelineMarshaller pipelineMarshaller, final String data) {
+    public static PipelineEntity createTestPipeline(final PipelineService pipelineEntityService, final PipelineMarshaller pipelineMarshaller, final String data) {
         return createTestPipeline(pipelineEntityService, pipelineMarshaller, null, "test", "test", data);
     }
 
-    public static PipelineEntity createTestPipeline(final PipelineEntityService pipelineEntityService, final PipelineMarshaller pipelineMarshaller, final DocRef folder, final String name,
-            final String description, final String data) {
+    public static PipelineEntity createTestPipeline(final PipelineService pipelineEntityService, final PipelineMarshaller pipelineMarshaller, final DocRef folder, final String name,
+                                                    final String description, final String data) {
         PipelineEntity pipelineEntity = pipelineEntityService.create(folder, name);
         pipelineEntity.setName(name);
         pipelineEntity.setDescription(description);

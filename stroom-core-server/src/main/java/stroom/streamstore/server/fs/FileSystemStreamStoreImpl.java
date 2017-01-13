@@ -47,7 +47,7 @@ import stroom.node.server.NodeCache;
 import stroom.node.shared.Volume;
 import stroom.node.shared.VolumeService;
 import stroom.pipeline.shared.PipelineEntity;
-import stroom.pipeline.shared.PipelineEntityService;
+import stroom.pipeline.shared.PipelineService;
 import stroom.query.shared.Condition;
 import stroom.security.Secured;
 import stroom.security.SecurityContext;
@@ -126,7 +126,7 @@ public class FileSystemStreamStoreImpl implements FileSystemStreamStore {
     private final StroomDatabaseInfo stroomDatabaseInfo;
     private final NodeCache nodeCache;
     private final StreamProcessorService streamProcessorService;
-    private final PipelineEntityService pipelineEntityService;
+    private final PipelineService pipelineEntityService;
     private final FeedService feedService;
     private final StreamTypeService streamTypeService;
     private final VolumeService volumeService;
@@ -173,7 +173,7 @@ public class FileSystemStreamStoreImpl implements FileSystemStreamStore {
     FileSystemStreamStoreImpl(final StroomEntityManager entityManager, final StroomDatabaseInfo stroomDatabaseInfo,
                               final NodeCache nodeCache,
                               @Named("cachedStreamProcessorService") final StreamProcessorService streamProcessorService,
-                              @Named("cachedPipelineEntityService") final PipelineEntityService pipelineEntityService,
+                              @Named("cachedPipelineEntityService") final PipelineService pipelineEntityService,
                               @Named("cachedFeedService") final FeedService feedService,
                               @Named("cachedStreamTypeService") final StreamTypeService streamTypeService,
                               final VolumeService volumeService, final FileSystemStreamStoreTransactionHelper fileSystemStreamStoreTransactionHelper,

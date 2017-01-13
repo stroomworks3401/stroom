@@ -40,7 +40,7 @@ import stroom.entity.shared.EntityIdSet;
 import stroom.entity.shared.EntityReferenceComparator;
 import stroom.entity.shared.Folder;
 import stroom.explorer.client.presenter.ExplorerDropDownTreePresenter;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 import stroom.process.shared.LoadEntityIdSetAction;
 import stroom.process.shared.SetId;
 import stroom.security.shared.DocumentPermissionNames;
@@ -110,9 +110,9 @@ public class EntityIdSetPresenter extends MyPresenterWidget<EntityIdSetPresenter
 
     @Override
     protected void onBind() {
-        registerHandler(treePresenter.addDataSelectionHandler(new DataSelectionHandler<ExplorerData>() {
+        registerHandler(treePresenter.addDataSelectionHandler(new DataSelectionHandler<ExplorerNode>() {
             @Override
-            public void onSelection(final DataSelectionEvent<ExplorerData> event) {
+            public void onSelection(final DataSelectionEvent<ExplorerNode> event) {
                 final DocRef docRef = treePresenter.getSelectedEntityReference();
                 if (docRef != null) {
                     data.add(docRef);

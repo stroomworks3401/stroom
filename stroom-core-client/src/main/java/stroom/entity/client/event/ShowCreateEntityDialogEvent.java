@@ -19,23 +19,23 @@ package stroom.entity.client.event;
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HasHandlers;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 
 public class ShowCreateEntityDialogEvent extends GwtEvent<ShowCreateEntityDialogEvent.Handler> {
     private static Type<Handler> TYPE;
-    private final ExplorerData selected;
+    private final ExplorerNode selected;
     private final String entityType;
     private final String entityDisplayType;
     private final boolean allowNullFolder;
 
-    private ShowCreateEntityDialogEvent(final ExplorerData selected, final String entityType, final String entityDisplayType, final boolean allowNullFolder) {
+    private ShowCreateEntityDialogEvent(final ExplorerNode selected, final String entityType, final String entityDisplayType, final boolean allowNullFolder) {
         this.selected = selected;
         this.entityType = entityType;
         this.entityDisplayType = entityDisplayType;
         this.allowNullFolder = allowNullFolder;
     }
 
-    public static void fire(final HasHandlers handlers, final ExplorerData selected, final String entityType, final String entityDisplayType, final boolean allowNullFolder) {
+    public static void fire(final HasHandlers handlers, final ExplorerNode selected, final String entityType, final String entityDisplayType, final boolean allowNullFolder) {
         handlers.fireEvent(
                 new ShowCreateEntityDialogEvent(selected, entityType, entityDisplayType, allowNullFolder));
     }
@@ -57,7 +57,7 @@ public class ShowCreateEntityDialogEvent extends GwtEvent<ShowCreateEntityDialog
         handler.onCreate(this);
     }
 
-    public ExplorerData getSelected() {
+    public ExplorerNode getSelected() {
         return selected;
     }
 

@@ -21,7 +21,7 @@ import stroom.entity.shared.DocRef;
 import stroom.entity.shared.Range;
 import stroom.feed.server.MockFeedService;
 import stroom.feed.shared.Feed;
-import stroom.pipeline.server.MockPipelineEntityService;
+import stroom.pipeline.server.MockPipelineService;
 import stroom.pipeline.server.errorhandler.ErrorReceiver;
 import stroom.pipeline.server.errorhandler.FatalErrorReceiver;
 import stroom.pipeline.shared.PipelineEntity;
@@ -49,7 +49,7 @@ public class TestReferenceData extends StroomUnitTest {
     private static final StroomLogger LOGGER = StroomLogger.getLogger(TestReferenceData.class);
 
     private final MockFeedService feedService = new MockFeedService();
-    private final MockPipelineEntityService pipelineEntityService = new MockPipelineEntityService();
+    private final MockPipelineService pipelineEntityService = new MockPipelineService();
 
     @Test
     public void testSimple() {

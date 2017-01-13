@@ -19,8 +19,9 @@ package stroom.pipeline.server;
 import stroom.entity.server.DocumentEntityServiceImpl;
 import stroom.entity.server.util.StroomDatabaseInfo;
 import stroom.entity.server.util.StroomEntityManager;
+import stroom.entity.shared.DocumentType;
+import stroom.logging.EntityEventLog;
 import stroom.pipeline.shared.FindXSLTCriteria;
-import stroom.pipeline.shared.PipelineEntity;
 import stroom.pipeline.shared.XSLT;
 import stroom.pipeline.shared.XSLTService;
 import stroom.security.SecurityContext;
@@ -28,18 +29,21 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 @Transactional
 public class XSLTServiceImpl extends DocumentEntityServiceImpl<XSLT, FindXSLTCriteria> implements XSLTService {
-    private final StroomDatabaseInfo stroomDatabaseInfo;
+//    private final StroomDatabaseInfo stroomDatabaseInfo;
 
     @Inject
-    XSLTServiceImpl(final StroomEntityManager entityManager, final SecurityContext securityContext, final StroomDatabaseInfo stroomDatabaseInfo) {
-        super(entityManager, securityContext);
-        this.stroomDatabaseInfo = stroomDatabaseInfo;
+    XSLTServiceImpl(final StroomEntityManager entityManager, final SecurityContext securityContext, final EntityEventLog entityEventLog, final StroomDatabaseInfo stroomDatabaseInfo) {
+        super(entityManager, securityContext, entityEventLog);
+//        this.stroomDatabaseInfo = stroomDatabaseInfo;
+    }
+
+    @Override
+    public DocumentType getDocumentType() {
+        return getDocumentType(5, "XSLT", "XSLT");
     }
 
     @Override
@@ -47,29 +51,29 @@ public class XSLTServiceImpl extends DocumentEntityServiceImpl<XSLT, FindXSLTCri
         return XSLT.class;
     }
 
-    @Override
-    protected List<EntityReferenceQuery> getReferenceTableList() {
-        final boolean mySql = stroomDatabaseInfo.isMysql();
-        final ArrayList<EntityReferenceQuery> rtnList = new ArrayList<>();
-        if (mySql) {
-            rtnList.add(new EntityReferenceQuery(PipelineEntity.ENTITY_TYPE, PipelineEntity.TABLE_NAME,
-                    PipelineEntity.DATA + " regexp '<type>@TYPE@</type>[[:space:]]*<id>@ID@</id>'"));
-            rtnList.add(new EntityReferenceQuery(XSLT.ENTITY_TYPE, XSLT.TABLE_NAME,
-                    XSLT.DATA + " regexp 'import[[:space:]]href=\"@NAME@\"'"));
-        } else {
-            // This won't work too well as we really need to match with a regex
-            // that we can only do in MySQL
-            rtnList.add(new EntityReferenceQuery(PipelineEntity.ENTITY_TYPE, PipelineEntity.TABLE_NAME,
-                    "(locate('<type>@TYPE@</type>', CAST(" + PipelineEntity.DATA
-                            + " AS LONGVARCHAR)) <> 0 AND locate('<id>@ID@</id>', CAST(" + PipelineEntity.DATA
-                            + " AS LONGVARCHAR)) <> 0)"));
-            rtnList.add(new EntityReferenceQuery(XSLT.ENTITY_TYPE, XSLT.TABLE_NAME,
-                    "locate('xsl:import href=\"@NAME@\"', CAST(" + XSLT.DATA + " AS LONGVARCHAR)) <> 0"));
-
-        }
-
-        return rtnList;
-    }
+//    @Override
+//    protected List<EntityReferenceQuery> getReferenceTableList() {
+//        final boolean mySql = stroomDatabaseInfo.isMysql();
+//        final ArrayList<EntityReferenceQuery> rtnList = new ArrayList<>();
+//        if (mySql) {
+//            rtnList.add(new EntityReferenceQuery(PipelineEntity.ENTITY_TYPE, PipelineEntity.TABLE_NAME,
+//                    PipelineEntity.DATA + " regexp '<type>@TYPE@</type>[[:space:]]*<id>@ID@</id>'"));
+//            rtnList.add(new EntityReferenceQuery(XSLT.ENTITY_TYPE, XSLT.TABLE_NAME,
+//                    XSLT.DATA + " regexp 'import[[:space:]]href=\"@NAME@\"'"));
+//        } else {
+//            // This won't work too well as we really need to match with a regex
+//            // that we can only do in MySQL
+//            rtnList.add(new EntityReferenceQuery(PipelineEntity.ENTITY_TYPE, PipelineEntity.TABLE_NAME,
+//                    "(locate('<type>@TYPE@</type>', CAST(" + PipelineEntity.DATA
+//                            + " AS LONGVARCHAR)) <> 0 AND locate('<id>@ID@</id>', CAST(" + PipelineEntity.DATA
+//                            + " AS LONGVARCHAR)) <> 0)"));
+//            rtnList.add(new EntityReferenceQuery(XSLT.ENTITY_TYPE, XSLT.TABLE_NAME,
+//                    "locate('xsl:import href=\"@NAME@\"', CAST(" + XSLT.DATA + " AS LONGVARCHAR)) <> 0"));
+//
+//        }
+//
+//        return rtnList;
+//    }
 
     @Override
     public FindXSLTCriteria createCriteria() {

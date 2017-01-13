@@ -7,23 +7,23 @@ import java.util.Set;
 public class FindExplorerDataCriteria implements SharedObject {
     private static final long serialVersionUID = 6474393620176001033L;
 
-    private Set<ExplorerData> openItems;
+    private Set<ExplorerNode> openItems;
     private ExplorerTreeFilter filter;
     private Integer minDepth;
-    private Set<ExplorerData> ensureVisible;
+    private Set<ExplorerNode> ensureVisible;
 
     public FindExplorerDataCriteria() {
         // Default constructor necessary for GWT serialisation.
     }
 
-    public FindExplorerDataCriteria(final Set<ExplorerData> openItems, final ExplorerTreeFilter filter, final Integer minDepth, final Set<ExplorerData> ensureVisible) {
+    public FindExplorerDataCriteria(final Set<ExplorerNode> openItems, final ExplorerTreeFilter filter, final Integer minDepth, final Set<ExplorerNode> ensureVisible) {
         this.openItems = openItems;
         this.filter = filter;
         this.minDepth = minDepth;
         this.ensureVisible = ensureVisible;
     }
 
-    public Set<ExplorerData> getOpenItems() {
+    public Set<ExplorerNode> getOpenItems() {
         return openItems;
     }
 
@@ -35,7 +35,7 @@ public class FindExplorerDataCriteria implements SharedObject {
         return minDepth;
     }
 
-    public Set<ExplorerData> getEnsureVisible() {
+    public Set<ExplorerNode> getEnsureVisible() {
         return ensureVisible;
     }
 }

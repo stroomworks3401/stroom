@@ -35,8 +35,7 @@ import stroom.entity.client.presenter.HasWrite;
 import stroom.entity.shared.DocRef;
 import stroom.entity.shared.DocRefs;
 import stroom.explorer.client.presenter.ExplorerDropDownTreePresenter;
-import stroom.explorer.shared.EntityData;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 import stroom.node.client.view.WrapperView;
 import stroom.script.shared.Script;
 import stroom.security.shared.DocumentPermissionNames;
@@ -102,12 +101,12 @@ public class ScriptDependencyListPresenter extends MyPresenterWidget<WrapperView
                 removeButton.setEnabled(selectedElement != null);
             }
         }));
-        registerHandler(explorerDropDownTreePresenter.addDataSelectionHandler(new DataSelectionHandler<ExplorerData>() {
+        registerHandler(explorerDropDownTreePresenter.addDataSelectionHandler(new DataSelectionHandler<ExplorerNode>() {
             @Override
-            public void onSelection(final DataSelectionEvent<ExplorerData> event) {
-                final EntityData selectedItem = (EntityData) event.getSelectedItem();
-                if (selectedItem != null) {
-                    final DocRef script = selectedItem.getDocRef();
+            public void onSelection(final DataSelectionEvent<ExplorerNode> event) {
+                final ExplorerNode explorerNode = event.getSelectedItem();
+                if (explorerNode != null) {
+                    final DocRef script = explorerNode.getDocRef();
                     if (script != null) {
                         if (scripts.add(script)) {
                             DirtyEvent.fire(ScriptDependencyListPresenter.this, true);

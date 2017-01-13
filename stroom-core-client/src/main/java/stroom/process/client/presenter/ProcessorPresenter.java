@@ -34,6 +34,7 @@ import stroom.entity.shared.DocRef;
 import stroom.entity.shared.EntityIdSet;
 import stroom.entity.shared.EntityReferenceComparator;
 import stroom.entity.shared.EntityServiceDeleteAction;
+import stroom.explorer.shared.ExplorerDeleteAction;
 import stroom.entity.shared.EntityServiceLoadAction;
 import stroom.entity.shared.EntityServiceSaveAction;
 import stroom.entity.shared.Folder;

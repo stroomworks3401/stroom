@@ -37,7 +37,7 @@ public class EntityServiceImplTestTransactionHelper {
     Feed feed;
 
     public void init() {
-        feed = feedService.create(null, "FEED_" + System.currentTimeMillis());
+        feed = feedService.loadByUuid(feedService.create(null, "FEED_" + System.currentTimeMillis()).getUuid());
     }
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)

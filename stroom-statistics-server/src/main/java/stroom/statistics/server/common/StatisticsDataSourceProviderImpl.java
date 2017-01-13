@@ -21,7 +21,7 @@ import stroom.query.shared.DataSource;
 import stroom.query.shared.IndexField;
 import stroom.query.shared.IndexFieldType;
 import stroom.query.shared.IndexFields;
-import stroom.statistics.common.StatisticStoreEntityService;
+import stroom.statistics.common.StatisticStoreService;
 import stroom.statistics.common.Statistics;
 import stroom.statistics.common.StatisticsFactory;
 import stroom.statistics.shared.StatisticField;
@@ -35,11 +35,11 @@ import java.util.List;
 
 @Component
 public class StatisticsDataSourceProviderImpl implements StatisticsDataSourceProvider {
-    private final StatisticStoreEntityService statisticStoreEntityService;
+    private final StatisticStoreService statisticStoreEntityService;
     private final StatisticsFactory statisticsFactory;
 
     @Inject
-    StatisticsDataSourceProviderImpl(final StatisticStoreEntityService statisticStoreEntityService, final StatisticsFactory statisticsFactory) {
+    StatisticsDataSourceProviderImpl(final StatisticStoreService statisticStoreEntityService, final StatisticsFactory statisticsFactory) {
         this.statisticStoreEntityService = statisticStoreEntityService;
         this.statisticsFactory = statisticsFactory;
     }

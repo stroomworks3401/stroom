@@ -28,7 +28,7 @@ import stroom.node.shared.Node;
 import stroom.node.shared.NodeService;
 import stroom.pipeline.shared.FindPipelineEntityCriteria;
 import stroom.pipeline.shared.PipelineEntity;
-import stroom.pipeline.shared.PipelineEntityService;
+import stroom.pipeline.shared.PipelineService;
 import stroom.statistics.common.StatisticEvent;
 import stroom.statistics.common.StatisticTag;
 import stroom.statistics.common.Statistics;
@@ -85,7 +85,7 @@ public class BenchmarkClusterExecutor extends AbstractBenchmark {
     @Resource
     private FeedService feedService;
     @Resource
-    private PipelineEntityService pipelineEntityService;
+    private PipelineService pipelineEntityService;
     @Resource
     private StreamProcessorFilterService streamProcessorFilterService;
     @Resource

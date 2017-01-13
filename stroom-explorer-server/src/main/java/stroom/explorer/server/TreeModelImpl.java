@@ -1,6 +1,6 @@
 package stroom.explorer.server;
 
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,22 +8,22 @@ import java.util.List;
 import java.util.Map;
 
 public class TreeModelImpl implements TreeModel {
-    private final Map<ExplorerData, ExplorerData> parentMap = new HashMap<>();
-    private final Map<ExplorerData, List<ExplorerData>> childMap = new HashMap<>();
+    private final Map<ExplorerNode, ExplorerNode> parentMap = new HashMap<>();
+    private final Map<ExplorerNode, List<ExplorerNode>> childMap = new HashMap<>();
 
     @Override
-    public void add(final ExplorerData parent, final ExplorerData child) {
+    public void add(final ExplorerNode parent, final ExplorerNode child) {
         parentMap.put(child, parent);
         childMap.computeIfAbsent(parent, k -> new ArrayList<>()).add(child);
     }
 
     @Override
-    public Map<ExplorerData, ExplorerData> getParentMap() {
+    public Map<ExplorerNode, ExplorerNode> getParentMap() {
         return parentMap;
     }
 
     @Override
-    public Map<ExplorerData, List<ExplorerData>> getChildMap() {
+    public Map<ExplorerNode, List<ExplorerNode>> getChildMap() {
         return childMap;
     }
 }

@@ -1,6 +1,6 @@
 package stroom.explorer.client.view;
 
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.resources.client.ClientBundle;
@@ -13,7 +13,7 @@ import com.google.gwt.safehtml.shared.*;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import stroom.util.client.ImageUtil;
 
-public class ExplorerCell extends AbstractCell<ExplorerData> {
+public class ExplorerCell extends AbstractCell<ExplorerNode> {
     public interface Style extends CssResource {
         /**
          * The path to the default CSS styles used by this resource.
@@ -79,7 +79,7 @@ public class ExplorerCell extends AbstractCell<ExplorerData> {
     }
 
     @Override
-    public void render(final Context context, final ExplorerData item, final SafeHtmlBuilder sb) {
+    public void render(final Context context, final ExplorerNode item, final SafeHtmlBuilder sb) {
         if (item != null) {
             final Style style = resources.style();
 

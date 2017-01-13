@@ -25,6 +25,8 @@ import stroom.entity.server.util.SQLBuilder;
 import stroom.entity.server.util.StroomEntityManager;
 import stroom.entity.shared.DocRef;
 import stroom.entity.shared.DocRefs;
+import stroom.entity.shared.DocumentType;
+import stroom.logging.EntityEventLog;
 import stroom.script.shared.FindScriptCriteria;
 import stroom.script.shared.Script;
 import stroom.script.shared.ScriptService;
@@ -38,8 +40,13 @@ import java.util.Set;
 @Transactional
 public class ScriptServiceImpl extends DocumentEntityServiceImpl<Script, FindScriptCriteria> implements ScriptService {
     @Inject
-    ScriptServiceImpl(final StroomEntityManager entityManager, final SecurityContext securityContext) {
-        super(entityManager, securityContext);
+    ScriptServiceImpl(final StroomEntityManager entityManager, final SecurityContext securityContext, final EntityEventLog entityEventLog) {
+        super(entityManager, securityContext, entityEventLog);
+    }
+
+    @Override
+    public DocumentType getDocumentType() {
+        return getDocumentType(99, "Script", "Script");
     }
 
     @Override
@@ -53,25 +60,25 @@ public class ScriptServiceImpl extends DocumentEntityServiceImpl<Script, FindScr
     }
 
     @Override
-    public Script copy(final Script entity, final DocRef folder, final String name) {
+    public Script copy(final Script original, final DocRef folder, final String name) {
         // Load resources or dependencies if we don't have them. This can happen
         // as they are loaded lazily by the UI and so won't always be available
         // on the entity being saved.
-        if (entity.isPersistent() && (entity.getResource() == null || entity.getResource().getData() == null
-                || entity.getDependencies() == null)) {
+        if (original.isPersistent() && (original.getResource() == null || original.getResource().getData() == null
+                || original.getDependencies() == null)) {
             final Set<String> fetchSet = new HashSet<>();
             fetchSet.add(Script.FETCH_RESOURCE);
-            final Script loaded = load(entity, fetchSet);
+            final Script loaded = load(original, fetchSet);
 
-            if (entity.getResource() == null || entity.getResource().getData() == null) {
-                entity.setResource(loaded.getResource());
+            if (original.getResource() == null || original.getResource().getData() == null) {
+                original.setResource(loaded.getResource());
             }
-            if (entity.getDependencies() == null) {
-                entity.setDependencies(loaded.getDependencies());
+            if (original.getDependencies() == null) {
+                original.setDependencies(loaded.getDependencies());
             }
         }
 
-        return super.copy(entity, folder, name);
+        return super.copy(original, folder, name);
     }
 
     @Override

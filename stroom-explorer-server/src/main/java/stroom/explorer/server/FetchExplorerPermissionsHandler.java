@@ -17,11 +17,10 @@
 package stroom.explorer.server;
 
 import stroom.entity.shared.DocRef;
+import stroom.entity.shared.DocumentType;
 import stroom.entity.shared.Folder;
-import stroom.explorer.shared.DocumentType;
 import stroom.explorer.shared.DocumentTypes;
-import stroom.explorer.shared.EntityData;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 import stroom.explorer.shared.ExplorerPermissions;
 import stroom.explorer.shared.FetchExplorerPermissionsAction;
 import stroom.security.SecurityContext;
@@ -39,7 +38,7 @@ import java.util.Set;
 
 @TaskHandlerBean(task = FetchExplorerPermissionsAction.class)
 class FetchExplorerPermissionsHandler
-        extends AbstractTaskHandler<FetchExplorerPermissionsAction, SharedMap<ExplorerData, ExplorerPermissions>> {
+        extends AbstractTaskHandler<FetchExplorerPermissionsAction, SharedMap<ExplorerNode, ExplorerPermissions>> {
     private static final DocRef ROOT = new DocRef("System", "00000000", "System");
 
     private final ExplorerService explorerService;
@@ -52,19 +51,14 @@ class FetchExplorerPermissionsHandler
     }
 
     @Override
-    public SharedMap<ExplorerData, ExplorerPermissions> exec(final FetchExplorerPermissionsAction action) {
-        final List<ExplorerData> explorerDataList = action.getExplorerDataList();
-        final Map<ExplorerData, ExplorerPermissions> resultMap = new HashMap<>();
+    public SharedMap<ExplorerNode, ExplorerPermissions> exec(final FetchExplorerPermissionsAction action) {
+        final List<ExplorerNode> explorerNodeList = action.getExplorerNodeList();
+        final Map<ExplorerNode, ExplorerPermissions> resultMap = new HashMap<>();
 
-        for (final ExplorerData explorerData : explorerDataList) {
+        for (final ExplorerNode explorerNode : explorerNodeList) {
             final Set<DocumentType> createPermissions = new HashSet<>();
             final Set<String> documentPermissions = new HashSet<>();
-            DocRef docRef = null;
-
-            if (explorerData instanceof EntityData) {
-                final EntityData entityData = (EntityData) explorerData;
-                docRef = entityData.getDocRef();
-            }
+            DocRef docRef = explorerNode.getDocRef();
 
             if (docRef != null) {
                 for (final String permissionName : DocumentPermissionNames.DOCUMENT_PERMISSIONS) {
@@ -92,7 +86,7 @@ class FetchExplorerPermissionsHandler
                 }
             }
 
-            resultMap.put(explorerData, new ExplorerPermissions(createPermissions, documentPermissions, securityContext.isAdmin()));
+            resultMap.put(explorerNode, new ExplorerPermissions(createPermissions, documentPermissions, securityContext.isAdmin()));
         }
 
         return new SharedMap<>(resultMap);

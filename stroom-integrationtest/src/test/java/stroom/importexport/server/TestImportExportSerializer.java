@@ -31,7 +31,7 @@ import stroom.feed.shared.FeedService;
 import stroom.importexport.server.ImportExportSerializer.ImportMode;
 import stroom.pipeline.shared.FindPipelineEntityCriteria;
 import stroom.pipeline.shared.PipelineEntity;
-import stroom.pipeline.shared.PipelineEntityService;
+import stroom.pipeline.shared.PipelineService;
 import stroom.streamstore.server.fs.FileSystemUtil;
 import stroom.test.StroomCoreServerTestFileUtil;
 import stroom.test.ComparisonHelper;
@@ -61,7 +61,7 @@ public class TestImportExportSerializer extends AbstractCoreIntegrationTest {
     @Resource
     private ImportExportSerializer importExportSerializer;
     @Resource
-    private PipelineEntityService pipelineEntityService;
+    private PipelineService pipelineEntityService;
     @Resource
     private FolderService folderService;
 

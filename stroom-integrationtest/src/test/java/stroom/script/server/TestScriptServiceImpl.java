@@ -17,18 +17,9 @@
 package stroom.script.server;
 
 import stroom.AbstractCoreIntegrationTest;
-import stroom.CommonTestScenarioCreator;
 import stroom.entity.shared.*;
-import stroom.feed.shared.Feed;
-import stroom.feed.shared.FeedService;
-import stroom.feed.shared.FindFeedCriteria;
-import stroom.pipeline.shared.FindPipelineEntityCriteria;
-import stroom.pipeline.shared.PipelineEntity;
-import stroom.pipeline.shared.PipelineEntityService;
 import stroom.script.shared.Script;
 import stroom.script.shared.ScriptService;
-import stroom.streamstore.shared.StreamType;
-import stroom.util.test.FileSystemTestUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -51,7 +42,7 @@ public class TestScriptServiceImpl extends AbstractCoreIntegrationTest {
         final Script script = scriptService.create(null, "test");
         script.setResource(res);
         scriptService.save(script);
-        final Script loaded = scriptService.loadByUuid(script.getUuid(), FETCH_SET);
+        final Script loaded = scriptService.load(script, FETCH_SET);
 
         Assert.assertEquals(data, loaded.getResource().getData());
     }

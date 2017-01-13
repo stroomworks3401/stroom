@@ -16,9 +16,12 @@
 
 package stroom.xmlschema.shared;
 
+import stroom.entity.shared.BaseEntityService;
 import stroom.entity.shared.DocumentEntityService;
+import stroom.entity.shared.DocumentService;
+import stroom.entity.shared.EntityService;
 import stroom.entity.shared.FindService;
 
 public interface XMLSchemaService
-        extends DocumentEntityService<XMLSchema>, FindService<XMLSchema, FindXMLSchemaCriteria> {
+        extends DocumentEntityService<XMLSchema, FindXMLSchemaCriteria> {
 }

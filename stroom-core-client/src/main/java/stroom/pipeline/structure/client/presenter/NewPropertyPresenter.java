@@ -36,7 +36,7 @@ import stroom.entity.shared.DocRef;
 import stroom.entity.shared.EntityReferenceFindAction;
 import stroom.entity.shared.ResultList;
 import stroom.explorer.client.presenter.EntityDropDownPresenter;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 import stroom.item.client.ItemListBox;
 import stroom.item.client.StringListBox;
 import stroom.pipeline.shared.data.PipelineProperty;
@@ -352,9 +352,9 @@ public class NewPropertyPresenter extends MyPresenterWidget<NewPropertyPresenter
 
     private void enterEntityMode(final PipelineProperty property) {
         if (!entityPresenterInitialised) {
-            entityDropDownPresenter.addDataSelectionHandler(new DataSelectionHandler<ExplorerData>() {
+            entityDropDownPresenter.addDataSelectionHandler(new DataSelectionHandler<ExplorerNode>() {
                 @Override
-                public void onSelection(final DataSelectionEvent<ExplorerData> event) {
+                public void onSelection(final DataSelectionEvent<ExplorerNode> event) {
                     final DocRef selection = entityDropDownPresenter.getSelectedEntityReference();
                     if (!EqualsUtil.isEquals(currentEntity, selection)) {
                         setDirty(true);

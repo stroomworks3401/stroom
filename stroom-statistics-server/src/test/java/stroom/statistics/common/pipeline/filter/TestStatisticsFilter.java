@@ -16,7 +16,8 @@
 
 package stroom.statistics.common.pipeline.filter;
 
-import stroom.entity.server.MockDocumentEntityService;
+import stroom.entity.server.MockDocumentService;
+import stroom.entity.shared.DocumentType;
 import stroom.pipeline.server.LocationFactoryProxy;
 import stroom.pipeline.server.errorhandler.ErrorReceiverProxy;
 import stroom.pipeline.server.errorhandler.FatalErrorReceiver;
@@ -24,7 +25,7 @@ import stroom.pipeline.server.errorhandler.ProcessException;
 import stroom.pipeline.server.util.ProcessorUtil;
 import stroom.statistics.common.FindStatisticsEntityCriteria;
 import stroom.statistics.common.StatisticEvent;
-import stroom.statistics.common.StatisticStoreEntityService;
+import stroom.statistics.common.StatisticStoreService;
 import stroom.statistics.common.Statistics;
 import stroom.statistics.common.StatisticsFactory;
 import stroom.statistics.shared.StatisticField;
@@ -507,7 +508,7 @@ public class TestStatisticsFilter implements Statistics {
 
     }
 
-    private static class MockStatisticsDataSourceService extends MockDocumentEntityService<StatisticStoreEntity, FindStatisticsEntityCriteria> implements StatisticStoreEntityService {
+    private static class MockStatisticsDataSourceService extends MockDocumentService<StatisticStoreEntity, FindStatisticsEntityCriteria> implements StatisticStoreService {
 //        @Override
 //        public BaseResultList<StatisticStoreEntity> find(final FindStatisticsEntityCriteria criteria)
 //                throws RuntimeException {
@@ -565,6 +566,11 @@ public class TestStatisticsFilter implements Statistics {
         // Set<String> fetchSet) {
         // throw new UnsupportedOperationException("Method not implmented");
         // }
+        @Override
+        public DocumentType getDocumentType() {
+            return getDocumentType(11, "StatisticStore", "Statistic");
+        }
+
         @Override
         public Class<StatisticStoreEntity> getEntityClass() {
             return StatisticStoreEntity.class;

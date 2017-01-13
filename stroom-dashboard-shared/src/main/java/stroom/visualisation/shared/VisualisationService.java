@@ -17,8 +17,11 @@
 package stroom.visualisation.shared;
 
 import stroom.entity.shared.DocumentEntityService;
+import stroom.entity.shared.DocumentService;
+import stroom.entity.shared.EntityService;
 import stroom.entity.shared.FindService;
+import stroom.entity.shared.HasLoadByUuid;
 
 public interface VisualisationService
-        extends DocumentEntityService<Visualisation>, FindService<Visualisation, FindVisualisationCriteria> {
+        extends DocumentEntityService<Visualisation, FindVisualisationCriteria> {
 }

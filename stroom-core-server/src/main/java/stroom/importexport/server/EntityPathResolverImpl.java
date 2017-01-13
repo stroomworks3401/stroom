@@ -35,75 +35,81 @@ public class EntityPathResolverImpl implements EntityPathResolver {
     @Override
     public <E extends NamedEntity> String getEntityPath(final String entityType, final BaseEntity relative,
                                                         final E entity) {
-        final StringBuilder path = new StringBuilder();
+//        final StringBuilder path = new StringBuilder();
+//
+//        // Append the name of the entity.
+//        path.append(entity.getName());
+//
+//        if (entity instanceof HasFolder) {
+//            // If the entity belongs to a folder then add the folder path.
+//            Folder folder = entityLoader.load(((HasFolder) entity).getFolder());
+//
+//            // Get all ancestor folders.
+//            while (folder != null) {
+//                path.insert(0, "/");
+//                path.insert(0, folder.getName());
+//                folder = entityLoader.load(folder.getFolder());
+//            }
+//            path.insert(0, "/");
+//
+//            // If the path should be relative to another entity then create a relative path.
+//            if (relative != null) {
+//                Folder relativeFolder = null;
+//                if (relative instanceof Folder) {
+//                    relativeFolder = (Folder) relative;
+//
+//                } else if (relative instanceof HasFolder) {
+//                    // The relative entity isn't a folder so use its parent folder to make a relative path.
+//                    final HasFolder hasFolder = (HasFolder) relative;
+//                    relativeFolder = hasFolder.getFolder();
+//                    if (relativeFolder != null) {
+//                        // Load the parent group.
+//                        relativeFolder = entityLoader.load(relativeFolder);
+//                    }
+//                }
+//
+//                if (relativeFolder != null) {
+//                    // If we have a relative folder that matches at least part of the path of this entity then subtract
+//                    // the path of the relative folder.
+//                    final String relativePath = getEntityPath(Folder.ENTITY_TYPE, null, relativeFolder);
+//                    if (relativePath != null && path.toString().startsWith(relativePath)) {
+//                        return path.substring(relativePath.length() + 1);
+//                    }
+//                }
+//            }
+//        }
+//
+//        return path.toString();
 
-        // Append the name of the entity.
-        path.append(entity.getName());
-
-        if (entity instanceof HasFolder) {
-            // If the entity belongs to a folder then add the folder path.
-            Folder folder = entityLoader.load(((HasFolder) entity).getFolder());
-
-            // Get all ancestor folders.
-            while (folder != null) {
-                path.insert(0, "/");
-                path.insert(0, folder.getName());
-                folder = entityLoader.load(folder.getFolder());
-            }
-            path.insert(0, "/");
-
-            // If the path should be relative to another entity then create a relative path.
-            if (relative != null) {
-                Folder relativeFolder = null;
-                if (relative instanceof Folder) {
-                    relativeFolder = (Folder) relative;
-
-                } else if (relative instanceof HasFolder) {
-                    // The relative entity isn't a folder so use its parent folder to make a relative path.
-                    final HasFolder hasFolder = (HasFolder) relative;
-                    relativeFolder = hasFolder.getFolder();
-                    if (relativeFolder != null) {
-                        // Load the parent group.
-                        relativeFolder = entityLoader.load(relativeFolder);
-                    }
-                }
-
-                if (relativeFolder != null) {
-                    // If we have a relative folder that matches at least part of the path of this entity then subtract
-                    // the path of the relative folder.
-                    final String relativePath = getEntityPath(Folder.ENTITY_TYPE, null, relativeFolder);
-                    if (relativePath != null && path.toString().startsWith(relativePath)) {
-                        return path.substring(relativePath.length() + 1);
-                    }
-                }
-            }
-        }
-
-        return path.toString();
+        // FIXME
+        return null;
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <E extends NamedEntity> E getEntity(final String entityType, final BaseEntity relative, final String path,
                                                final Set<String> fetchSet) {
-        Folder folder = null;
-        if (relative instanceof Folder) {
-            folder = (Folder) relative;
-        } else {
-            if (relative instanceof HasFolder) {
-                folder = ((HasFolder) relative).getFolder();
-            }
-        }
+//        Folder folder = null;
+//        if (relative instanceof Folder) {
+//            folder = (Folder) relative;
+//        } else {
+//            if (relative instanceof HasFolder) {
+//                folder = ((HasFolder) relative).getFolder();
+//            }
+//        }
+//
+//        final String[] pathParts = path.split("/");
+//        for (int i = 0; i < pathParts.length - 1; i++) {
+//            folder = entityLoader.loadByName(Folder.ENTITY_TYPE, DocRef.create(folder), pathParts[i]);
+//        }
+//
+//        final String name = pathParts[pathParts.length - 1];
+//
+//        entityLoader.getEntityService(entityType);
+//
+//        return (E) entityLoader.loadByName(entityType, DocRef.create(folder), name, fetchSet);
 
-        final String[] pathParts = path.split("/");
-        for (int i = 0; i < pathParts.length - 1; i++) {
-            folder = entityLoader.loadByName(Folder.ENTITY_TYPE, DocRef.create(folder), pathParts[i]);
-        }
-
-        final String name = pathParts[pathParts.length - 1];
-
-        entityLoader.getEntityService(entityType);
-
-        return (E) entityLoader.loadByName(entityType, DocRef.create(folder), name, fetchSet);
+        // FIXME
+        return null;
     }
 }

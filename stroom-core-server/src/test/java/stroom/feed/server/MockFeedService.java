@@ -16,7 +16,9 @@
 
 package stroom.feed.server;
 
-import stroom.entity.server.MockDocumentEntityService;
+import stroom.entity.server.MockDocumentService;
+import stroom.entity.shared.BaseResultList;
+import stroom.entity.shared.DocumentType;
 import stroom.feed.shared.Feed;
 import stroom.feed.shared.FeedService;
 import stroom.feed.shared.FindFeedCriteria;
@@ -35,7 +37,12 @@ import org.springframework.stereotype.Component;
  */
 @Profile(StroomSpringProfiles.TEST)
 @Component("feedService")
-public class MockFeedService extends MockDocumentEntityService<Feed, FindFeedCriteria> implements FeedService {
+public class MockFeedService extends MockDocumentService<Feed, FindFeedCriteria> implements FeedService {
+    @Override
+    public DocumentType getDocumentType() {
+        return getDocumentType(3, "Feed", "Feed");
+    }
+
     @Override
     public Class<Feed> getEntityClass() {
         return Feed.class;
@@ -43,7 +50,14 @@ public class MockFeedService extends MockDocumentEntityService<Feed, FindFeedCri
 
     @Override
     public Feed loadByName(final String name) {
-        return loadByName(null, name);
+        BaseResultList<Feed> list = find(createCriteria());
+        for (final Feed feed : list) {
+            if (feed.getName().equals(name)) {
+                return feed;
+            }
+        }
+
+        return null;
     }
 
     @Override

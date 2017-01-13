@@ -24,10 +24,9 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
-import stroom.entity.server.GenericEntityService;
 import stroom.entity.shared.DocRef;
-import stroom.entity.shared.DocumentEntityService;
-import stroom.entity.shared.EntityService;
+import stroom.entity.shared.DocumentService;
+import stroom.entity.shared.DocumentServiceLocator;
 import stroom.entity.shared.Folder;
 import stroom.security.SecurityContext;
 import stroom.security.server.exception.AuthenticationServiceException;
@@ -55,14 +54,14 @@ class SecurityContextImpl implements SecurityContext {
     private final UserPermissionsCache userPermissionCache;
     private final UserService userService;
     private final DocumentPermissionService documentPermissionService;
-    private final GenericEntityService genericEntityService;
+    private final DocumentServiceLocator documentServiceLocator;
 
     @Inject
-    SecurityContextImpl(final UserPermissionsCache userPermissionCache, final UserService userService, final DocumentPermissionService documentPermissionService, final GenericEntityService genericEntityService) {
+    SecurityContextImpl(final UserPermissionsCache userPermissionCache, final UserService userService, final DocumentPermissionService documentPermissionService, final DocumentServiceLocator documentServiceLocator) {
         this.userPermissionCache = userPermissionCache;
         this.userService = userService;
         this.documentPermissionService = documentPermissionService;
-        this.genericEntityService = genericEntityService;
+        this.documentServiceLocator = documentServiceLocator;
     }
 
     @Override
@@ -236,10 +235,9 @@ class SecurityContextImpl implements SecurityContext {
         if (documentPermissions != null) {
             final Map<UserRef, Set<String>> userPermissions = documentPermissions.getUserPermissions();
             if (userPermissions != null && userPermissions.size() > 0) {
-                final EntityService<?> entityService = genericEntityService.getEntityService(documentType);
-                if (entityService != null && entityService instanceof DocumentEntityService) {
-                    final DocumentEntityService<?> documentEntityService = (DocumentEntityService) entityService;
-                    final String[] allowedPermissions = documentEntityService.getPermissions();
+                final DocumentService documentService = documentServiceLocator.locate(documentType);
+                if (documentService != null) {
+                    final String[] allowedPermissions = documentService.getPermissions();
 
                     for (final Map.Entry<UserRef, Set<String>> entry : userPermissions.entrySet()) {
                         final UserRef userRef = entry.getKey();

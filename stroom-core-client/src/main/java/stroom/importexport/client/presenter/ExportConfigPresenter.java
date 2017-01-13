@@ -22,8 +22,7 @@ import stroom.dispatch.client.ExportFileCompleteHandler;
 import stroom.entity.shared.FindFolderCriteria;
 import stroom.entity.shared.Folder;
 import stroom.explorer.client.presenter.EntityCheckTreePresenter;
-import stroom.explorer.shared.EntityData;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 import stroom.importexport.client.event.ExportConfigEvent;
 import stroom.importexport.shared.ExportConfigAction;
 import stroom.security.shared.DocumentPermissionNames;
@@ -92,7 +91,7 @@ public class ExportConfigPresenter
         // Disable the popup ok/cancel buttons before we attempt export.
         DisablePopupEvent.fire(this, this);
 
-        final Set<ExplorerData> dataItems = folderCheckTreePresenter.getSelectionModel().getSelectedSet();
+        final Set<ExplorerNode> dataItems = folderCheckTreePresenter.getSelectionModel().getSelectedSet();
         if (dataItems == null || dataItems.size() == 0) {
             // Let the user know that they didn't select anything to export.
             AlertEvent.fireWarn(this, "No folders have been selected for export", null);
@@ -101,15 +100,9 @@ public class ExportConfigPresenter
 
         } else {
             final FindFolderCriteria criteria = new FindFolderCriteria();
-            for (final ExplorerData dataItem : dataItems) {
-                if (dataItem instanceof EntityData) {
-                    final EntityData entityData = (EntityData) dataItem;
-                    if (Folder.ENTITY_TYPE.equals(entityData.getType())) {
-                        criteria.getFolderIdSet().add(entityData.getDocRef().getId());
-                    }
-                } else {
-                    // It must be the root folder that is selected
-                    criteria.getFolderIdSet().setMatchNull(Boolean.TRUE);
+            for (final ExplorerNode explorerNode : dataItems) {
+                if (Folder.ENTITY_TYPE.equals(explorerNode.getType())) {
+                    criteria.getFolderIdSet().add(explorerNode.getDocRef().getId());
                 }
             }
             criteria.getFolderIdSet().setGlobal(false);

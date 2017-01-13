@@ -14,9 +14,17 @@
  * limitations under the License.
  */
 
-package stroom.explorer.server;
+package stroom.statistics.common;
 
-import fri.util.database.jpa.tree.TreeDao;
+import stroom.entity.shared.DocumentEntityService;
+import stroom.entity.shared.DocumentService;
+import stroom.entity.shared.EntityService;
+import stroom.entity.shared.FindService;
+import stroom.entity.shared.HasLoadByUuid;
+import stroom.statistics.shared.StatisticStoreEntity;
 
-public interface ExplorerTreeService extends TreeDao<ExplorerTreeNode> {
+public interface StatisticStoreService
+        extends DocumentEntityService<StatisticStoreEntity, FindStatisticsEntityCriteria> {
+    String FIELD_NAME_DATE_TIME = "Date Time";
+    String FIELD_NAME_VALUE = "Value";
 }

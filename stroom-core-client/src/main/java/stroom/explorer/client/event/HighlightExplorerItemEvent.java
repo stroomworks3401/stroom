@@ -16,13 +16,11 @@
 
 package stroom.explorer.client.event;
 
-import java.util.List;
-
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HasHandlers;
 
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 
 public class HighlightExplorerItemEvent extends GwtEvent<HighlightExplorerItemEvent.Handler> {
     public interface Handler extends EventHandler {
@@ -31,13 +29,13 @@ public class HighlightExplorerItemEvent extends GwtEvent<HighlightExplorerItemEv
 
     private static Type<Handler> TYPE;
 
-    private final ExplorerData item;
+    private final ExplorerNode item;
 
-    private HighlightExplorerItemEvent(final ExplorerData item) {
+    private HighlightExplorerItemEvent(final ExplorerNode item) {
         this.item = item;
     }
 
-    public static void fire(final HasHandlers source, final ExplorerData item) {
+    public static void fire(final HasHandlers source, final ExplorerNode item) {
         source.fireEvent(new HighlightExplorerItemEvent(item));
     }
 
@@ -58,7 +56,7 @@ public class HighlightExplorerItemEvent extends GwtEvent<HighlightExplorerItemEv
         handler.onHighlight(this);
     }
 
-    public ExplorerData getItem() {
+    public ExplorerNode getItem() {
         return item;
     }
 }

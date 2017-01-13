@@ -42,8 +42,7 @@ import stroom.entity.client.presenter.HasRead;
 import stroom.entity.client.presenter.HasWrite;
 import stroom.entity.shared.DocRef;
 import stroom.explorer.client.presenter.EntityDropDownPresenter;
-import stroom.explorer.shared.EntityData;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 import stroom.pipeline.shared.*;
 import stroom.pipeline.shared.data.PipelineData;
 import stroom.pipeline.shared.data.PipelineElement;
@@ -165,12 +164,12 @@ public class PipelineStructurePresenter extends MyPresenterWidget<PipelineStruct
 
         registerHandler(propertyListPresenter.addDirtyHandler(dirtyHandler));
         registerHandler(pipelineReferenceListPresenter.addDirtyHandler(dirtyHandler));
-        registerHandler(pipelinePresenter.addDataSelectionHandler(new DataSelectionHandler<ExplorerData>() {
+        registerHandler(pipelinePresenter.addDataSelectionHandler(new DataSelectionHandler<ExplorerNode>() {
             @Override
-            public void onSelection(final DataSelectionEvent<ExplorerData> event) {
-                if (event.getSelectedItem() != null) {
-                    final EntityData entityData = (EntityData) event.getSelectedItem();
-                    if (EqualsUtil.isEquals(entityData.getDocRef().getUuid(), pipelineEntity.getUuid())) {
+            public void onSelection(final DataSelectionEvent<ExplorerNode> event) {
+                final ExplorerNode explorerNode = event.getSelectedItem();
+                if (explorerNode != null) {
+                    if (EqualsUtil.isEquals(explorerNode.getDocRef().getUuid(), pipelineEntity.getUuid())) {
                         AlertEvent.fireWarn(PipelineStructurePresenter.this, "A pipeline cannot inherit from itself",
                                 new AlertCallback() {
                                     @Override
@@ -180,7 +179,7 @@ public class PipelineStructurePresenter extends MyPresenterWidget<PipelineStruct
                                     }
                                 });
                     } else {
-                        changeParentPipeline(entityData.getDocRef());
+                        changeParentPipeline(explorerNode.getDocRef());
                     }
                 } else {
                     changeParentPipeline(null);
@@ -492,7 +491,7 @@ public class PipelineStructurePresenter extends MyPresenterWidget<PipelineStruct
                 }
             };
 
-            dispatcher.execute(new FetchPipelineXMLAction(pipelineEntity.getId()),
+            dispatcher.execute(new FetchPipelineXMLAction(DocRef.create(pipelineEntity)),
                     new AsyncCallbackAdaptor<SharedString>() {
                         @Override
                         public void onSuccess(final SharedString result) {
@@ -523,7 +522,7 @@ public class PipelineStructurePresenter extends MyPresenterWidget<PipelineStruct
     }
 
     private void doActualSave(final XMLEditorPresenter xmlEditor) {
-        dispatcher.execute(new SavePipelineXMLAction(pipelineEntity.getId(), xmlEditor.getText()),
+        dispatcher.execute(new SavePipelineXMLAction(DocRef.create(pipelineEntity), xmlEditor.getText()),
                 new AsyncCallbackAdaptor<VoidResult>() {
                     @Override
                     public void onSuccess(final VoidResult result) {

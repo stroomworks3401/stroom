@@ -31,7 +31,7 @@ import stroom.pipeline.shared.ElementIcons;
 import stroom.pipeline.shared.data.PipelineElementType;
 import stroom.pipeline.shared.data.PipelineElementType.Category;
 import stroom.statistics.common.StatisticEvent;
-import stroom.statistics.common.StatisticStoreEntityService;
+import stroom.statistics.common.StatisticStoreService;
 import stroom.statistics.common.StatisticTag;
 import stroom.statistics.common.Statistics;
 import stroom.statistics.common.StatisticsEventValidatorFactory;
@@ -76,7 +76,7 @@ public class StatisticsFilter extends AbstractXMLFilter {
     private final ErrorReceiverProxy errorReceiverProxy;
     private final LocationFactoryProxy locationFactory;
     private final StatisticsFactory statisticEventStoreFactory;
-    private final StatisticStoreEntityService statisticsDataSourceService;
+    private final StatisticStoreService statisticsDataSourceService;
     private final List<StatisticEvent> statisticEventList = new ArrayList<>(EVENT_BUFFER_SIZE);
     private final StringBuilder textBuffer = new StringBuilder();
     private final Map<String, String> emptyTagToValueMap = new HashMap<String, String>();
@@ -96,7 +96,7 @@ public class StatisticsFilter extends AbstractXMLFilter {
     @Inject
     public StatisticsFilter(final ErrorReceiverProxy errorReceiverProxy, final LocationFactoryProxy locationFactory,
                             final StatisticsFactory statisticEventStoreFactory,
-                            final StatisticStoreEntityService statisticsDataSourceService) {
+                            final StatisticStoreService statisticsDataSourceService) {
         this.errorReceiverProxy = errorReceiverProxy;
         this.locationFactory = locationFactory;
         this.statisticEventStoreFactory = statisticEventStoreFactory;

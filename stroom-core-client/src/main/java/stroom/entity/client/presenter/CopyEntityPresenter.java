@@ -30,8 +30,7 @@ import stroom.entity.client.event.ShowCopyEntityDialogEvent;
 import stroom.entity.shared.DocRef;
 import stroom.entity.shared.Folder;
 import stroom.explorer.client.presenter.EntityTreePresenter;
-import stroom.explorer.shared.EntityData;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 import stroom.security.shared.DocumentPermissionNames;
 import stroom.widget.popup.client.event.HidePopupEvent;
 import stroom.widget.popup.client.event.ShowPopupEvent;
@@ -45,8 +44,8 @@ public class CopyEntityPresenter
         extends MyPresenter<CopyEntityPresenter.CopyEntityView, CopyEntityPresenter.CopyEntityProxy>
         implements ShowCopyEntityDialogEvent.Handler, PopupUiHandlers {
     private final EntityTreePresenter entityTreePresenter;
-    private List<ExplorerData> explorerDataList;
-    private EntityData entity;
+    private List<ExplorerNode> explorerNodeList;
+    private ExplorerNode entity;
 
     @Inject
     public CopyEntityPresenter(final EventBus eventBus, final CopyEntityView view, final CopyEntityProxy proxy,
@@ -64,7 +63,7 @@ public class CopyEntityPresenter
     @ProxyEvent
     @Override
     public void onCopy(final ShowCopyEntityDialogEvent event) {
-        explorerDataList = event.getExplorerDataList();
+        explorerNodeList = event.getExplorerNodeList();
         copyNextEntity();
     }
 
@@ -72,24 +71,6 @@ public class CopyEntityPresenter
         entity = getNextEntity();
         if (entity != null) {
             entityTreePresenter.setSelectedItem(null);
-
-//        if (event.getCurrentParents() != null && event.getCurrentParents().size() > 0) {
-//            ExplorerData folder = null;
-//            for (final ExplorerData parent : event.getCurrentParents()) {
-//                if (folder == null && parent != null && parent instanceof EntityData
-//                        && Folder.ENTITY_TYPE.equals(parent.getType())) {
-//                    folder = parent;
-//                }
-//            }
-//
-//            if (folder != null) {
-//                entityTreePresenter.getSelectionModel().setSelected(folder, true);
-//            }
-//
-//            entityTreePresenter.reset(new HashSet<>(event.getCurrentParents()), 1);
-//        } else {
-//            entityTreePresenter.reset(null, 1);
-//        }
 
             entityTreePresenter.setSelectedItem(entity);
             entityTreePresenter.getModel().reset();
@@ -100,12 +81,9 @@ public class CopyEntityPresenter
         }
     }
 
-    private EntityData getNextEntity() {
-        while (explorerDataList.size() > 0) {
-            final ExplorerData explorerData = explorerDataList.remove(0);
-            if (explorerData instanceof EntityData) {
-                return (EntityData) explorerData;
-            }
+    private ExplorerNode getNextEntity() {
+        while (explorerNodeList.size() > 0) {
+            return explorerNodeList.remove(0);
         }
         return null;
     }
@@ -122,7 +100,7 @@ public class CopyEntityPresenter
     @Override
     public void onHideRequest(final boolean autoClose, final boolean ok) {
         if (ok) {
-            final DocRef folder = getFolder();
+            final ExplorerNode folder = getFolder();
             // if (!allowNullFolder && folder == null) {
             // AlertEvent.fireWarn(CopyEntityPresenter.this,
             // "No parent group has been selected", null);
@@ -136,7 +114,7 @@ public class CopyEntityPresenter
                 AlertEvent.fireWarn(CopyEntityPresenter.this,
                         "You must provide a name for the new " + entity.getType().toLowerCase(), null);
             } else {
-                CopyEntityEvent.fire(CopyEntityPresenter.this, CopyEntityPresenter.this, entity.getDocRef(),
+                CopyEntityEvent.fire(CopyEntityPresenter.this, CopyEntityPresenter.this, entity,
                         folder, entityName);
             }
             // }
@@ -151,13 +129,8 @@ public class CopyEntityPresenter
         copyNextEntity();
     }
 
-    private DocRef getFolder() {
-        final ExplorerData selected = entityTreePresenter.getSelectedItem();
-        if (selected != null && selected instanceof EntityData) {
-            return ((EntityData) selected).getDocRef();
-        }
-
-        return null;
+    private ExplorerNode getFolder() {
+        return entityTreePresenter.getSelectedItem();
     }
 
     public interface CopyEntityView extends View, HasUiHandlers<PopupUiHandlers> {

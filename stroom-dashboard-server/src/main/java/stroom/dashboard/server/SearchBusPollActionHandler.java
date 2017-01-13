@@ -23,6 +23,7 @@ import stroom.dashboard.shared.QueryKeyImpl;
 import stroom.dashboard.shared.QueryService;
 import stroom.dashboard.shared.SearchBusPollAction;
 import stroom.dashboard.shared.SearchBusPollResult;
+import stroom.entity.shared.DocRef;
 import stroom.logging.SearchEventLog;
 import stroom.query.SearchDataSourceProvider;
 import stroom.query.SearchResultCollector;

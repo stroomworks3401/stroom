@@ -18,7 +18,7 @@ package stroom.pipeline.server;
 
 import stroom.entity.server.MarshalOptions;
 import stroom.pipeline.shared.PipelineEntity;
-import stroom.pipeline.shared.PipelineEntityService;
+import stroom.pipeline.shared.PipelineService;
 import stroom.pipeline.shared.SavePipelineXMLAction;
 import stroom.task.server.AbstractTaskHandler;
 import stroom.task.server.TaskHandlerBean;
@@ -29,7 +29,7 @@ import javax.annotation.Resource;
 @TaskHandlerBean(task = SavePipelineXMLAction.class)
 public class SavePipelineXMLHandler extends AbstractTaskHandler<SavePipelineXMLAction, VoidResult> {
     @Resource
-    private PipelineEntityService pipelineEntityService;
+    private PipelineService pipelineEntityService;
     @Resource
     private MarshalOptions marshalOptions;
 
@@ -37,7 +37,7 @@ public class SavePipelineXMLHandler extends AbstractTaskHandler<SavePipelineXMLA
     public VoidResult exec(final SavePipelineXMLAction action) {
         marshalOptions.setDisabled(true);
 
-        final PipelineEntity pipelineEntity = pipelineEntityService.loadById(action.getPipelineId());
+        final PipelineEntity pipelineEntity = pipelineEntityService.loadByUuid(action.getPipeline().getUuid());
 
         if (pipelineEntity != null) {
             pipelineEntity.setData(action.getXml());

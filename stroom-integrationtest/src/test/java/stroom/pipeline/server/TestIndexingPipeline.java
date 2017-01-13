@@ -29,7 +29,7 @@ import stroom.pipeline.server.factory.Pipeline;
 import stroom.pipeline.server.factory.PipelineDataCache;
 import stroom.pipeline.server.factory.PipelineFactory;
 import stroom.pipeline.shared.PipelineEntity;
-import stroom.pipeline.shared.PipelineEntityService;
+import stroom.pipeline.shared.PipelineService;
 import stroom.pipeline.shared.XSLT;
 import stroom.pipeline.shared.XSLTService;
 import stroom.pipeline.shared.data.PipelineData;
@@ -66,7 +66,7 @@ public class TestIndexingPipeline extends AbstractProcessIntegrationTest {
     @Resource
     private MockIndexShardWriterCache indexShardPool;
     @Resource
-    private PipelineEntityService pipelineEntityService;
+    private PipelineService pipelineEntityService;
     @Resource
     private PipelineMarshaller pipelineMarshaller;
     @Resource

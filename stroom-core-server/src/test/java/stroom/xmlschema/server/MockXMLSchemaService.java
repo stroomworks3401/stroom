@@ -16,8 +16,9 @@
 
 package stroom.xmlschema.server;
 
-import stroom.entity.server.MockDocumentEntityService;
+import stroom.entity.server.MockDocumentService;
 import stroom.entity.shared.BaseResultList;
+import stroom.entity.shared.DocumentType;
 import stroom.entity.shared.Folder;
 import stroom.entity.shared.FolderService;
 import stroom.importexport.server.ImportExportSerializer.ImportMode;
@@ -36,7 +37,7 @@ import java.util.HashMap;
 
 @Profile(StroomSpringProfiles.TEST)
 @Component
-public class MockXMLSchemaService extends MockDocumentEntityService<XMLSchema, FindXMLSchemaCriteria>
+public class MockXMLSchemaService extends MockDocumentService<XMLSchema, FindXMLSchemaCriteria>
         implements XMLSchemaService {
     private final File xsdDir;
     @Resource
@@ -47,6 +48,11 @@ public class MockXMLSchemaService extends MockDocumentEntityService<XMLSchema, F
 
     public MockXMLSchemaService() {
         xsdDir = new File(StroomCoreServerTestFileUtil.getTestResourcesDir(), "samples/config/XML Schemas");
+    }
+
+    @Override
+    public DocumentType getDocumentType() {
+        return getDocumentType(13, "XMLSchema", "XML Schema");
     }
 
     @Override

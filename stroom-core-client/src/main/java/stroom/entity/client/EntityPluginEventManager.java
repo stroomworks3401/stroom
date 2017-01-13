@@ -20,6 +20,8 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import stroom.alert.client.event.ConfirmEvent;
+import stroom.alert.client.presenter.ConfirmCallback;
 import stroom.content.client.event.ContentTabSelectionChangeEvent;
 import stroom.core.client.KeyboardInterceptor;
 import stroom.core.client.KeyboardInterceptor.KeyTest;
@@ -42,17 +44,22 @@ import stroom.entity.client.event.ShowRenameEntityDialogEvent;
 import stroom.entity.client.event.ShowSaveAsEntityDialogEvent;
 import stroom.entity.client.presenter.EntityEditPresenter;
 import stroom.entity.shared.DocRef;
+import stroom.entity.shared.DocumentType;
 import stroom.entity.shared.Folder;
 import stroom.explorer.client.event.ExplorerTreeDeleteEvent;
 import stroom.explorer.client.event.ExplorerTreeSelectEvent;
+import stroom.explorer.client.event.HighlightExplorerItemEvent;
+import stroom.explorer.client.event.RefreshExplorerTreeEvent;
 import stroom.explorer.client.event.ShowExplorerMenuEvent;
 import stroom.explorer.client.event.ShowNewMenuEvent;
 import stroom.explorer.client.presenter.DocumentTypeCache;
 import stroom.explorer.client.presenter.MultiSelectionModel;
-import stroom.explorer.shared.DocumentType;
 import stroom.explorer.shared.DocumentTypes;
-import stroom.explorer.shared.EntityData;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerCopyAction;
+import stroom.explorer.shared.ExplorerCreateAction;
+import stroom.explorer.shared.ExplorerDeleteAction;
+import stroom.explorer.shared.ExplorerMoveAction;
+import stroom.explorer.shared.ExplorerNode;
 import stroom.explorer.shared.ExplorerPermissions;
 import stroom.explorer.shared.FetchExplorerPermissionsAction;
 import stroom.menubar.client.event.BeforeRevealMenubarEvent;
@@ -61,6 +68,7 @@ import stroom.security.shared.DocumentPermissionNames;
 import stroom.util.client.ImageUtil;
 import stroom.util.shared.HasDisplayValue;
 import stroom.util.shared.SharedMap;
+import stroom.util.shared.VoidResult;
 import stroom.widget.button.client.GlyphIcons;
 import stroom.widget.menu.client.presenter.IconMenuItem;
 import stroom.widget.menu.client.presenter.Item;
@@ -68,6 +76,7 @@ import stroom.widget.menu.client.presenter.MenuItem;
 import stroom.widget.menu.client.presenter.MenuListPresenter;
 import stroom.widget.menu.client.presenter.Separator;
 import stroom.widget.menu.client.presenter.SimpleParentMenuItem;
+import stroom.widget.popup.client.event.HidePopupEvent;
 import stroom.widget.popup.client.event.ShowPopupEvent;
 import stroom.widget.popup.client.presenter.PopupPosition;
 import stroom.widget.popup.client.presenter.PopupView.PopupType;
@@ -96,7 +105,7 @@ public class EntityPluginEventManager extends Plugin {
     private final Map<String, EntityPlugin<?>> pluginMap = new HashMap<>();
     private final KeyboardInterceptor keyboardInterceptor;
     private TabData selectedTab;
-    private MultiSelectionModel<ExplorerData> selectionModel;
+    private MultiSelectionModel<ExplorerNode> selectionModel;
 
     @Inject
     public EntityPluginEventManager(final EventBus eventBus,
@@ -120,10 +129,23 @@ public class EntityPluginEventManager extends Plugin {
 
         // 1. Handle entity creation events.
         registerHandler(getEventBus().addHandler(CreateEntityEvent.getType(), event -> {
-            final EntityPlugin<?> plugin = pluginMap.get(event.getEntityType());
-            if (plugin != null) {
-                plugin.createEntity(event.getPresenter(), event.getFolder(), event.getEntityName());
-            }
+            dispatcher.execute(new ExplorerCreateAction(event.getEntityType(), event.getEntityName(), event.getFolder()), new AsyncCallbackAdaptor<ExplorerNode>() {
+                @Override
+                public void onSuccess(final ExplorerNode explorerNode) {
+                    if (explorerNode != null) {
+                        HighlightExplorerItemEvent.fire(EntityPluginEventManager.this, explorerNode);
+                        final EntityPlugin<?> plugin = pluginMap.get(explorerNode.getType());
+                        if (plugin != null) {
+                            plugin.open(explorerNode.getDocRef(), true);
+                        }
+                    }
+                }
+            });
+
+//            final EntityPlugin<?> plugin = pluginMap.get(event.getEntityType());
+//            if (plugin != null) {
+//                plugin.createEntity(event.getPresenter(), event.getFolder(), event.getEntityName());
+//            }
         }));
 
         // // 2. Handle requests to close tabs.
@@ -162,12 +184,11 @@ public class EntityPluginEventManager extends Plugin {
                     selectionModel = event.getSelectionModel();
 
                     if (!event.getSelectionType().isRightClick() && !event.getSelectionType().isMultiSelect()) {
-                        final ExplorerData explorerData = event.getSelectionModel().getSelected();
-                        if (explorerData != null && explorerData instanceof EntityData) {
-                            final EntityData entityData = (EntityData) explorerData;
-                            final EntityPlugin<?> plugin = pluginMap.get(entityData.getType());
+                        final ExplorerNode explorerNode = event.getSelectionModel().getSelected();
+                        if (explorerNode != null) {
+                            final EntityPlugin<?> plugin = pluginMap.get(explorerNode.getType());
                             if (plugin != null) {
-                                plugin.open(entityData.getDocRef(), event.getSelectionType().isDoubleSelect());
+                                plugin.open(explorerNode.getDocRef(), event.getSelectionType().isDoubleSelect());
                             }
                         }
                     }
@@ -184,41 +205,134 @@ public class EntityPluginEventManager extends Plugin {
             }
         }));
 
-        // 6. Handle save as events.
-        registerHandler(getEventBus().addHandler(SaveAsEntityEvent.getType(), event -> {
-            final EntityPlugin<?> plugin = pluginMap.get(event.getTabData().getType());
-            if (plugin != null) {
-                plugin.copy(event.getDialog(), event.getTabData(), event.getEntityName());
-            }
-        }));
+//        // 6. Handle save as events.
+//        registerHandler(getEventBus().addHandler(SaveAsEntityEvent.getType(), event -> {
+//            final EntityPlugin<?> plugin = pluginMap.get(event.getTabData().getType());
+//            if (plugin != null) {
+//                plugin.sa(event.getDialog(), event.getTabData(), event.getEntityName());
+//            }
+//        }));
 
         // 7. Save all entities - handled directly.
 
         // 8.1. Handle entity copy events.
         registerHandler(getEventBus().addHandler(CopyEntityEvent.getType(), event -> {
-            final EntityPlugin<?> plugin = pluginMap.get(event.getDocument().getType());
-            if (plugin != null) {
-                plugin.copyEntity(event.getPresenter(), event.getDocument(), event.getFolder(),
-                        event.getName());
-            }
+            dispatcher.execute(new ExplorerCopyAction(event.getDocument(), event.getDocument(), event.getName()), new AsyncCallbackAdaptor<ExplorerNode>() {
+                @Override
+                public void onSuccess(final ExplorerNode result) {
+                    // Hide the save as presenter.
+                    HidePopupEvent.fire(EntityPluginEventManager.this, event.getPresenter());
+
+                    // Create an entity item so we can open it in the editor and
+                    // select it in the explorer tree.
+                    HighlightExplorerItemEvent.fire(EntityPluginEventManager.this, result);
+//                    final DocRef docRef = DocRef.create(entity);
+//                    highlight(docRef);
+
+//                    // The entity we had open before is now effectively closed
+//                    // and the new one open so record this fact so that we can
+//                    // open the old one again and the new one won't open twice.
+//                    entityToTabDataMap.remove(oldEntityReference);
+//                    entityToTabDataMap.put(docRef, tabData);
+//                    tabDataToEntityMap.remove(tabData);
+//                    tabDataToEntityMap.put(tabData, docRef);
+//
+//                    // Update the item in the content pane.
+//                    presenter.read(entity);
+                }
+            });
+
+            //            final EntityEditPresenter<?, E> presenter = (EntityEditPresenter<?, E>) tabData;
+//            final E entity = presenter.getEntity();
+//            presenter.write(presenter.getEntity());
+//
+//            final DocRef oldEntityReference = DocRef.create(entity);
+//
+//            DocRef folder = null;
+//            if (entity instanceof HasFolder) {
+//                folder = DocRef.create(((HasFolder) entity).getFolder());
+//            }
+//
+//            copy(entity, folder, name, new SaveCallback<E>() {
+//                @Override
+//                public void onSave(final E entity) {
+//                    // Hide the save as presenter.
+//                    HidePopupEvent.fire(EntityPlugin.this, dialog);
+//
+//                    // Create an entity item so we can open it in the editor and
+//                    // select it in the explorer tree.
+//                    final DocRef docRef = DocRef.create(entity);
+////                    highlight(docRef);
+//
+//                    // The entity we had open before is now effectively closed
+//                    // and the new one open so record this fact so that we can
+//                    // open the old one again and the new one won't open twice.
+//                    entityToTabDataMap.remove(oldEntityReference);
+//                    entityToTabDataMap.put(docRef, tabData);
+//                    tabDataToEntityMap.remove(tabData);
+//                    tabDataToEntityMap.put(tabData, docRef);
+//
+//                    // Update the item in the content pane.
+//                    presenter.read(entity);
+//                }
+//            });
+
+
+//            final EntityPlugin<?> plugin = pluginMap.get(event.getDocument().getType());
+//            if (plugin != null) {
+//                plugin.copyEntity(event.getPresenter(), event.getDocument(), event.getFolder(),
+//                        event.getName());
+//            }
         }));
 
         // 8.2. Handle entity move events.
         registerHandler(getEventBus().addHandler(MoveEntityEvent.getType(), event -> {
-            DocRef folder = null;
-            if (event.getFolder() instanceof EntityData) {
-                folder = ((EntityData) event.getFolder()).getDocRef();
-            }
 
-            final List<ExplorerData> children = event.getChildren();
-            for (final ExplorerData child : children) {
-                if (child instanceof EntityData) {
-                    final EntityData entityData = (EntityData) child;
-                    final EntityPlugin<?> plugin = pluginMap.get(entityData.getType());
-                    if (plugin != null) {
-                        plugin.moveEntity(event.getPresenter(), entityData.getDocRef(), folder);
+
+//            DocRef folder = null;
+//            if (event.getFolder() != null) {
+//                folder = event.getFolder().getDocRef();
+//            }
+
+            final List<ExplorerNode> children = event.getChildren();
+            for (final ExplorerNode child : children) {
+                dispatcher.execute(new ExplorerMoveAction(child, event.getFolder(), child.getName()), new AsyncCallbackAdaptor<ExplorerNode>() {
+                    @Override
+                    public void onSuccess(final ExplorerNode result) {
+                        // Hide the save as presenter.
+                        HidePopupEvent.fire(EntityPluginEventManager.this, event.getPresenter());
+
+                        // Create an entity item so we can open it in the editor and
+                        // select it in the explorer tree.
+                        HighlightExplorerItemEvent.fire(EntityPluginEventManager.this, result);
+//                    final DocRef docRef = DocRef.create(entity);
+//                    highlight(docRef);
+
+//                    // The entity we had open before is now effectively closed
+//                    // and the new one open so record this fact so that we can
+//                    // open the old one again and the new one won't open twice.
+//                    entityToTabDataMap.remove(oldEntityReference);
+//                    entityToTabDataMap.put(docRef, tabData);
+//                    tabDataToEntityMap.remove(tabData);
+//                    tabDataToEntityMap.put(tabData, docRef);
+//
+//                    // Update the item in the content pane.
+//                    presenter.read(entity);
                     }
-                }
+                });
+
+
+
+
+
+
+
+
+
+//                final EntityPlugin<?> plugin = pluginMap.get(child.getType());
+//                if (plugin != null) {
+//                    plugin.moveEntity(event.getPresenter(), child.getDocRef(), folder);
+//                }
             }
         }));
 
@@ -233,13 +347,13 @@ public class EntityPluginEventManager extends Plugin {
         // 10. Handle entity delete events.
         registerHandler(getEventBus().addHandler(ExplorerTreeDeleteEvent.getType(), event -> {
             if (selectionModel != null && selectionModel.getSelectedItems().size() > 0) {
-                fetchPermissions(selectionModel.getSelectedItems(), new AsyncCallbackAdaptor<SharedMap<ExplorerData, ExplorerPermissions>>() {
+                fetchPermissions(selectionModel.getSelectedItems(), new AsyncCallbackAdaptor<SharedMap<ExplorerNode, ExplorerPermissions>>() {
                     @Override
-                    public void onSuccess(final SharedMap<ExplorerData, ExplorerPermissions> documentPermissionMap) {
+                    public void onSuccess(final SharedMap<ExplorerNode, ExplorerPermissions> documentPermissionMap) {
                         documentTypeCache.fetch(new AsyncCallbackAdaptor<DocumentTypes>() {
                             @Override
                             public void onSuccess(final DocumentTypes documentTypes) {
-                                final List<ExplorerData> deletableItems = getExplorerDataListWithPermission(documentPermissionMap, DocumentPermissionNames.DELETE);
+                                final List<ExplorerNode> deletableItems = getExplorerDataListWithPermission(documentPermissionMap, DocumentPermissionNames.DELETE);
                                 if (deletableItems.size() > 0) {
                                     deleteItems(deletableItems);
                                 }
@@ -262,7 +376,7 @@ public class EntityPluginEventManager extends Plugin {
 
         registerHandler(getEventBus().addHandler(ShowNewMenuEvent.getType(), event -> {
             if (selectionModel != null && selectionModel.getSelectedItems().size() == 1) {
-                final ExplorerData primarySelection = selectionModel.getSelected();
+                final ExplorerNode primarySelection = selectionModel.getSelected();
                 getNewMenuItems(primarySelection, new AsyncCallbackAdaptor<List<Item>>() {
                     @Override
                     public void onSuccess(final List<Item> children) {
@@ -278,12 +392,12 @@ public class EntityPluginEventManager extends Plugin {
         registerHandler(getEventBus().addHandler(ShowExplorerMenuEvent.getType(), event -> {
             if (selectionModel != null) {
                 final boolean singleSelection = selectionModel.getSelectedItems().size() == 1;
-                final ExplorerData primarySelection = selectionModel.getSelected();
+                final ExplorerNode primarySelection = selectionModel.getSelected();
 
                 if (selectionModel.getSelectedItems().size() > 0) {
-                    fetchPermissions(selectionModel.getSelectedItems(), new AsyncCallbackAdaptor<SharedMap<ExplorerData, ExplorerPermissions>>() {
+                    fetchPermissions(selectionModel.getSelectedItems(), new AsyncCallbackAdaptor<SharedMap<ExplorerNode, ExplorerPermissions>>() {
                         @Override
-                        public void onSuccess(final SharedMap<ExplorerData, ExplorerPermissions> documentPermissionMap) {
+                        public void onSuccess(final SharedMap<ExplorerNode, ExplorerPermissions> documentPermissionMap) {
                             documentTypeCache.fetch(new AsyncCallbackAdaptor<DocumentTypes>() {
                                 @Override
                                 public void onSuccess(final DocumentTypes documentTypes) {
@@ -306,9 +420,9 @@ public class EntityPluginEventManager extends Plugin {
         }));
     }
 
-    private List<ExplorerData> getExplorerDataListWithPermission(final SharedMap<ExplorerData, ExplorerPermissions> documentPermissionMap, final String permission) {
-        final List<ExplorerData> list = new ArrayList<>();
-        for (final Map.Entry<ExplorerData, ExplorerPermissions> entry : documentPermissionMap.entrySet()) {
+    private List<ExplorerNode> getExplorerDataListWithPermission(final SharedMap<ExplorerNode, ExplorerPermissions> documentPermissionMap, final String permission) {
+        final List<ExplorerNode> list = new ArrayList<>();
+        for (final Map.Entry<ExplorerNode, ExplorerPermissions> entry : documentPermissionMap.entrySet()) {
             if (entry.getValue().hasDocumentPermission(permission)) {
                 list.add(entry.getKey());
             }
@@ -328,12 +442,12 @@ public class EntityPluginEventManager extends Plugin {
             public void getChildren(final AsyncCallback<List<Item>> callback) {
                 if (selectionModel != null) {
                     final boolean singleSelection = selectionModel.getSelectedItems().size() == 1;
-                    final ExplorerData primarySelection = selectionModel.getSelected();
+                    final ExplorerNode primarySelection = selectionModel.getSelected();
 
                     if (selectionModel.getSelectedItems().size() > 0) {
-                        fetchPermissions(selectionModel.getSelectedItems(), new AsyncCallbackAdaptor<SharedMap<ExplorerData, ExplorerPermissions>>() {
+                        fetchPermissions(selectionModel.getSelectedItems(), new AsyncCallbackAdaptor<SharedMap<ExplorerNode, ExplorerPermissions>>() {
                             @Override
-                            public void onSuccess(final SharedMap<ExplorerData, ExplorerPermissions> documentPermissionMap) {
+                            public void onSuccess(final SharedMap<ExplorerNode, ExplorerPermissions> documentPermissionMap) {
                                 documentTypeCache.fetch(new AsyncCallbackAdaptor<DocumentTypes>() {
                                     @Override
                                     public void onSuccess(final DocumentTypes documentTypes) {
@@ -361,36 +475,27 @@ public class EntityPluginEventManager extends Plugin {
         });
     }
 
-    private void getNewMenuItems(final ExplorerData explorerData, final AsyncCallback<List<Item>> callback) {
-        fetchPermissions(Collections.singletonList(explorerData), new AsyncCallbackAdaptor<SharedMap<ExplorerData, ExplorerPermissions>>() {
+    private void getNewMenuItems(final ExplorerNode explorerNode, final AsyncCallback<List<Item>> callback) {
+        fetchPermissions(Collections.singletonList(explorerNode), new AsyncCallbackAdaptor<SharedMap<ExplorerNode, ExplorerPermissions>>() {
             @Override
-            public void onSuccess(final SharedMap<ExplorerData, ExplorerPermissions> documentPermissions) {
+            public void onSuccess(final SharedMap<ExplorerNode, ExplorerPermissions> documentPermissions) {
                 documentTypeCache.fetch(new AsyncCallbackAdaptor<DocumentTypes>() {
                     @Override
                     public void onSuccess(final DocumentTypes documentTypes) {
-                        callback.onSuccess(createNewMenuItems(explorerData, documentPermissions.get(explorerData), documentTypes));
+                        callback.onSuccess(createNewMenuItems(explorerNode, documentPermissions.get(explorerNode), documentTypes));
                     }
                 });
             }
         });
     }
 
-    private void fetchPermissions(final List<ExplorerData> explorerDataList,
-                                  final AsyncCallbackAdaptor<SharedMap<ExplorerData, ExplorerPermissions>> callback) {
-        final FetchExplorerPermissionsAction action = new FetchExplorerPermissionsAction(explorerDataList);
+    private void fetchPermissions(final List<ExplorerNode> explorerNodeList,
+                                  final AsyncCallbackAdaptor<SharedMap<ExplorerNode, ExplorerPermissions>> callback) {
+        final FetchExplorerPermissionsAction action = new FetchExplorerPermissionsAction(explorerNodeList);
         dispatcher.execute(action, callback);
     }
 
-//    private DocRef getDocRef(final ExplorerData explorerData) {
-//        DocRef docRef = null;
-//        if (explorerData != null && explorerData instanceof EntityData) {
-//            final EntityData entityData = (EntityData) explorerData;
-//            docRef = entityData.getDocRef();
-//        }
-//        return docRef;
-//    }
-
-    private void addNewMenuItem(final List<Item> menuItems, final boolean singleSelection, final SharedMap<ExplorerData, ExplorerPermissions> documentPermissionMap, final ExplorerData primarySelection, final DocumentTypes documentTypes) {
+    private void addNewMenuItem(final List<Item> menuItems, final boolean singleSelection, final SharedMap<ExplorerNode, ExplorerPermissions> documentPermissionMap, final ExplorerNode primarySelection, final DocumentTypes documentTypes) {
         // Only allow the new menu to appear if we have a single selection.
         if (singleSelection) {
             // Add 'New' menu item.
@@ -413,7 +518,7 @@ public class EntityPluginEventManager extends Plugin {
         }
     }
 
-    private List<Item> createNewMenuItems(final ExplorerData explorerData,
+    private List<Item> createNewMenuItems(final ExplorerNode explorerNode,
                                           final ExplorerPermissions documentPermissions, final DocumentTypes documentTypes) {
         final List<Item> children = new ArrayList<>();
 
@@ -421,7 +526,7 @@ public class EntityPluginEventManager extends Plugin {
             if (documentPermissions.hasCreatePermission(documentType)) {
                 final Item item = new IconMenuItem(documentType.getPriority(), ImageIcon.create(ImageUtil.getImageURL() + documentType.getIconUrl()), null,
                         documentType.getDisplayType(), null, true, () -> ShowCreateEntityDialogEvent.fire(EntityPluginEventManager.this,
-                        explorerData, documentType.getType(), documentType.getDisplayType(), true));
+                        explorerNode, documentType.getType(), documentType.getDisplayType(), true));
                 children.add(item);
 
                 if (Folder.ENTITY_TYPE.equals(documentType.getType())) {
@@ -433,10 +538,10 @@ public class EntityPluginEventManager extends Plugin {
         return children;
     }
 
-    private void addModifyMenuItems(final List<Item> menuItems, final boolean singleSelection, final SharedMap<ExplorerData, ExplorerPermissions> documentPermissionMap) {
-        final List<ExplorerData> readableItems = getExplorerDataListWithPermission(documentPermissionMap, DocumentPermissionNames.READ);
-        final List<ExplorerData> updatableItems = getExplorerDataListWithPermission(documentPermissionMap, DocumentPermissionNames.UPDATE);
-        final List<ExplorerData> deletableItems = getExplorerDataListWithPermission(documentPermissionMap, DocumentPermissionNames.DELETE);
+    private void addModifyMenuItems(final List<Item> menuItems, final boolean singleSelection, final SharedMap<ExplorerNode, ExplorerPermissions> documentPermissionMap) {
+        final List<ExplorerNode> readableItems = getExplorerDataListWithPermission(documentPermissionMap, DocumentPermissionNames.READ);
+        final List<ExplorerNode> updatableItems = getExplorerDataListWithPermission(documentPermissionMap, DocumentPermissionNames.UPDATE);
+        final List<ExplorerNode> deletableItems = getExplorerDataListWithPermission(documentPermissionMap, DocumentPermissionNames.DELETE);
 
         final boolean allowRead = readableItems.size() > 0;
         final boolean allowUpdate = updatableItems.size() > 0;
@@ -449,7 +554,7 @@ public class EntityPluginEventManager extends Plugin {
 
         // Only allow users to change permissions if they have a single item selected.
         if (singleSelection) {
-            final List<ExplorerData> ownedItems = getExplorerDataListWithPermission(documentPermissionMap, DocumentPermissionNames.OWNER);
+            final List<ExplorerNode> ownedItems = getExplorerDataListWithPermission(documentPermissionMap, DocumentPermissionNames.OWNER);
             if (ownedItems.size() == 1) {
                 menuItems.add(new Separator(7));
                 menuItems.add(createPermissionsMenuItem(ownedItems.get(0), 8, true));
@@ -524,40 +629,40 @@ public class EntityPluginEventManager extends Plugin {
                 "Ctrl+Shift+S", enabled, command);
     }
 
-    private MenuItem createCopyMenuItem(final List<ExplorerData> explorerDataList, final int priority, final boolean enabled) {
+    private MenuItem createCopyMenuItem(final List<ExplorerNode> explorerNodeList, final int priority, final boolean enabled) {
         final Command command = () -> {
-            ShowCopyEntityDialogEvent.fire(EntityPluginEventManager.this, explorerDataList);
+            ShowCopyEntityDialogEvent.fire(EntityPluginEventManager.this, explorerNodeList);
         };
 
         return new IconMenuItem(priority, GlyphIcons.COPY, GlyphIcons.COPY, "Copy", null, enabled,
                 command);
     }
 
-    private MenuItem createMoveMenuItem(final List<ExplorerData> explorerDataList, final int priority, final boolean enabled) {
-        final Command command = () -> ShowMoveEntityDialogEvent.fire(EntityPluginEventManager.this, explorerDataList);
+    private MenuItem createMoveMenuItem(final List<ExplorerNode> explorerNodeList, final int priority, final boolean enabled) {
+        final Command command = () -> ShowMoveEntityDialogEvent.fire(EntityPluginEventManager.this, explorerNodeList);
 
         return new IconMenuItem(priority, GlyphIcons.MOVE, GlyphIcons.MOVE, "Move", null, enabled,
                 command);
     }
 
-    private MenuItem createRenameMenuItem(final List<ExplorerData> explorerDataList, final int priority, final boolean enabled) {
-        final Command command = () -> ShowRenameEntityDialogEvent.fire(EntityPluginEventManager.this, explorerDataList);
+    private MenuItem createRenameMenuItem(final List<ExplorerNode> explorerNodeList, final int priority, final boolean enabled) {
+        final Command command = () -> ShowRenameEntityDialogEvent.fire(EntityPluginEventManager.this, explorerNodeList);
 
         return new IconMenuItem(priority, GlyphIcons.EDIT, GlyphIcons.EDIT, "Rename", null,
                 enabled, command);
     }
 
-    private MenuItem createDeleteMenuItem(final List<ExplorerData> explorerDataList, final int priority, final boolean enabled) {
-        final Command command = () -> deleteItems(explorerDataList);
+    private MenuItem createDeleteMenuItem(final List<ExplorerNode> explorerNodeList, final int priority, final boolean enabled) {
+        final Command command = () -> deleteItems(explorerNodeList);
 
         return new IconMenuItem(priority, GlyphIcons.DELETE, GlyphIcons.DELETE, "Delete", null,
                 enabled, command);
     }
 
-    private MenuItem createPermissionsMenuItem(final ExplorerData explorerData, final int priority, final boolean enabled) {
+    private MenuItem createPermissionsMenuItem(final ExplorerNode explorerNode, final int priority, final boolean enabled) {
         final Command command = () -> {
-            if (explorerData != null) {
-                ShowPermissionsEntityDialogEvent.fire(EntityPluginEventManager.this, explorerData);
+            if (explorerNode != null) {
+                ShowPermissionsEntityDialogEvent.fire(EntityPluginEventManager.this, explorerNode);
             }
         };
 
@@ -565,16 +670,82 @@ public class EntityPluginEventManager extends Plugin {
                 enabled, command);
     }
 
-    private void deleteItems(final List<ExplorerData> explorerDataList) {
-        if (explorerDataList != null) {
-            for (final ExplorerData explorerData : explorerDataList) {
-                if (explorerData instanceof EntityData) {
-                    final EntityData entityData = (EntityData) explorerData;
-                    final EntityPlugin<?> plugin = pluginMap.get(entityData.getType());
-                    if (plugin != null) {
-                        plugin.deleteEntity(entityData.getDocRef());
-                    }
-                }
+    private void deleteItems(final List<ExplorerNode> explorerNodeList) {
+        if (explorerNodeList != null) {
+            for (final ExplorerNode explorerNode : explorerNodeList) {
+
+
+
+
+                        ConfirmEvent.fire(EntityPluginEventManager.this, "Are you sure you want to delete " + explorerNode.getType() + " '"
+                                + explorerNode.getDisplayValue() + "'?", new ConfirmCallback() {
+                            @Override
+                            public void onResult(final boolean result) {
+                                dispatcher.execute(new ExplorerDeleteAction(explorerNode), new AsyncCallbackAdaptor<VoidResult>() {
+                                    @Override
+                                    public void onSuccess(final VoidResult result) {
+                                        RefreshExplorerTreeEvent.fire(EntityPluginEventManager.this);
+                                    }
+                                });
+
+//                                if (result) {
+//                                    // We need to load the entity here as it hasn't
+//                                    // been loaded yet.
+//                                    load(docRef, new EntityPlugin.LoadCallback<E>() {
+//                                        @Override
+//                                        public void onLoad(final E entity) {
+//                                            deleteEntity(entity, null);
+//                                        }
+//                                    });
+//                                }
+                            }
+                        });
+//                    }
+//                }
+//
+//                delete(entity, new EntityPlugin.DeleteCallback<E>() {
+//                    @Override
+//                    public void onDelete(final E entity) {
+//                        if (tabData != null) {
+//                            // Cleanup reference to this tab data.
+//                            removeTabData(tabData);
+//                            contentManager.forceClose(tabData);
+//                        }
+//                        // Refresh the explorer tree so the entity is marked as deleted.
+//                        RefreshExplorerTreeEvent.fire(EntityPlugin.this);
+//                    }
+//                });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//                    final EntityPlugin<?> plugin = pluginMap.get(explorerNode.getType());
+//                    if (plugin != null) {
+//                        plugin.deleteEntity(explorerNode.getDocRef());
+//                    }
             }
         }
     }

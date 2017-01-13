@@ -21,6 +21,8 @@ import stroom.dictionary.shared.DictionaryService;
 import stroom.dictionary.shared.FindDictionaryCriteria;
 import stroom.entity.server.DocumentEntityServiceImpl;
 import stroom.entity.server.util.StroomEntityManager;
+import stroom.entity.shared.DocumentType;
+import stroom.logging.EntityEventLog;
 import stroom.security.SecurityContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,8 +34,13 @@ import javax.inject.Inject;
 public class DictionaryServiceImpl extends DocumentEntityServiceImpl<Dictionary, FindDictionaryCriteria>
         implements DictionaryService {
     @Inject
-    DictionaryServiceImpl(final StroomEntityManager entityManager, final SecurityContext securityContext) {
-        super(entityManager, securityContext);
+    DictionaryServiceImpl(final StroomEntityManager entityManager, final SecurityContext securityContext, final EntityEventLog entityEventLog) {
+        super(entityManager, securityContext, entityEventLog);
+    }
+
+    @Override
+    public DocumentType getDocumentType() {
+        return getDocumentType(9, "Dictionary", "Dictionary");
     }
 
     @Override

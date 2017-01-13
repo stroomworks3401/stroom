@@ -29,7 +29,7 @@ import stroom.statistics.common.FilterTermsTree;
 import stroom.statistics.common.FindEventCriteria;
 import stroom.statistics.common.RolledUpStatisticEvent;
 import stroom.statistics.common.StatisticEvent;
-import stroom.statistics.common.StatisticStoreEntityService;
+import stroom.statistics.common.StatisticStoreService;
 import stroom.statistics.common.StatisticTag;
 import stroom.statistics.common.TimeAgnosticStatisticEvent;
 import stroom.statistics.common.rollup.RollUpBitMask;
@@ -307,7 +307,7 @@ public class TestAbstractStatisticEventStore extends StroomUnitTest {
 
         final String dateTerm = "2000-01-01T00:00:00.000Z,2010-01-01T00:00:00.000Z";
 
-        rootOperator.addChild(new ExpressionTerm(StatisticStoreEntityService.FIELD_NAME_DATE_TIME,
+        rootOperator.addChild(new ExpressionTerm(StatisticStoreService.FIELD_NAME_DATE_TIME,
                 Condition.IN_DICTIONARY, dateTerm));
 
         final Search search = new Search(null, rootOperator);
@@ -331,7 +331,7 @@ public class TestAbstractStatisticEventStore extends StroomUnitTest {
         final String dateTerm = fromDateStr + "," + toDateStr;
 
         rootOperator.addChild(
-                new ExpressionTerm(StatisticStoreEntityService.FIELD_NAME_DATE_TIME, Condition.BETWEEN, dateTerm));
+                new ExpressionTerm(StatisticStoreService.FIELD_NAME_DATE_TIME, Condition.BETWEEN, dateTerm));
 
         final Search search = new Search(null, rootOperator);
 
@@ -359,7 +359,7 @@ public class TestAbstractStatisticEventStore extends StroomUnitTest {
         final String dateTerm = fromDateStr;
 
         rootOperator.addChild(
-                new ExpressionTerm(StatisticStoreEntityService.FIELD_NAME_DATE_TIME, Condition.BETWEEN, dateTerm));
+                new ExpressionTerm(StatisticStoreService.FIELD_NAME_DATE_TIME, Condition.BETWEEN, dateTerm));
 
         final Search search = new Search(null, rootOperator);
 
@@ -381,7 +381,7 @@ public class TestAbstractStatisticEventStore extends StroomUnitTest {
         final String dateTerm = fromDateStr + "," + toDateStr;
 
         rootOperator.addChild(
-                new ExpressionTerm(StatisticStoreEntityService.FIELD_NAME_DATE_TIME, Condition.BETWEEN, dateTerm));
+                new ExpressionTerm(StatisticStoreService.FIELD_NAME_DATE_TIME, Condition.BETWEEN, dateTerm));
 
         rootOperator.addChild(new ExpressionTerm(null, Condition.EQUALS, "xxx"));
 
@@ -405,7 +405,7 @@ public class TestAbstractStatisticEventStore extends StroomUnitTest {
         final String dateTerm = fromDateStr + "," + toDateStr;
 
         rootOperator.addChild(
-                new ExpressionTerm(StatisticStoreEntityService.FIELD_NAME_DATE_TIME, Condition.BETWEEN, dateTerm));
+                new ExpressionTerm(StatisticStoreService.FIELD_NAME_DATE_TIME, Condition.BETWEEN, dateTerm));
 
         rootOperator.addChild(new ExpressionTerm("MyField", Condition.EQUALS, ""));
 
@@ -432,7 +432,7 @@ public class TestAbstractStatisticEventStore extends StroomUnitTest {
         final String dateTerm = fromDateStr + "," + toDateStr;
 
         rootOperator.addChild(
-                new ExpressionTerm(StatisticStoreEntityService.FIELD_NAME_DATE_TIME, Condition.BETWEEN, dateTerm));
+                new ExpressionTerm(StatisticStoreService.FIELD_NAME_DATE_TIME, Condition.BETWEEN, dateTerm));
 
         rootOperator.addChild(new ExpressionTerm("MyField", Condition.EQUALS, "xxx"));
 

@@ -14,23 +14,26 @@
  * limitations under the License.
  */
 
-package stroom.explorer.shared;
+package stroom.entity.shared;
 
-import stroom.util.shared.HasDisplayValue;
-import stroom.util.shared.HasNodeState;
-import stroom.util.shared.HasType;
-import stroom.util.shared.SharedObject;
-
+import javax.print.Doc;
+import java.util.List;
 import java.util.Set;
 
-public interface ExplorerData extends HasType, HasNodeState, HasDisplayValue, SharedObject {
-    int getDepth();
+public interface DocumentService {//extends BaseEntityService<E>, HasLoadByUuid<E>, ProvidesNamePattern {
+    DocRef createDocument(DocRef folder, String name);
 
-    void setDepth(int depth);
+    DocRef copyDocument(DocRef item, DocRef folder, String name);
 
-    String getIconUrl();
+    DocRef moveDocument(DocRef item, DocRef folder, String name);
 
-    void setNodeState(HasNodeState.NodeState nodeState);
+    Boolean deleteDocument(DocRef item);
 
-    Set<String> getTags();
+    DocRef importDocument(DocRef folder, String name, String data);
+
+    String exportDocument(DocRef item);
+
+    String[] getPermissions();
+
+    DocumentType getDocumentType();
 }

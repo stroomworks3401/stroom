@@ -28,6 +28,8 @@ import stroom.entity.server.DocumentEntityServiceImpl;
 import stroom.entity.server.util.SQLBuilder;
 import stroom.entity.server.util.StroomEntityManager;
 import stroom.entity.shared.DocRef;
+import stroom.entity.shared.DocumentType;
+import stroom.logging.EntityEventLog;
 import stroom.security.SecurityContext;
 import stroom.util.io.StreamUtil;
 import stroom.util.logging.StroomLogger;
@@ -52,9 +54,14 @@ public class DashboardServiceImpl extends DocumentEntityServiceImpl<Dashboard, F
     private String xmlTemplate;
 
     @Inject
-    DashboardServiceImpl(final StroomEntityManager entityManager, final SecurityContext securityContext, final ResourceLoader resourceLoader) {
-        super(entityManager, securityContext);
+    DashboardServiceImpl(final StroomEntityManager entityManager, final SecurityContext securityContext, final EntityEventLog entityEventLog, final ResourceLoader resourceLoader) {
+        super(entityManager, securityContext, entityEventLog);
         this.resourceLoader = resourceLoader;
+    }
+
+    @Override
+    public DocumentType getDocumentType() {
+        return getDocumentType(7, "Dashboard", "Dashboard");
     }
 
     @Override
@@ -68,14 +75,12 @@ public class DashboardServiceImpl extends DocumentEntityServiceImpl<Dashboard, F
     }
 
     @Override
-    public Dashboard create(final DocRef folder, final String name) throws RuntimeException {
+    public Dashboard create(final DocRef folder, final String name) {
         final Dashboard dashboard = super.create(folder, name);
-
-        // Add the template.
         if (dashboard.getData() == null) {
             dashboard.setData(getTemplate());
         }
-        return super.save(dashboard);
+        return super.internalSave(dashboard);
     }
 
     @Override
@@ -88,7 +93,7 @@ public class DashboardServiceImpl extends DocumentEntityServiceImpl<Dashboard, F
 
     @Override
     public Boolean delete(final Dashboard entity) throws RuntimeException {
-        checkDeletePermission(entity);
+        checkDeletePermission(DocRef.create(entity));
 
         // Delete associated queries first.
         final SQLBuilder sql = new SQLBuilder();

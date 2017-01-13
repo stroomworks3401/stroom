@@ -26,7 +26,7 @@ import stroom.pipeline.server.factory.Pipeline;
 import stroom.pipeline.server.factory.PipelineDataCache;
 import stroom.pipeline.server.factory.PipelineFactory;
 import stroom.pipeline.shared.PipelineEntity;
-import stroom.pipeline.shared.PipelineEntityService;
+import stroom.pipeline.shared.PipelineService;
 import stroom.pipeline.shared.data.PipelineData;
 import stroom.pipeline.state.FeedHolder;
 import stroom.streamstore.shared.Stream;
@@ -56,7 +56,7 @@ public class ContextDataLoadTaskHandler extends AbstractTaskHandler<ContextDataL
     @Resource
     private ErrorReceiverProxy errorReceiverProxy;
     @Resource(name = "cachedPipelineEntityService")
-    private PipelineEntityService pipelineEntityService;
+    private PipelineService pipelineEntityService;
     @Resource
     private PipelineDataCache pipelineDataCache;
 

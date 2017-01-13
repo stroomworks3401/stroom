@@ -37,6 +37,7 @@ import stroom.security.Insecure;
 import stroom.util.logging.StroomLogger;
 
 import javax.annotation.Resource;
+import javax.inject.Inject;
 import java.util.List;
 
 @Component
@@ -44,10 +45,12 @@ import java.util.List;
 public class ImportExportEventLog {
     private static final StroomLogger LOGGER = StroomLogger.getLogger(ImportExportEventLog.class);
 
-    @Resource
-    private StroomEventLoggingService eventLoggingService;
-    @Resource
-    private FolderService folderService;
+    private final StroomEventLoggingService eventLoggingService;
+
+    @Inject
+    ImportExportEventLog(final StroomEventLoggingService eventLoggingService) {
+        this.eventLoggingService = eventLoggingService;
+    }
 
     public void export(final ExportConfigAction exportDataAction) {
         try {
@@ -117,11 +120,10 @@ public class ImportExportEventLog {
             advanced.getAdvancedQueryItems().add(or);
 
             for (final Long folderId : criteria.getFolderIdSet()) {
-                final Folder folder = folderService.loadById(folderId);
                 final event.logging.Term term = new event.logging.Term();
-                term.setName("Folder");
+                term.setName("FolderId");
                 term.setCondition(TermCondition.EQUALS);
-                term.setValue(folder.getName());
+                term.setValue(String.valueOf(folderId));
 
                 or.getAdvancedQueryItems().add(term);
             }

@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 
+import stroom.pipeline.shared.PipelineService;
 import stroom.util.logging.StroomLogger;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -51,7 +52,6 @@ import stroom.pipeline.server.factory.PipelineDataCache;
 import stroom.pipeline.server.factory.PipelineFactory;
 import stroom.pipeline.server.factory.Processor;
 import stroom.pipeline.shared.PipelineEntity;
-import stroom.pipeline.shared.PipelineEntityService;
 import stroom.pipeline.shared.data.PipelineData;
 import stroom.pipeline.state.FeedHolder;
 import stroom.pipeline.state.MetaData;
@@ -182,7 +182,7 @@ public class PipelineStreamProcessor implements StreamProcessorTaskExecutor {
     @Resource(name = "cachedFeedService")
     private FeedService feedService;
     @Resource(name = "cachedPipelineEntityService")
-    private PipelineEntityService pipelineEntityService;
+    private PipelineService pipelineEntityService;
     @Resource
     private TaskMonitor taskMonitor;
     @Resource

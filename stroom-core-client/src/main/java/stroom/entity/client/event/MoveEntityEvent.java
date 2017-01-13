@@ -20,25 +20,25 @@ import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HasHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 
 import java.util.List;
 
 public class MoveEntityEvent extends GwtEvent<MoveEntityEvent.Handler> {
     private static Type<Handler> TYPE;
     private final PresenterWidget<?> presenter;
-    private final ExplorerData folder;
-    private final List<ExplorerData> children;
+    private final ExplorerNode folder;
+    private final List<ExplorerNode> children;
 
     private MoveEntityEvent(final PresenterWidget<?> presenter,
-                            final ExplorerData folder, final List<ExplorerData> children) {
+                            final ExplorerNode folder, final List<ExplorerNode> children) {
         this.presenter = presenter;
         this.folder = folder;
         this.children = children;
     }
 
     public static void fire(final HasHandlers handlers, final PresenterWidget<?> presenter,
-                            final ExplorerData folder, final List<ExplorerData> children) {
+                            final ExplorerNode folder, final List<ExplorerNode> children) {
         handlers.fireEvent(new MoveEntityEvent(presenter, folder, children));
     }
 
@@ -63,11 +63,11 @@ public class MoveEntityEvent extends GwtEvent<MoveEntityEvent.Handler> {
         return presenter;
     }
 
-    public ExplorerData getFolder() {
+    public ExplorerNode getFolder() {
         return folder;
     }
 
-    public List<ExplorerData> getChildren() {
+    public List<ExplorerNode> getChildren() {
         return children;
     }
 

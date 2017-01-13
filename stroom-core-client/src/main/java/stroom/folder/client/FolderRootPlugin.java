@@ -24,12 +24,11 @@ import stroom.core.client.ContentManager.CloseHandler;
 import stroom.core.client.presenter.Plugin;
 import stroom.dispatch.client.ClientDispatchAsync;
 import stroom.entity.client.EntityPluginEventManager;
-import stroom.entity.shared.FolderService;
 import stroom.explorer.client.event.ExplorerTreeSelectEvent;
 import stroom.explorer.client.event.SelectionType;
 import stroom.explorer.client.presenter.ExplorerTreePresenter;
 import stroom.explorer.shared.DocumentType;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 import stroom.util.client.ImageUtil;
 import stroom.widget.tab.client.presenter.Icon;
 import stroom.widget.tab.client.presenter.ImageIcon;
@@ -58,7 +57,7 @@ public class FolderRootPlugin extends Plugin implements TabData {
                 getEventBus().addHandler(ExplorerTreeSelectEvent.getType(), event -> {
                     final SelectionType selectionType = event.getSelectionType();
                     if (!selectionType.isRightClick() && !selectionType.isMultiSelect()) {
-                        final ExplorerData selected = event.getSelectionModel().getSelected();
+                        final ExplorerNode selected = event.getSelectionModel().getSelected();
                         if (selected != null && "System".equals(selected.getType())) {
                             if (presenter == null && selectionType.isDoubleSelect()) {
                                 // If the presenter is null then we haven't got

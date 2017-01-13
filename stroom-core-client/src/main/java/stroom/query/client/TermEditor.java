@@ -31,7 +31,7 @@ import stroom.data.client.event.DataSelectionEvent;
 import stroom.data.client.event.DataSelectionEvent.DataSelectionHandler;
 import stroom.entity.shared.DocRef;
 import stroom.explorer.client.presenter.EntityDropDownPresenter;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 import stroom.item.client.ItemListBox;
 import stroom.query.shared.Condition;
 import stroom.query.shared.ExpressionTerm;
@@ -469,9 +469,9 @@ public class TermEditor extends Composite {
 //        registerHandler(dateTo.addValueChangeHandler(dateChangeHandler));
 
         if (dictionaryPresenter != null) {
-            registerHandler(dictionaryPresenter.addDataSelectionHandler(new DataSelectionHandler<ExplorerData>() {
+            registerHandler(dictionaryPresenter.addDataSelectionHandler(new DataSelectionHandler<ExplorerNode>() {
                 @Override
-                public void onSelection(final DataSelectionEvent<ExplorerData> event) {
+                public void onSelection(final DataSelectionEvent<ExplorerNode> event) {
                     final DocRef selection = dictionaryPresenter.getSelectedEntityReference();
                     if (!EqualsUtil.isEquals(term.getDictionary(), selection)) {
                         write(term);

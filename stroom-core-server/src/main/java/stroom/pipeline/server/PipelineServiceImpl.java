@@ -22,9 +22,11 @@ import stroom.entity.server.ObjectMarshaller;
 import stroom.entity.server.QueryAppender;
 import stroom.entity.server.util.StroomEntityManager;
 import stroom.entity.shared.DocRef;
+import stroom.entity.shared.DocumentType;
+import stroom.logging.EntityEventLog;
 import stroom.pipeline.shared.FindPipelineEntityCriteria;
 import stroom.pipeline.shared.PipelineEntity;
-import stroom.pipeline.shared.PipelineEntityService;
+import stroom.pipeline.shared.PipelineService;
 import stroom.security.SecurityContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,11 +36,16 @@ import javax.inject.Inject;
 @Component("pipelineEntityService")
 @Transactional
 @AutoMarshal
-public class PipelineEntityServiceImpl extends DocumentEntityServiceImpl<PipelineEntity, FindPipelineEntityCriteria>
-        implements PipelineEntityService {
+public class PipelineServiceImpl extends DocumentEntityServiceImpl<PipelineEntity, FindPipelineEntityCriteria>
+        implements PipelineService {
     @Inject
-    PipelineEntityServiceImpl(final StroomEntityManager entityManager, final SecurityContext securityContext) {
-        super(entityManager, securityContext);
+    PipelineServiceImpl(final StroomEntityManager entityManager, final SecurityContext securityContext, final EntityEventLog entityEventLog) {
+        super(entityManager, securityContext, entityEventLog);
+    }
+
+    @Override
+    public DocumentType getDocumentType() {
+        return getDocumentType(6, "Pipeline", "Pipeline");
     }
 
     @Override

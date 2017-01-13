@@ -21,10 +21,12 @@ import stroom.entity.server.DocumentEntityServiceImpl;
 import stroom.entity.server.QueryAppender;
 import stroom.entity.server.util.StroomEntityManager;
 import stroom.entity.server.util.SQLUtil;
+import stroom.entity.shared.DocumentType;
 import stroom.entity.shared.StringCriteria;
+import stroom.logging.EntityEventLog;
 import stroom.security.SecurityContext;
 import stroom.statistics.common.FindStatisticsEntityCriteria;
-import stroom.statistics.common.StatisticStoreEntityService;
+import stroom.statistics.common.StatisticStoreService;
 import stroom.statistics.shared.StatisticStoreEntity;
 import stroom.util.logging.StroomLogger;
 import org.springframework.stereotype.Component;
@@ -36,15 +38,20 @@ import java.util.List;
 @Component
 @Transactional
 @AutoMarshal
-public class StatisticStoreEntityServiceImpl
+public class StatisticStoreServiceImpl
         extends DocumentEntityServiceImpl<StatisticStoreEntity, FindStatisticsEntityCriteria>
-        implements StatisticStoreEntityService {
-    private static final StroomLogger LOGGER = StroomLogger.getLogger(StatisticStoreEntityServiceImpl.class);
+        implements StatisticStoreService {
+    private static final StroomLogger LOGGER = StroomLogger.getLogger(StatisticStoreServiceImpl.class);
 
     @Inject
-    StatisticStoreEntityServiceImpl(final StroomEntityManager entityManager, final SecurityContext securityContext) {
-        super(entityManager, securityContext);
+    StatisticStoreServiceImpl(final StroomEntityManager entityManager, final SecurityContext securityContext, final EntityEventLog entityEventLog) {
+        super(entityManager, securityContext, entityEventLog);
         LOGGER.debug("StatisticsDataSourceServiceImpl initialised");
+    }
+
+    @Override
+    public DocumentType getDocumentType() {
+        return getDocumentType(11, "StatisticStore", "Statistic");
     }
 
     @Override

@@ -18,6 +18,7 @@ package stroom.explorer.shared;
 
 import java.util.List;
 
+import stroom.entity.shared.DocumentType;
 import stroom.util.shared.SharedObject;
 
 public class DocumentTypes implements SharedObject {

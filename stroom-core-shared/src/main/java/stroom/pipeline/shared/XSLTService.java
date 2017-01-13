@@ -17,7 +17,10 @@
 package stroom.pipeline.shared;
 
 import stroom.entity.shared.DocumentEntityService;
+import stroom.entity.shared.DocumentService;
+import stroom.entity.shared.EntityService;
 import stroom.entity.shared.FindService;
+import stroom.entity.shared.HasLoadByUuid;
 
-public interface XSLTService extends DocumentEntityService<XSLT>, FindService<XSLT, FindXSLTCriteria> {
+public interface XSLTService extends DocumentEntityService<XSLT, FindXSLTCriteria> {
 }

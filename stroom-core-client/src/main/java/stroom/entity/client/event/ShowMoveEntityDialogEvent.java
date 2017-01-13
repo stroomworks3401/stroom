@@ -19,20 +19,20 @@ package stroom.entity.client.event;
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HasHandlers;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 
 import java.util.List;
 
 public class ShowMoveEntityDialogEvent extends GwtEvent<ShowMoveEntityDialogEvent.Handler> {
     private static Type<Handler> TYPE;
-    private final List<ExplorerData> explorerDataList;
+    private final List<ExplorerNode> explorerNodeList;
 
-    private ShowMoveEntityDialogEvent(final List<ExplorerData> explorerDataList) {
-        this.explorerDataList = explorerDataList;
+    private ShowMoveEntityDialogEvent(final List<ExplorerNode> explorerNodeList) {
+        this.explorerNodeList = explorerNodeList;
     }
 
-    public static void fire(final HasHandlers handlers, final List<ExplorerData> explorerDataList) {
-        handlers.fireEvent(new ShowMoveEntityDialogEvent(explorerDataList));
+    public static void fire(final HasHandlers handlers, final List<ExplorerNode> explorerNodeList) {
+        handlers.fireEvent(new ShowMoveEntityDialogEvent(explorerNodeList));
     }
 
     public static Type<Handler> getType() {
@@ -52,8 +52,8 @@ public class ShowMoveEntityDialogEvent extends GwtEvent<ShowMoveEntityDialogEven
         handler.onMove(this);
     }
 
-    public List<ExplorerData> getExplorerDataList() {
-        return explorerDataList;
+    public List<ExplorerNode> getExplorerNodeList() {
+        return explorerNodeList;
     }
 
     public interface Handler extends EventHandler {

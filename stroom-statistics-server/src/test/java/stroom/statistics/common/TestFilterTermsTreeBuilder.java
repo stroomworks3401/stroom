@@ -148,7 +148,7 @@ public class TestFilterTermsTreeBuilder extends StroomUnitTest {
         // --term1 - datetime equals 123456789
         // --term2 - field1 between 1 and 2
 
-        final ExpressionTerm term1 = buildTerm(StatisticStoreEntityService.FIELD_NAME_DATE_TIME, "123456789",
+        final ExpressionTerm term1 = buildTerm(StatisticStoreService.FIELD_NAME_DATE_TIME, "123456789",
                 Condition.EQUALS);
         final ExpressionTerm term2 = buildTerm("term2field", "1,2", Condition.BETWEEN);
 
@@ -165,7 +165,7 @@ public class TestFilterTermsTreeBuilder extends StroomUnitTest {
         // --term1 - datetime between 1 and 2
         // --term2 - field1 equals 123456789
 
-        final ExpressionTerm term1 = buildTerm(StatisticStoreEntityService.FIELD_NAME_DATE_TIME, "1,2",
+        final ExpressionTerm term1 = buildTerm(StatisticStoreService.FIELD_NAME_DATE_TIME, "1,2",
                 Condition.BETWEEN);
         final ExpressionTerm term2 = buildTerm("term2field", "123456789", Condition.EQUALS);
 
@@ -182,7 +182,7 @@ public class TestFilterTermsTreeBuilder extends StroomUnitTest {
 
     @Test
     public void testInConditionOneValue() {
-        final ExpressionTerm term1 = buildTerm(StatisticStoreEntityService.FIELD_NAME_DATE_TIME, "1,2",
+        final ExpressionTerm term1 = buildTerm(StatisticStoreService.FIELD_NAME_DATE_TIME, "1,2",
                 Condition.BETWEEN);
         final ExpressionTerm term2 = buildTerm("term1field", "123456789", Condition.IN);
 
@@ -201,7 +201,7 @@ public class TestFilterTermsTreeBuilder extends StroomUnitTest {
 
     @Test
     public void testInConditionNoValue() {
-        final ExpressionTerm term1 = buildTerm(StatisticStoreEntityService.FIELD_NAME_DATE_TIME, "1,2",
+        final ExpressionTerm term1 = buildTerm(StatisticStoreService.FIELD_NAME_DATE_TIME, "1,2",
                 Condition.BETWEEN);
         final ExpressionTerm term2 = buildTerm("term1field", null, Condition.IN);
 

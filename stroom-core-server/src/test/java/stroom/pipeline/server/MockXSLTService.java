@@ -16,7 +16,8 @@
 
 package stroom.pipeline.server;
 
-import stroom.entity.server.MockDocumentEntityService;
+import stroom.entity.server.MockDocumentService;
+import stroom.entity.shared.DocumentType;
 import stroom.pipeline.shared.FindXSLTCriteria;
 import stroom.pipeline.shared.XSLT;
 import stroom.pipeline.shared.XSLTService;
@@ -35,7 +36,12 @@ import org.springframework.stereotype.Component;
  */
 @Profile(StroomSpringProfiles.TEST)
 @Component
-public class MockXSLTService extends MockDocumentEntityService<XSLT, FindXSLTCriteria> implements XSLTService {
+public class MockXSLTService extends MockDocumentService<XSLT, FindXSLTCriteria> implements XSLTService {
+    @Override
+    public DocumentType getDocumentType() {
+        return getDocumentType(5, "XSLT", "XSLT");
+    }
+
     @Override
     public Class<XSLT> getEntityClass() {
         return XSLT.class;

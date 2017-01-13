@@ -26,7 +26,7 @@ import stroom.entity.shared.DocRef;
 import stroom.entity.shared.EntityReferenceFindAction;
 import stroom.entity.shared.ResultList;
 import stroom.explorer.client.presenter.EntityDropDownPresenter;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 import stroom.feed.shared.Feed;
 import stroom.item.client.StringListBox;
 import stroom.pipeline.shared.PipelineEntity;
@@ -99,9 +99,9 @@ public class NewPipelineReferencePresenter
         feedPresenter.setSelectedEntityReference(pipelineReference.getFeed());
         streamTypesWidget.setSelected(pipelineReference.getStreamType());
 
-        pipelinePresenter.addDataSelectionHandler(new DataSelectionHandler<ExplorerData>() {
+        pipelinePresenter.addDataSelectionHandler(new DataSelectionHandler<ExplorerNode>() {
             @Override
-            public void onSelection(final DataSelectionEvent<ExplorerData> event) {
+            public void onSelection(final DataSelectionEvent<ExplorerNode> event) {
                 final DocRef selection = pipelinePresenter.getSelectedEntityReference();
                 if ((pipelineReference.getPipeline() == null && selection != null)
                         || (pipelineReference.getPipeline() != null
@@ -110,9 +110,9 @@ public class NewPipelineReferencePresenter
                 }
             }
         });
-        feedPresenter.addDataSelectionHandler(new DataSelectionHandler<ExplorerData>() {
+        feedPresenter.addDataSelectionHandler(new DataSelectionHandler<ExplorerNode>() {
             @Override
-            public void onSelection(final DataSelectionEvent<ExplorerData> event) {
+            public void onSelection(final DataSelectionEvent<ExplorerNode> event) {
                 final DocRef selection = feedPresenter.getSelectedEntityReference();
                 if ((pipelineReference.getFeed() == null && selection != null)
                         || (pipelineReference.getFeed() != null && !pipelineReference.getFeed().equals(selection))) {

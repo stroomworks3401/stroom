@@ -39,7 +39,7 @@ import stroom.pipeline.shared.FetchDataAction;
 import stroom.pipeline.shared.FetchDataResult;
 import stroom.pipeline.shared.FetchMarkerResult;
 import stroom.pipeline.shared.PipelineEntity;
-import stroom.pipeline.shared.PipelineEntityService;
+import stroom.pipeline.shared.PipelineService;
 import stroom.pipeline.shared.XSLTService;
 import stroom.pipeline.shared.data.PipelineData;
 import stroom.pipeline.state.FeedHolder;
@@ -93,7 +93,7 @@ public abstract class AbstractFetchDataHandler<A extends FetchDataAction>
     @Resource
     private StreamHolder streamHolder;
     @Resource
-    private PipelineEntityService pipelineEntityService;
+    private PipelineService pipelineEntityService;
     @Resource
     private PipelineFactory pipelineFactory;
     @Resource
@@ -386,14 +386,14 @@ public abstract class AbstractFetchDataHandler<A extends FetchDataAction>
     }
 
     private String usePipeline(final StreamSource streamSource, final String string, final Feed feed,
-                               final DocRef pipelineEntity) throws IOException, TransformerException {
+                               final DocRef pipelineRef) throws IOException, TransformerException {
         String data = null;
 
         final LoggingErrorReceiver errorReceiver = new LoggingErrorReceiver();
         errorReceiverProxy.setErrorReceiver(errorReceiver);
 
         // Set the pipeline so it can be used by a filter if needed.
-        final PipelineEntity loadedPipeline = pipelineEntityService.loadByUuid(pipelineEntity.getUuid());
+        final PipelineEntity loadedPipeline = pipelineEntityService.loadByUuid(pipelineRef.getUuid());
         if (loadedPipeline == null) {
             throw new EntityServiceException("Unable to load pipeline");
         }

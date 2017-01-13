@@ -40,6 +40,7 @@ import stroom.util.logging.StroomLogger;
 import stroom.util.spring.StroomBeanStore;
 
 import javax.annotation.Resource;
+import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,15 +48,19 @@ import java.util.Set;
 
 @Component
 @Insecure
-public class EntityEventLogImpl implements EntityEventLog {
+class EntityEventLogImpl implements EntityEventLog {
     private static final StroomLogger LOGGER = StroomLogger.getLogger(EntityEventLogImpl.class);
 
-    @Resource
-    private StroomEventLoggingService eventLoggingService;
-    @Resource
-    private StroomBeanStore stroomBeanStore;
+    private final StroomEventLoggingService eventLoggingService;
+    private final StroomBeanStore stroomBeanStore;
 
     private volatile Map<Class<?>, EventInfoProvider> entityInfoAppenders;
+
+    @Inject
+    EntityEventLogImpl(final StroomEventLoggingService eventLoggingService, final StroomBeanStore stroomBeanStore) {
+        this.eventLoggingService = eventLoggingService;
+        this.stroomBeanStore = stroomBeanStore;
+    }
 
     private EventInfoProvider getInfoAppender(final Class<?> type) {
         if (entityInfoAppenders == null) {
@@ -156,6 +161,43 @@ public class EntityEventLogImpl implements EntityEventLog {
             }
 
             update.setOutcome(EventLoggingUtil.createOutcome(ex));
+
+            eventLoggingService.log(event);
+        } catch (final Exception e) {
+            LOGGER.error(e, e);
+        }
+    }
+
+    @Override
+    public void copy(final BaseEntity original, final BaseEntity copy) {
+        copy(original, copy, null);
+    }
+
+    @Override
+    public void copy(final BaseEntity original, final BaseEntity copy, final Exception ex) {
+        try {
+            final Event event = createAction("Copy", "Copying", original);
+            final CopyMove copyMove = new CopyMove();
+            event.getEventDetail().setCopy(copyMove);
+
+            if (original != null) {
+                final MultiObject source = new MultiObject();
+                copyMove.setSource(source);
+                source.getObjects().add(createBaseObject(original));
+            }
+
+            if (copy != null) {
+                final MultiObject destination = new MultiObject();
+                copyMove.setDestination(destination);
+                destination.getObjects().add(createBaseObject(copy));
+            }
+
+            if (ex != null && ex.getMessage() != null) {
+                final CopyMoveOutcome outcome = new CopyMoveOutcome();
+                outcome.setSuccess(Boolean.FALSE);
+                outcome.setDescription(ex.getMessage());
+                copyMove.setOutcome(outcome);
+            }
 
             eventLoggingService.log(event);
         } catch (final Exception e) {

@@ -24,19 +24,19 @@ import java.util.UUID;
 
 public class TestExplorerTree extends AbstractCoreIntegrationTest {
     @Resource
-    private ExplorerTreeService explorerTreeService;
+    private ExplorerTreeDao explorerTreeDao;
     
     @Test
     public void testCreateTree() throws Exception {
-        ExplorerTreeNode root = explorerTreeService.createRoot(newTreePojo("System"));
-        ExplorerTreeNode a = explorerTreeService.addChild(root, newTreePojo("A"));
-        ExplorerTreeNode b = explorerTreeService.addChild(root, newTreePojo("B"));
-        ExplorerTreeNode c = explorerTreeService.addChild(root, newTreePojo("C"));
-        explorerTreeService.addChild(b, newTreePojo( "B1"));
-        explorerTreeService.addChild(b, newTreePojo("B2"));
-        explorerTreeService.addChild(a, newTreePojo( "A1"));
-        ExplorerTreeNode c1 = explorerTreeService.addChild(c, newTreePojo( "C1"));
-        explorerTreeService.addChild(c1, newTreePojo( "C11"));
+        ExplorerTreeNode root = explorerTreeDao.createRoot(newTreePojo("System"));
+        ExplorerTreeNode a = explorerTreeDao.addChild(root, newTreePojo("A"));
+        ExplorerTreeNode b = explorerTreeDao.addChild(root, newTreePojo("B"));
+        ExplorerTreeNode c = explorerTreeDao.addChild(root, newTreePojo("C"));
+        explorerTreeDao.addChild(b, newTreePojo( "B1"));
+        explorerTreeDao.addChild(b, newTreePojo("B2"));
+        explorerTreeDao.addChild(a, newTreePojo( "A1"));
+        ExplorerTreeNode c1 = explorerTreeDao.addChild(c, newTreePojo( "C1"));
+        explorerTreeDao.addChild(c1, newTreePojo( "C11"));
 //        outputTree(root, dao);
 
         //commitDbTransaction(session, "insert tree nodes");

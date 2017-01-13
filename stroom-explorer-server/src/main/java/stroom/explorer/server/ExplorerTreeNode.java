@@ -21,6 +21,7 @@ import stroom.entity.shared.BaseEntitySmall;
 import stroom.entity.shared.HasName;
 import stroom.entity.shared.HasUuid;
 import stroom.entity.shared.SQLNameConstants;
+import stroom.explorer.shared.ExplorerNode;
 import stroom.util.shared.HasDisplayValue;
 import stroom.util.shared.HasType;
 
@@ -43,6 +44,29 @@ public class ExplorerTreeNode implements ClosureTableTreeNode {
     private String uuid;
     private String name;
     private String tags;
+
+    public ExplorerTreeNode() {
+    }
+
+    public ExplorerTreeNode(final String type, final String uuid, final String name, final String tags) {
+        this.type = type;
+        this.uuid = uuid;
+        this.name = name;
+        this.tags = tags;
+    }
+
+    public static ExplorerTreeNode create(final ExplorerNode node) {
+        if (node == null) {
+            return null;
+        }
+
+        final ExplorerTreeNode explorerTreeNode = new ExplorerTreeNode();
+        explorerTreeNode.setType(node.getType());
+        explorerTreeNode.setUuid(node.getUuid());
+        explorerTreeNode.setName(node.getName());
+        explorerTreeNode.setTags(node.getTags());
+        return explorerTreeNode;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -109,6 +133,7 @@ public class ExplorerTreeNode implements ClosureTableTreeNode {
         clone.type = type;
         clone.uuid = uuid;
         clone.name = name;
+        clone.tags = tags;
         return clone;
     }
 }

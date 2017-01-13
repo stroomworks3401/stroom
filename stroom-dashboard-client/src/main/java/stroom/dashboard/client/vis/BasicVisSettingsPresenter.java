@@ -34,7 +34,7 @@ import stroom.dispatch.client.AsyncCallbackAdaptor;
 import stroom.dispatch.client.ClientDispatchAsync;
 import stroom.entity.shared.DocRef;
 import stroom.explorer.client.presenter.EntityDropDownPresenter;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 import stroom.query.shared.Field;
 import stroom.query.shared.VisDashboardSettings;
 import stroom.security.shared.DocumentPermissionNames;
@@ -75,9 +75,9 @@ public class BasicVisSettingsPresenter extends BasicSettingsTabPresenter<BasicVi
 
     @Override
     protected void onBind() {
-        registerHandler(visualisationPresenter.addDataSelectionHandler(new DataSelectionHandler<ExplorerData>() {
+        registerHandler(visualisationPresenter.addDataSelectionHandler(new DataSelectionHandler<ExplorerNode>() {
             @Override
-            public void onSelection(final DataSelectionEvent<ExplorerData> event) {
+            public void onSelection(final DataSelectionEvent<ExplorerNode> event) {
                 if (!EqualsUtil.isEquals(currentVisualisation, visualisationPresenter.getSelectedEntityReference())) {
                     writeDynamicSettings(dynamicSettings);
                     loadVisualisation(visualisationPresenter.getSelectedEntityReference(), dynamicSettings);

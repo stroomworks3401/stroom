@@ -17,17 +17,14 @@
 package stroom.folder.server;
 
 import stroom.entity.server.DocumentEntityServiceImpl;
-import stroom.entity.server.GenericEntityService;
-import stroom.entity.server.UserManagerQueryUtil;
 import stroom.entity.server.util.StroomEntityManager;
-import stroom.entity.shared.BaseEntity;
-import stroom.entity.shared.DocumentEntityService;
-import stroom.entity.shared.EntityIdSet;
+import stroom.entity.shared.DocumentServiceLocator;
+import stroom.entity.shared.DocumentType;
 import stroom.entity.shared.EntityServiceException;
 import stroom.entity.shared.FindFolderCriteria;
 import stroom.entity.shared.Folder;
-import stroom.entity.shared.FolderIdSet;
 import stroom.entity.shared.FolderService;
+import stroom.logging.EntityEventLog;
 import stroom.security.SecurityContext;
 import stroom.security.shared.DocumentPermissionNames;
 import stroom.util.logging.StroomLogger;
@@ -38,22 +35,27 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @Transactional
 @Component("folderService")
 public class FolderServiceImpl extends DocumentEntityServiceImpl<Folder, FindFolderCriteria> implements FolderService {
     private static final StroomLogger LOGGER = StroomLogger.getLogger(FolderServiceImpl.class);
 
-    private final GenericEntityService genericEntityService;
+    private final DocumentServiceLocator documentServiceLocator;
     private volatile String[] permissions;
 
     @Inject
-    FolderServiceImpl(final StroomEntityManager entityManager, final SecurityContext securityContext, final GenericEntityService genericEntityService) {
-        super(entityManager, securityContext);
-        this.genericEntityService = genericEntityService;
+    FolderServiceImpl(final StroomEntityManager entityManager, final SecurityContext securityContext, final EntityEventLog entityEventLog, final DocumentServiceLocator documentServiceLocator) {
+        super(entityManager, securityContext, entityEventLog);
+        this.documentServiceLocator = documentServiceLocator;
+    }
+
+    @Override
+    public DocumentType getDocumentType() {
+        return getDocumentType(1, "Folder", "Folder");
     }
 
     @Override
@@ -105,14 +107,9 @@ public class FolderServiceImpl extends DocumentEntityServiceImpl<Folder, FindFol
     public String[] getPermissions() {
         if (permissions == null) {
             final List<String> permissionList = new ArrayList<>();
-            try {
-                final Collection<DocumentEntityService<?>> serviceList = genericEntityService.findAll();
-                for (final DocumentEntityService<?> service : serviceList) {
-                    final BaseEntity e = service.getEntityClass().newInstance();
-                    permissionList.add(DocumentPermissionNames.getDocumentCreatePermission(e.getType()));
-                }
-            } catch (final IllegalAccessException | InstantiationException | RuntimeException e) {
-                LOGGER.error(e.getMessage(), e);
+            final List<DocumentType> types = documentServiceLocator.getTypes();
+            for (final DocumentType type : types) {
+                permissionList.add(DocumentPermissionNames.getDocumentCreatePermission(type.getType()));
             }
 
             Collections.sort(permissionList);

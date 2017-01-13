@@ -22,8 +22,7 @@ import stroom.entity.client.event.ShowCreateEntityDialogEvent;
 import stroom.entity.shared.DocRef;
 import stroom.entity.shared.Folder;
 import stroom.explorer.client.presenter.EntityTreePresenter;
-import stroom.explorer.shared.EntityData;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 import stroom.security.shared.DocumentPermissionNames;
 import stroom.widget.popup.client.event.HidePopupEvent;
 import stroom.widget.popup.client.event.ShowPopupEvent;
@@ -66,24 +65,6 @@ public class CreateEntityPresenter
 
         entityTreePresenter.setSelectedItem(null);
 
-//        if (event.getCurrentParents() != null && event.getCurrentParents().size() > 0) {
-//            ExplorerData folder = null;
-//            for (final ExplorerData parent : event.getCurrentParents()) {
-//                if (folder == null && parent != null && parent instanceof EntityData
-//                        && Folder.ENTITY_TYPE.equals(parent.getType())) {
-//                    folder = parent;
-//                }
-//            }
-//
-//            if (folder != null) {
-//                entityTreePresenter.getSelectionModel().setSelected(folder, true);
-//            }
-//
-//            entityTreePresenter.reset(new HashSet<>(event.getCurrentParents()), 1);
-//        } else {
-//            entityTreePresenter.reset(null, 1);
-//        }
-
         entityTreePresenter.setSelectedItem(event.getSelected());
         entityTreePresenter.getModel().reset();
         entityTreePresenter.getModel().setEnsureVisible(event.getSelected());
@@ -106,7 +87,7 @@ public class CreateEntityPresenter
     @Override
     public void onHideRequest(final boolean autoClose, final boolean ok) {
         if (ok) {
-            final DocRef folder = getFolder();
+            final ExplorerNode folder = getFolder();
             if (!allowNullFolder && folder == null) {
                 AlertEvent.fireWarn(CreateEntityPresenter.this, "No parent folder has been selected", null);
             } else {
@@ -132,13 +113,8 @@ public class CreateEntityPresenter
         // Do nothing.
     }
 
-    private DocRef getFolder() {
-        final ExplorerData selected = entityTreePresenter.getSelectedItem();
-        if (selected != null && selected instanceof EntityData) {
-            return ((EntityData) selected).getDocRef();
-        }
-
-        return null;
+    private ExplorerNode getFolder() {
+        return entityTreePresenter.getSelectedItem();
     }
 
     public interface CreateEntityView extends View, HasUiHandlers<PopupUiHandlers> {

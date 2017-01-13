@@ -16,15 +16,15 @@
 
 package stroom.explorer.server;
 
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 
 import java.util.List;
 import java.util.Map;
 
 public interface TreeModel {
-    void add(ExplorerData parent, ExplorerData child);
+    void add(ExplorerNode parent, ExplorerNode child);
 
-    Map<ExplorerData, ExplorerData> getParentMap();
+    Map<ExplorerNode, ExplorerNode> getParentMap();
 
-    Map<ExplorerData, List<ExplorerData>> getChildMap();
+    Map<ExplorerNode, List<ExplorerNode>> getChildMap();
 }

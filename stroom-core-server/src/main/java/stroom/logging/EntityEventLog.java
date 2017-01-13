@@ -34,6 +34,10 @@ public interface EntityEventLog {
 
     void update(BaseEntity before, BaseEntity after, Exception ex);
 
+    void copy(BaseEntity original, BaseEntity copy);
+
+    void copy(BaseEntity original, BaseEntity copy, Exception ex);
+
     void move(BaseEntity before, BaseEntity after);
 
     void move(BaseEntity before, BaseEntity after, Exception ex);
@@ -45,6 +49,10 @@ public interface EntityEventLog {
     void view(BaseEntity entity);
 
     void view(BaseEntity entity, Exception ex);
+
+//    void view(String entityType, String entityName);
+//
+//    void view(String entityType, String entityName, Exception ex);
 
     void delete(BaseCriteria criteria, Query query, Long size);
 

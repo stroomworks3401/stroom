@@ -25,7 +25,7 @@ import stroom.pipeline.server.factory.PipelineDataCache;
 import stroom.pipeline.server.factory.PipelineFactory;
 import stroom.pipeline.server.parser.CombinedParser;
 import stroom.pipeline.shared.PipelineEntity;
-import stroom.pipeline.shared.PipelineEntityService;
+import stroom.pipeline.shared.PipelineService;
 import stroom.pipeline.shared.TextConverter;
 import stroom.pipeline.shared.TextConverter.TextConverterType;
 import stroom.pipeline.shared.TextConverterService;
@@ -70,7 +70,7 @@ public class TestXMLHttpBlankTokenFix extends AbstractProcessIntegrationTest {
     @Resource
     private XSLTService xsltService;
     @Resource
-    private PipelineEntityService pipelineEntityService;
+    private PipelineService pipelineEntityService;
     @Resource
     private PipelineMarshaller pipelineMarshaller;
     @Resource

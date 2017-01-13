@@ -21,6 +21,8 @@ import stroom.entity.server.QueryAppender;
 import stroom.entity.server.util.StroomEntityManager;
 import stroom.entity.server.util.SQLBuilder;
 import stroom.entity.server.util.SQLUtil;
+import stroom.entity.shared.DocumentType;
+import stroom.logging.EntityEventLog;
 import stroom.security.SecurityContext;
 import stroom.xmlschema.shared.FindXMLSchemaCriteria;
 import stroom.xmlschema.shared.XMLSchema;
@@ -35,8 +37,13 @@ import javax.inject.Inject;
 public class XMLSchemaServiceImpl extends DocumentEntityServiceImpl<XMLSchema, FindXMLSchemaCriteria>
         implements XMLSchemaService {
     @Inject
-    XMLSchemaServiceImpl(final StroomEntityManager entityManager, final SecurityContext securityContext) {
-        super(entityManager, securityContext);
+    XMLSchemaServiceImpl(final StroomEntityManager entityManager, final SecurityContext securityContext, final EntityEventLog entityEventLog) {
+        super(entityManager, securityContext, entityEventLog);
+    }
+
+    @Override
+    public DocumentType getDocumentType() {
+        return getDocumentType(13, "XMLSchema", "XML Schema");
     }
 
     @Override

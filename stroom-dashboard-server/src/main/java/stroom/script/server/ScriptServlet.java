@@ -84,19 +84,21 @@ public class ScriptServlet extends HttpServlet {
                         pw.close();
                     }
 
-                } else {
-                    final String idString = queryParamMap.get("id");
-                    if (idString != null && idString.length() > 0) {
-                        final long id = Long.parseLong(idString);
-                        final Script script = getScript(id);
-                        final Res res = script.getResource();
-                        if (res != null && res.getData() != null) {
-                            final PrintWriter pw = response.getWriter();
-                            pw.write(res.getData());
-                            pw.close();
-                        }
-                    }
                 }
+
+//                else {
+//                    final String idString = queryParamMap.get("id");
+//                    if (idString != null && idString.length() > 0) {
+//                        final long id = Long.parseLong(idString);
+//                        final Script script = getScript(id);
+//                        final Res res = script.getResource();
+//                        if (res != null && res.getData() != null) {
+//                            final PrintWriter pw = response.getWriter();
+//                            pw.write(res.getData());
+//                            pw.close();
+//                        }
+//                    }
+//                }
             }
 
         } finally {
@@ -105,15 +107,15 @@ public class ScriptServlet extends HttpServlet {
         }
     }
 
-    private Script getScript(final long id) {
-        // TODO : Remove this when the explorer service is broken out as a separate micro service.
-        final DocumentEntityServiceImpl documentEntityService = getDocEntityService();
-        if (documentEntityService != null) {
-            return (Script) documentEntityService.loadByIdInsecure(id, FETCH_SET);
-        }
-
-        return scriptService.loadById(id, FETCH_SET);
-    }
+//    private Script getScript(final long id) {
+//        // TODO : Remove this when the explorer service is broken out as a separate micro service.
+//        final DocumentEntityServiceImpl documentEntityService = getDocEntityService();
+//        if (documentEntityService != null) {
+//            return (Script) documentEntityService.loadByIdInsecure(id, FETCH_SET);
+//        }
+//
+//        return scriptService.loadById(id, FETCH_SET);
+//    }
 
     private Script getScript(final String uuid) {
         // TODO : Remove this when the explorer service is broken out as a separate micro service.

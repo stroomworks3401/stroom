@@ -32,6 +32,7 @@ import stroom.dispatch.client.ClientDispatchAsync;
 import stroom.entity.client.presenter.ManageNewEntityPresenter;
 import stroom.entity.shared.DocRef;
 import stroom.entity.shared.EntityServiceDeleteAction;
+import stroom.explorer.shared.ExplorerDeleteAction;
 import stroom.entity.shared.EntityServiceLoadAction;
 import stroom.entity.shared.EntityServiceSaveAction;
 import stroom.security.client.ClientSecurityContext;

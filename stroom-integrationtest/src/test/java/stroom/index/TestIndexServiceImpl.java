@@ -118,16 +118,16 @@ public class TestIndexServiceImpl extends AbstractCoreIntegrationTest {
         Assert.assertEquals("Test index", index.getName());
     }
 
-    @Test
-    public void testLoadById() {
-        final Index index = indexService.loadById(testIndex.getId());
-        Assert.assertNotNull(index);
-        Assert.assertEquals("Test index", index.getName());
-    }
+//    @Test
+//    public void testLoadById() {
+//        final Index index = indexService.loadById(testIndex.getId());
+//        Assert.assertNotNull(index);
+//        Assert.assertEquals("Test index", index.getName());
+//    }
 
     @Test
     public void testClientSideStuff1() {
-        Index index = indexService.loadById(refIndex.getId());
+        Index index = indexService.loadByUuid(refIndex.getUuid());
         index = ((Index) new BaseEntityDeProxyProcessor(true).process(index));
         indexService.save(index);
 
@@ -135,7 +135,7 @@ public class TestIndexServiceImpl extends AbstractCoreIntegrationTest {
 
     @Test
     public void testClientSideStuff2() {
-        Index index = indexService.loadById(testIndex.getId());
+        Index index = indexService.loadByUuid(testIndex.getUuid());
         index = ((Index) new BaseEntityDeProxyProcessor(true).process(index));
         indexService.save(index);
     }

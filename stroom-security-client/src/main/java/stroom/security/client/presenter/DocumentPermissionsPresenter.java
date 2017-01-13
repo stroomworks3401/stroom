@@ -22,8 +22,7 @@ import com.gwtplatform.mvp.client.View;
 import stroom.dispatch.client.AsyncCallbackAdaptor;
 import stroom.dispatch.client.ClientDispatchAsync;
 import stroom.entity.shared.Folder;
-import stroom.explorer.shared.EntityData;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 import stroom.item.client.ItemListBox;
 import stroom.security.shared.ChangeDocumentPermissionsAction;
 import stroom.security.shared.ChangeSet;
@@ -60,20 +59,17 @@ public class DocumentPermissionsPresenter
         view.setSlideTabView(slideTabPresenter.getView());
     }
 
-    public void show(final ExplorerData explorerData) {
-        if (explorerData instanceof EntityData) {
-            final EntityData entityData = (EntityData) explorerData;
-
-            getView().setCascasdeVisible(Folder.ENTITY_TYPE.equals(entityData.getType()));
-            final DocumentPermissionsTabPresenter usersPresenter = getTabPresenter(entityData);
-            final DocumentPermissionsTabPresenter groupsPresenter = getTabPresenter(entityData);
+    public void show(final ExplorerNode explorerNode) {
+            getView().setCascasdeVisible(Folder.ENTITY_TYPE.equals(explorerNode.getType()));
+            final DocumentPermissionsTabPresenter usersPresenter = getTabPresenter(explorerNode);
+            final DocumentPermissionsTabPresenter groupsPresenter = getTabPresenter(explorerNode);
 
             final TabData groups = slideTabPresenter.addTab("Groups", groupsPresenter);
             final TabData users = slideTabPresenter.addTab("Users", usersPresenter);
 
             slideTabPresenter.changeSelectedTab(groups);
 
-            final FetchAllDocumentPermissionsAction fetchAllDocumentPermissionsAction = new FetchAllDocumentPermissionsAction(entityData.getDocRef());
+            final FetchAllDocumentPermissionsAction fetchAllDocumentPermissionsAction = new FetchAllDocumentPermissionsAction(explorerNode.getDocRef());
             dispatcher.execute(fetchAllDocumentPermissionsAction, new AsyncCallbackAdaptor<DocumentPermissions>() {
                 @Override
                 public void onSuccess(final DocumentPermissions documentPermissions) {
@@ -102,19 +98,18 @@ public class DocumentPermissionsPresenter
                     };
 
                     PopupSize popupSize;
-                    if (Folder.ENTITY_TYPE.equals(entityData.getType())) {
+                    if (Folder.ENTITY_TYPE.equals(explorerNode.getType())) {
                         popupSize = new PopupSize(384, 664, 384, 664, true);
                     } else {
                         popupSize = new PopupSize(384, 500, 384, 500, true);
                     }
 
-                    ShowPopupEvent.fire(DocumentPermissionsPresenter.this, DocumentPermissionsPresenter.this, PopupView.PopupType.OK_CANCEL_DIALOG, popupSize, "Set " + entityData.getType() + " Permissions", popupUiHandlers);
+                    ShowPopupEvent.fire(DocumentPermissionsPresenter.this, DocumentPermissionsPresenter.this, PopupView.PopupType.OK_CANCEL_DIALOG, popupSize, "Set " + explorerNode.getType() + " Permissions", popupUiHandlers);
                 }
             });
-        }
     }
 
-    private DocumentPermissionsTabPresenter getTabPresenter(final EntityData entity) {
+    private DocumentPermissionsTabPresenter getTabPresenter(final ExplorerNode entity) {
         if (Folder.ENTITY_TYPE.equals(entity.getType())) {
             return folderPermissionsListPresenterProvider.get();
         }

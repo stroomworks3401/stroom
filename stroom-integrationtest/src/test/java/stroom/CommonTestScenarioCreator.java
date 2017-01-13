@@ -80,12 +80,14 @@ public class CommonTestScenarioCreator {
     }
 
     public DocRef getTestFolder() {
-        Folder globalGroup = null;
-        globalGroup = folderService.loadByName(null, "GlobalGroup");
-        if (globalGroup == null) {
-            globalGroup = folderService.create(null, "GlobalGroup");
-        }
-        return DocRef.create(globalGroup);
+//        Folder globalGroup = null;
+//        globalGroup = folderService.loadByName(null, "GlobalGroup");
+//        if (globalGroup == null) {
+//            globalGroup = folderService.create(null, "GlobalGroup");
+//        }
+//        return DocRef.create(globalGroup);
+
+        return null;
     }
 
     public Feed createSimpleFeed() {

@@ -34,7 +34,7 @@ import stroom.dispatch.client.ClientDispatchAsync;
 import stroom.explorer.client.event.ExplorerTreeSelectEvent;
 import stroom.explorer.client.event.ShowExplorerMenuEvent;
 import stroom.explorer.client.view.ExplorerTickBoxCell;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 import stroom.explorer.shared.FetchExplorerDataResult;
 import stroom.util.shared.HasNodeState;
 import stroom.widget.spinner.client.SpinnerSmall;
@@ -45,7 +45,7 @@ import java.util.List;
 public class ExplorerTickBoxTree extends AbstractExporerTree {
     private final ExplorerTreeModel treeModel;
     private final TickBoxSelectionModel selectionModel;
-    private final CellTable<ExplorerData> cellTable;
+    private final CellTable<ExplorerNode> cellTable;
     private final DoubleSelectTest doubleClickTest = new DoubleSelectTest();
 
     private String expanderClassName;
@@ -67,9 +67,9 @@ public class ExplorerTickBoxTree extends AbstractExporerTree {
         cellTable = new CellTable<>(Integer.MAX_VALUE, resources);
         cellTable.setWidth("100%");
         cellTable.setKeyboardSelectionHandler(new MyKeyboardSelectionHandler(cellTable));
-        cellTable.addColumn(new Column<ExplorerData, ExplorerData>(explorerCell) {
+        cellTable.addColumn(new Column<ExplorerNode, ExplorerNode>(explorerCell) {
             @Override
-            public ExplorerData getValue(ExplorerData object) {
+            public ExplorerNode getValue(ExplorerNode object) {
                 return object;
             }
         });
@@ -107,17 +107,17 @@ public class ExplorerTickBoxTree extends AbstractExporerTree {
     }
 
     @Override
-    void setData(final List<ExplorerData> rows) {
+    void setData(final List<ExplorerNode> rows) {
         cellTable.setRowData(0, rows);
         cellTable.setRowCount(rows.size(), true);
     }
 
-//    protected void select(final ExplorerData selection) {
+//    protected void select(final ExplorerNode selection) {
 //        final boolean doubleClick = doubleClickTest.test(selection);
 //        select(selection, doubleClick);
 //    }
 //
-//    protected void select(final ExplorerData selection, final boolean doubleClick) {
+//    protected void select(final ExplorerNode selection, final boolean doubleClick) {
 //        selectedItem = selection;
 //        if (selection != null) {
 //            ExplorerTreeSelectEvent.fire(ExplorerTickBoxTree.this, selection, doubleClick, false);
@@ -174,7 +174,7 @@ public class ExplorerTickBoxTree extends AbstractExporerTree {
     }
 
     private void setOpenState(boolean open) {
-        final ExplorerData selected = getKeyBoardSelected();
+        final ExplorerNode selected = getKeyBoardSelected();
         if (selected != null) {
             if (open) {
                 if (!treeModel.getOpenItems().contains(selected)) {
@@ -191,13 +191,13 @@ public class ExplorerTickBoxTree extends AbstractExporerTree {
     }
 
     private void selectCurrent() {
-        final ExplorerData selected = getKeyBoardSelected();
+        final ExplorerNode selected = getKeyBoardSelected();
         if (selected != null) {
             toggleSelection(selected);
         }
     }
 
-    private ExplorerData getKeyBoardSelected() {
+    private ExplorerNode getKeyBoardSelected() {
         final int row = cellTable.getKeyboardSelectedRow();
         if (row >= 0) {
             return cellTable.getVisibleItem(row);
@@ -207,12 +207,12 @@ public class ExplorerTickBoxTree extends AbstractExporerTree {
     }
 
     @Override
-    void setInitialSelectedItem(final ExplorerData selection) {
+    void setInitialSelectedItem(final ExplorerNode selection) {
 //        doSelect(selection);
     }
 
 //    private void moveSelection(int plus) {
-//        ExplorerData currentSelection = getKeyBoardSelected();
+//        ExplorerNode currentSelection = getKeyBoardSelected();
 //        if (currentSelection == null) {
 //            selectFirstItem();
 //        } else {
@@ -220,7 +220,7 @@ public class ExplorerTickBoxTree extends AbstractExporerTree {
 //            if (index == -1) {
 //                selectFirstItem();
 //            } else {
-//                final ExplorerData newSelection = cellTable.getVisibleItem(index + plus);
+//                final ExplorerNode newSelection = cellTable.getVisibleItem(index + plus);
 //                if (newSelection != null) {
 //                    setSelectedItem(newSelection);
 //                } else {
@@ -231,12 +231,12 @@ public class ExplorerTickBoxTree extends AbstractExporerTree {
 //    }
 //
 //    private void selectFirstItem() {
-//        final ExplorerData firstItem = cellTable.getVisibleItem(0);
+//        final ExplorerNode firstItem = cellTable.getVisibleItem(0);
 //        setSelectedItem(firstItem);
 //    }
 //
-//    private int getItemIndex(ExplorerData item) {
-//        final List<ExplorerData> items = cellTable.getVisibleItems();
+//    private int getItemIndex(ExplorerNode item) {
+//        final List<ExplorerNode> items = cellTable.getVisibleItems();
 //        if (items != null) {
 //            for (int i = 0; i < items.size(); i++) {
 //                if (EqualsUtil.isEquals(items.get(i), item)) {
@@ -248,7 +248,7 @@ public class ExplorerTickBoxTree extends AbstractExporerTree {
 //        return -1;
 //    }
 
-    private void toggleSelection(final ExplorerData selection) {
+    private void toggleSelection(final ExplorerNode selection) {
         if (selection != null) {
             selectionModel.setSelected(selection, !selectionModel.isSelected(selection));
 //        } else {
@@ -265,16 +265,16 @@ public class ExplorerTickBoxTree extends AbstractExporerTree {
         return selectionModel;
     }
 
-//    protected void setSelectedItem(final ExplorerData selection) {
+//    protected void setSelectedItem(final ExplorerNode selection) {
 //        doSelect(selection, false, false);
 //    }
 //
-//    private void setSelectedItemWithDoubleClickTest(final ExplorerData selection) {
+//    private void setSelectedItemWithDoubleClickTest(final ExplorerNode selection) {
 //        final boolean doubleClick = doubleClickTest.test(selection);
 //        doSelect(selection, doubleClick, false);
 //    }
 //
-//    protected void doSelect(final ExplorerData selection, final boolean doubleClick, final boolean rightClick) {
+//    protected void doSelect(final ExplorerNode selection, final boolean doubleClick, final boolean rightClick) {
 //        if (selection != null) {
 //            selectionModel.setSelected(selection, true);
 ////        } else {
@@ -287,7 +287,7 @@ public class ExplorerTickBoxTree extends AbstractExporerTree {
         return addHandler(handler, ExplorerTreeSelectEvent.getType());
     }
 //
-//    public ExplorerData getSelectedItem() {
+//    public ExplorerNode getSelectedItem() {
 //        return selectedItem;
 //    }
 
@@ -310,20 +310,20 @@ public class ExplorerTickBoxTree extends AbstractExporerTree {
         ExplorerTreeStyle cellTableStyle();
     }
 
-    private class MyKeyboardSelectionHandler extends AbstractCellTable.CellTableKeyboardSelectionHandler<ExplorerData> {
-        MyKeyboardSelectionHandler(AbstractCellTable<ExplorerData> table) {
+    private class MyKeyboardSelectionHandler extends AbstractCellTable.CellTableKeyboardSelectionHandler<ExplorerNode> {
+        MyKeyboardSelectionHandler(AbstractCellTable<ExplorerNode> table) {
             super(table);
         }
 
         @Override
-        public void onCellPreview(CellPreviewEvent<ExplorerData> event) {
+        public void onCellPreview(CellPreviewEvent<ExplorerNode> event) {
             final NativeEvent nativeEvent = event.getNativeEvent();
             final String type = nativeEvent.getType();
 
             if ("click".equals(type)) {
                 final int button = nativeEvent.getButton();
 
-                final ExplorerData selectedItem = event.getValue();
+                final ExplorerNode selectedItem = event.getValue();
 
                 if (selectedItem != null) {
                     if ((button & NativeEvent.BUTTON_LEFT) != 0) {

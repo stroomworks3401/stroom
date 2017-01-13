@@ -18,10 +18,11 @@ package stroom.explorer.server;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import stroom.explorer.shared.DocumentType;
+import stroom.entity.shared.DocRef;
+import stroom.entity.shared.DocumentServiceLocator;
+import stroom.entity.shared.DocumentType;
 import stroom.explorer.shared.DocumentTypes;
-import stroom.explorer.shared.EntityData;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 import stroom.explorer.shared.ExplorerTreeFilter;
 import stroom.explorer.shared.FetchExplorerDataResult;
 import stroom.explorer.shared.FindExplorerDataCriteria;
@@ -31,6 +32,7 @@ import stroom.util.shared.HasNodeState;
 import stroom.util.spring.StroomScope;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -39,13 +41,14 @@ import java.util.stream.Collectors;
 @Component
 @Scope(StroomScope.THREAD)
 class ExplorerServiceImpl implements ExplorerService {
-    private final AllDocumentTypes allDocumentTypes = new AllDocumentTypes();
     private final SecurityContext securityContext;
+    private final DocumentServiceLocator documentServiceLocator;
     private final ExplorerTreeModel explorerTreeModel;
 
     @Inject
-    ExplorerServiceImpl(SecurityContext securityContext, ExplorerTreeModel explorerTreeModel) {
+    ExplorerServiceImpl(final SecurityContext securityContext,final DocumentServiceLocator documentServiceLocator, final ExplorerTreeModel explorerTreeModel) {
         this.securityContext = securityContext;
+        this.documentServiceLocator = documentServiceLocator;
         this.explorerTreeModel = explorerTreeModel;
     }
 
@@ -57,11 +60,11 @@ class ExplorerServiceImpl implements ExplorerService {
         final TreeModel masterTreeModel = explorerTreeModel.getModel();
 
         // See if we need to open any more folders to see nodes we want to ensure are visible.
-        final Set<ExplorerData> forcedOpen = getForcedOpenItems(masterTreeModel, criteria);
+        final Set<ExplorerNode> forcedOpen = getForcedOpenItems(masterTreeModel, criteria);
 
         final TreeModel filteredModel = new TreeModelImpl();
-        final List<ExplorerData> roots = masterTreeModel.getChildMap().get(null);
-        for (final ExplorerData root : roots) {
+        final List<ExplorerNode> roots = masterTreeModel.getChildMap().get(null);
+        for (final ExplorerNode root : roots) {
             addDescendants(root, masterTreeModel, filteredModel, criteria.getFilter());
 
             // Add root node.
@@ -72,12 +75,12 @@ class ExplorerServiceImpl implements ExplorerService {
         return result;
     }
 
-    private Set<ExplorerData> getForcedOpenItems(final TreeModel masterTreeModel, final FindExplorerDataCriteria criteria) {
-        final Set<ExplorerData> forcedOpen = new HashSet<>();
+    private Set<ExplorerNode> getForcedOpenItems(final TreeModel masterTreeModel, final FindExplorerDataCriteria criteria) {
+        final Set<ExplorerNode> forcedOpen = new HashSet<>();
         if (criteria.getEnsureVisible() != null && criteria.getEnsureVisible().size() > 0) {
-            for (final ExplorerData ensureVisible : criteria.getEnsureVisible()) {
+            for (final ExplorerNode ensureVisible : criteria.getEnsureVisible()) {
 
-                ExplorerData parent = masterTreeModel.getParentMap().get(ensureVisible);
+                ExplorerNode parent = masterTreeModel.getParentMap().get(ensureVisible);
                 while (parent != null) {
                     forcedOpen.add(parent);
                     parent = masterTreeModel.getParentMap().get(parent);
@@ -87,12 +90,12 @@ class ExplorerServiceImpl implements ExplorerService {
         return forcedOpen;
     }
 
-    private boolean addDescendants(final ExplorerData parent, final TreeModel treeModelIn, final TreeModel treeModelOut, final ExplorerTreeFilter filter) {
+    private boolean addDescendants(final ExplorerNode parent, final TreeModel treeModelIn, final TreeModel treeModelOut, final ExplorerTreeFilter filter) {
         boolean added = false;
 
-        final List<ExplorerData> children = treeModelIn.getChildMap().get(parent);
+        final List<ExplorerNode> children = treeModelIn.getChildMap().get(parent);
         if (children != null) {
-            for (final ExplorerData child : children) {
+            for (final ExplorerNode child : children) {
                 // Recurse right down to find out if a descendant is being added and therefore if we need to include this as an ancestor.
                 final boolean hasChildren = addDescendants(child, treeModelIn, treeModelOut, filter);
                 if (hasChildren) {
@@ -115,17 +118,13 @@ class ExplorerServiceImpl implements ExplorerService {
         return added;
     }
 
-    private boolean checkSecurity(final ExplorerData explorerData, final Set<String> requiredPermissions) {
-        if (!(explorerData instanceof EntityData)) {
-            return true;
-        }
-
+    private boolean checkSecurity(final ExplorerNode explorerNode, final Set<String> requiredPermissions) {
         if (requiredPermissions == null || requiredPermissions.size() == 0) {
             return false;
         }
 
-        final String type = explorerData.getType();
-        final String uuid = ((EntityData) explorerData).getDocRef().getUuid();
+        final String type = explorerNode.getType();
+        final String uuid = explorerNode.getDocRef().getUuid();
         for (final String permission : requiredPermissions) {
             if (!securityContext.hasDocumentPermission(type, uuid, permission)) {
                 return false;
@@ -135,16 +134,16 @@ class ExplorerServiceImpl implements ExplorerService {
         return true;
     }
 
-    private boolean checkType(final ExplorerData explorerData, final Set<String> types) {
-        return types == null || types.contains(explorerData.getType()) || "System".equals(explorerData.getType());
+    private boolean checkType(final ExplorerNode explorerNode, final Set<String> types) {
+        return types == null || types.contains(explorerNode.getType()) || "System".equals(explorerNode.getType());
     }
 
-    private boolean checkTags(final ExplorerData explorerData, final Set<String> tags) {
+    private boolean checkTags(final ExplorerNode explorerNode, final Set<String> tags) {
         if (tags == null) {
             return true;
-        } else if (explorerData.getTags() != null && explorerData.getTags().size() > 0 && tags.size() > 0) {
+        } else if (explorerNode.getTags() != null && explorerNode.getTags().length() > 0 && tags.size() > 0) {
             for (final String tag : tags) {
-                if (explorerData.getTags().contains(tag)) {
+                if (explorerNode.getTags().contains(tag)) {
                     return true;
                 }
             }
@@ -153,11 +152,11 @@ class ExplorerServiceImpl implements ExplorerService {
         return false;
     }
 
-    private boolean checkName(final ExplorerData explorerData, final String nameFilter) {
-        return nameFilter == null || explorerData.getDisplayValue().toLowerCase().contains(nameFilter.toLowerCase());
+    private boolean checkName(final ExplorerNode explorerNode, final String nameFilter) {
+        return nameFilter == null || explorerNode.getDisplayValue().toLowerCase().contains(nameFilter.toLowerCase());
     }
 
-    private void addChildren(final ExplorerData parent, final TreeModel filteredModel, final Set<ExplorerData> openItems, final Set<ExplorerData> forcedOpen, final Integer minDepth, final int currentDepth, final FetchExplorerDataResult result) {
+    private void addChildren(final ExplorerNode parent, final TreeModel filteredModel, final Set<ExplorerNode> openItems, final Set<ExplorerNode> forcedOpen, final Integer minDepth, final int currentDepth, final FetchExplorerDataResult result) {
         parent.setDepth(currentDepth);
 
         // See if we need to force this item open.
@@ -167,13 +166,13 @@ class ExplorerServiceImpl implements ExplorerService {
             result.getOpenedItems().add(parent);
         }
 
-        final List<ExplorerData> children = filteredModel.getChildMap().get(parent);
+        final List<ExplorerNode> children = filteredModel.getChildMap().get(parent);
         if (children == null) {
             parent.setNodeState(HasNodeState.NodeState.LEAF);
 
         } else if (force || openItems.contains(parent) || currentDepth < minDepth) {
             parent.setNodeState(HasNodeState.NodeState.OPEN);
-            for (final ExplorerData child : children) {
+            for (final ExplorerNode child : children) {
                 result.getTreeStructure().add(parent, child);
                 addChildren(child, filteredModel, openItems, forcedOpen, minDepth, currentDepth + 1, result);
             }
@@ -184,7 +183,7 @@ class ExplorerServiceImpl implements ExplorerService {
     }
 
     public DocumentTypes getAllDocumentTypes() {
-        final List<DocumentType> allTypes = allDocumentTypes.getAllTypes();
+        final List<DocumentType> allTypes = documentServiceLocator.getTypes();
         final List<DocumentType> visibleTypes = getVisibleTypes();
         return new DocumentTypes(allTypes, visibleTypes);
     }
@@ -198,22 +197,22 @@ class ExplorerServiceImpl implements ExplorerService {
         requiredPermissions.add(DocumentPermissionNames.READ);
 
         final Set<String> visibleTypes = new HashSet<>();
-        final List<ExplorerData> roots = masterTreeModel.getChildMap().get(null);
-        for (final ExplorerData root : roots) {
+        final List<ExplorerNode> roots = masterTreeModel.getChildMap().get(null);
+        for (final ExplorerNode root : roots) {
             addTypes(root, masterTreeModel, visibleTypes, requiredPermissions);
         }
 
-        final List<DocumentType> documentTypes = allDocumentTypes.getAllTypes();
+        final List<DocumentType> documentTypes = documentServiceLocator.getTypes();
         final List<DocumentType> filtered = documentTypes.stream().filter(documentType -> visibleTypes.contains(documentType.getType())).collect(Collectors.toList());
         return filtered;
     }
 
-    private boolean addTypes(final ExplorerData parent, final TreeModel treeModel, final Set<String> types, final Set<String> requiredPermissions) {
+    private boolean addTypes(final ExplorerNode parent, final TreeModel treeModel, final Set<String> types, final Set<String> requiredPermissions) {
         boolean added = false;
 
-        final List<ExplorerData> children = treeModel.getChildMap().get(parent);
+        final List<ExplorerNode> children = treeModel.getChildMap().get(parent);
         if (children != null) {
-            for (final ExplorerData child : children) {
+            for (final ExplorerNode child : children) {
                 // Recurse right down to find out if a descendant is being added and therefore if we need to include this type as it is an ancestor.
                 final boolean hasChildren = addTypes(child, treeModel, types, requiredPermissions);
                 if (hasChildren) {
@@ -227,5 +226,23 @@ class ExplorerServiceImpl implements ExplorerService {
         }
 
         return added;
+    }
+
+    @Override
+    public List<DocRef> getDescendants(final DocRef ancestor) {
+        final List<DocRef> descendants = new ArrayList<>();
+        final ExplorerNode root = new ExplorerNode(null, ancestor.getType(), ancestor.getUuid(), ancestor.getName(), null);
+        addRefs(root, descendants);
+        return descendants;
+    }
+
+    private void addRefs(final ExplorerNode parent, final List<DocRef> refs) {
+        final List<ExplorerNode> children = explorerTreeModel.getModel().getChildMap().get(parent);
+        if (children != null) {
+            for (final ExplorerNode child : children) {
+                refs.add(child.getDocRef());
+                addRefs(child, refs);
+            }
+        }
     }
 }

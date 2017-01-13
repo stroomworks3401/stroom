@@ -22,7 +22,7 @@ import stroom.feed.shared.Feed;
 import stroom.feed.shared.FeedService;
 import stroom.pipeline.shared.FindPipelineEntityCriteria;
 import stroom.pipeline.shared.PipelineEntity;
-import stroom.pipeline.shared.PipelineEntityService;
+import stroom.pipeline.shared.PipelineService;
 import stroom.pipeline.shared.stepping.GetPipelineForStreamAction;
 import stroom.streamstore.server.StreamStore;
 import stroom.streamstore.shared.FindStreamCriteria;
@@ -37,11 +37,11 @@ import java.util.List;
 @TaskHandlerBean(task = GetPipelineForStreamAction.class)
 public class GetPipelineForStreamHandler extends AbstractTaskHandler<GetPipelineForStreamAction, DocRef> {
     private final StreamStore streamStore;
-    private final PipelineEntityService pipelineEntityService;
+    private final PipelineService pipelineEntityService;
     private final FeedService feedService;
 
     @Inject
-    GetPipelineForStreamHandler(final StreamStore streamStore, final PipelineEntityService pipelineEntityService, final FeedService feedService) {
+    GetPipelineForStreamHandler(final StreamStore streamStore, final PipelineService pipelineEntityService, final FeedService feedService) {
         this.streamStore = streamStore;
         this.pipelineEntityService = pipelineEntityService;
         this.feedService = feedService;

@@ -25,8 +25,7 @@ import com.gwtplatform.mvp.client.proxy.Proxy;
 import stroom.alert.client.event.AlertEvent;
 import stroom.entity.client.event.RenameEntityEvent;
 import stroom.entity.client.event.ShowRenameEntityDialogEvent;
-import stroom.explorer.shared.EntityData;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 import stroom.widget.popup.client.event.HidePopupEvent;
 import stroom.widget.popup.client.event.ShowPopupEvent;
 import stroom.widget.popup.client.presenter.PopupSize;
@@ -37,8 +36,8 @@ import java.util.List;
 
 public class NameEntityPresenter extends MyPresenter<NameEntityView, NameEntityPresenter.RenameEntityProxy>
         implements ShowRenameEntityDialogEvent.Handler, PopupUiHandlers {
-    private List<ExplorerData> explorerDataList;
-    private EntityData entity;
+    private List<ExplorerNode> explorerNodeList;
+    private ExplorerNode entity;
 
     @Inject
     public NameEntityPresenter(final EventBus eventBus, final NameEntityView view, final RenameEntityProxy proxy) {
@@ -49,7 +48,7 @@ public class NameEntityPresenter extends MyPresenter<NameEntityView, NameEntityP
     @ProxyEvent
     @Override
     public void onRename(final ShowRenameEntityDialogEvent event) {
-        explorerDataList = event.getExplorerDataList();
+        explorerNodeList = event.getExplorerNodeList();
         renameNextEntity();
     }
 
@@ -60,12 +59,9 @@ public class NameEntityPresenter extends MyPresenter<NameEntityView, NameEntityP
         }
     }
 
-    private EntityData getNextEntity() {
-        while (explorerDataList.size() > 0) {
-            final ExplorerData explorerData = explorerDataList.remove(0);
-            if (explorerData instanceof EntityData) {
-                return (EntityData) explorerData;
-            }
+    private ExplorerNode getNextEntity() {
+        while (explorerNodeList.size() > 0) {
+            return explorerNodeList.remove(0);
         }
         return null;
     }

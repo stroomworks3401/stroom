@@ -20,7 +20,7 @@ import stroom.data.client.event.DataSelectionEvent;
 import stroom.data.client.event.DataSelectionEvent.DataSelectionHandler;
 import stroom.data.client.event.HasDataSelectionHandlers;
 import stroom.dispatch.client.ClientDispatchAsync;
-import stroom.explorer.shared.ExplorerData;
+import stroom.explorer.shared.ExplorerNode;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.HandlerRegistration;
@@ -31,21 +31,21 @@ import com.gwtplatform.mvp.client.View;
 import java.util.Set;
 
 public class EntityCheckTreePresenter extends MyPresenterWidget<EntityCheckTreePresenter.EntityCheckTreeView>
-        implements HasDataSelectionHandlers<Set<ExplorerData>> {
+        implements HasDataSelectionHandlers<Set<ExplorerNode>> {
     public interface EntityCheckTreeView extends View {
         void setCellTree(Widget cellTree);
     }
 
-//    private final TickBoxSelectionModel<ExplorerData> selectionModel;
+//    private final TickBoxSelectionModel<ExplorerNode> selectionModel;
     private final ExplorerTickBoxTree explorerTree;
 
     @Inject
     public EntityCheckTreePresenter(final EntityCheckTreeView view, final ClientDispatchAsync dispatcher) {
         super(new SimpleEventBus(), view);
 
-//        selectionModel = new TickBoxSelectionModel<ExplorerData>() {
+//        selectionModel = new TickBoxSelectionModel<ExplorerNode>() {
 //            @Override
-//            public ExplorerData getParent(final ExplorerData object) {
+//            public ExplorerNode getParent(final ExplorerNode object) {
 //                if (object instanceof EntityCheckTreeData) {
 //                    return ((EntityCheckTreeData) object).getParent();
 //                }
@@ -54,7 +54,7 @@ public class EntityCheckTreePresenter extends MyPresenterWidget<EntityCheckTreeP
 //            }
 //
 //            @Override
-//            public List<ExplorerData> getChildren(final ExplorerData object) {
+//            public List<ExplorerNode> getChildren(final ExplorerNode object) {
 //                if (object instanceof EntityCheckTreeData) {
 //                    return ((EntityCheckTreeData) object).getChildren();
 //                }
@@ -63,27 +63,27 @@ public class EntityCheckTreePresenter extends MyPresenterWidget<EntityCheckTreeP
 //            }
 //        };
 //
-//        final TickBoxTreeCell<ExplorerData> cell = new TickBoxTreeCell<ExplorerData>(selectionModel) {
+//        final TickBoxTreeCell<ExplorerNode> cell = new TickBoxTreeCell<ExplorerNode>(selectionModel) {
 //            @Override
-//            protected Image getIcon(final ExplorerData item) {
+//            protected Image getIcon(final ExplorerNode item) {
 //                return new Image(ImageUtil.getImageURL() + item.getIconUrl());
 //            }
 //        };
 
-//        treeModel = new ExplorerTreeModel(selectionModel, new TickBoxSelectionManager<ExplorerData>(), cell,
+//        treeModel = new ExplorerTreeModel(selectionModel, new TickBoxSelectionManager<ExplorerNode>(), cell,
 //                dispatcher);
 //        final MyCellTree cellTree = new MyCellTree(treeModel);
 //        cellTree.addOpenHandler(treeModel);
 //        cellTree.addCloseHandler(treeModel);
 //        treeModel.setRootTreeNode(cellTree.getRootTreeNode());
 //
-//        final UpdateHandler<ExplorerData> updateHandler = new UpdateHandler<ExplorerData>() {
+//        final UpdateHandler<ExplorerNode> updateHandler = new UpdateHandler<ExplorerNode>() {
 //            @Override
-//            public List<ExplorerData> onUpdate(final ExplorerData parent, final List<ExplorerData> result) {
-//                List<ExplorerData> children = result;
+//            public List<ExplorerNode> onUpdate(final ExplorerNode parent, final List<ExplorerNode> result) {
+//                List<ExplorerNode> children = result;
 //                if (result != null && selectionModel.isAffectRelatives()) {
-//                    children = new ArrayList<ExplorerData>();
-//                    for (final ExplorerData child : result) {
+//                    children = new ArrayList<ExplorerNode>();
+//                    for (final ExplorerNode child : result) {
 //                        // Select if the parent is selected. If is is then set
 //                        // this item to be selected.
 //                        if (TickBoxState.TICK.equals(selectionModel.getState(parent))) {
@@ -143,7 +143,7 @@ public class EntityCheckTreePresenter extends MyPresenterWidget<EntityCheckTreeP
 //        treeModel.setRemoveOrphans(removeOrphans);
 //    }
 //
-//    public void refresh(final Set<ExplorerData> openItems, final Integer depth) {
+//    public void refresh(final Set<ExplorerNode> openItems, final Integer depth) {
 //        treeModel.refresh(openItems, depth);
 //    }
 
@@ -156,7 +156,7 @@ public class EntityCheckTreePresenter extends MyPresenterWidget<EntityCheckTreeP
     }
 
     @Override
-    public HandlerRegistration addDataSelectionHandler(final DataSelectionHandler<Set<ExplorerData>> handler) {
+    public HandlerRegistration addDataSelectionHandler(final DataSelectionHandler<Set<ExplorerNode>> handler) {
         return addHandlerToSource(DataSelectionEvent.getType(), handler);
     }
 }

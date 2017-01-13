@@ -40,7 +40,7 @@ import stroom.feed.shared.Feed;
 import stroom.feed.shared.FeedService;
 import stroom.node.shared.Volume;
 import stroom.pipeline.shared.PipelineEntity;
-import stroom.pipeline.shared.PipelineEntityService;
+import stroom.pipeline.shared.PipelineService;
 import stroom.streamstore.server.fs.FileSystemStreamTypeUtil;
 import stroom.streamstore.shared.FindStreamAttributeMapCriteria;
 import stroom.streamstore.shared.FindStreamCriteria;
@@ -66,7 +66,7 @@ public class StreamAttributeMapServiceImpl
     @Resource(name = "cachedFeedService")
     private FeedService feedService;
     @Resource(name = "cachedPipelineEntityService")
-    private PipelineEntityService pipelineEntityService;
+    private PipelineService pipelineEntityService;
     @Resource(name = "cachedStreamTypeService")
     private StreamTypeService streamTypeService;
     @Resource(name = "cachedStreamProcessorService")

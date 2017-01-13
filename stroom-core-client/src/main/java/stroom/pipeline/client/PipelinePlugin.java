@@ -58,7 +58,7 @@ public class PipelinePlugin extends EntityPlugin<PipelineEntity> {
                 // Open the item in the content pane.
                 final PipelinePresenter pipelinePresenter = (PipelinePresenter) open(docRef, true);
                 // Highlight the item in the explorer tree.
-                highlight(docRef);
+//                highlight(docRef);
 
                 pipelinePresenter.selectTab(PipelinePresenter.PROCESSORS);
                 pipelinePresenter.getContent(PipelinePresenter.PROCESSORS, new ContentCallback() {

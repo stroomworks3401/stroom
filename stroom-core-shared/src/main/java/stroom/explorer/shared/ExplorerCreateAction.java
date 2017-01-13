@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
-package stroom.entity.shared;
+package stroom.explorer.shared;
 
-public class EntityServiceCreateAction extends Action<DocRef> {
+import stroom.entity.shared.Action;
+import stroom.entity.shared.DocRef;
+
+public class ExplorerCreateAction extends Action<ExplorerNode> {
     private static final long serialVersionUID = 800905016214418723L;
 
     private String type;
     private String name;
-    private DocRef folder;
+    private ExplorerNode folder;
 
-    public EntityServiceCreateAction() {
+    public ExplorerCreateAction() {
         // Default constructor necessary for GWT serialisation.
     }
 
-    public EntityServiceCreateAction(final String type, final String name, final DocRef folder) {
+    public ExplorerCreateAction(final String type, final String name, final ExplorerNode folder) {
         this.type = type;
         this.name = name;
         this.folder = folder;
@@ -41,12 +44,12 @@ public class EntityServiceCreateAction extends Action<DocRef> {
         return name;
     }
 
-    public DocRef getFolder() {
+    public ExplorerNode getFolder() {
         return folder;
     }
 
     @Override
     public String getTaskName() {
-        return "Create: ";
+        return "Create: " + type + " '" + name + "'";
     }
 }

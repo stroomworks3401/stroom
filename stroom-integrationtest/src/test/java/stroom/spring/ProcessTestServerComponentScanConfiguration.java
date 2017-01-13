@@ -16,6 +16,7 @@
 
 package stroom.spring;
 
+import stroom.pipeline.server.PipelineServiceImpl;
 import stroom.util.logging.StroomLogger;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -38,7 +39,6 @@ import stroom.node.server.GlobalPropertyServiceImpl;
 import stroom.node.server.NodeConfigImpl;
 import stroom.node.server.NodeServiceImpl;
 import stroom.node.server.RecordCountServiceImpl;
-import stroom.pipeline.server.PipelineEntityServiceImpl;
 import stroom.pipeline.server.TextConverterServiceImpl;
 import stroom.pipeline.server.XSLTServiceImpl;
 import stroom.resource.server.ResourceStoreImpl;
@@ -96,7 +96,7 @@ import stroom.xmlschema.server.XMLSchemaServiceImpl;
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = MetaDataStatisticImpl.class),
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = NodeConfigImpl.class),
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = NodeServiceImpl.class),
-        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = PipelineEntityServiceImpl.class),
+        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = PipelineServiceImpl.class),
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = QueryServiceImpl.class),
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = RecordCountServiceImpl.class),
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = ResourceStoreImpl.class),

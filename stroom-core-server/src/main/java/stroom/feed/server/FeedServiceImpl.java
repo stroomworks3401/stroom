@@ -21,9 +21,12 @@ import stroom.entity.server.QueryAppender;
 import stroom.entity.server.util.StroomEntityManager;
 import stroom.entity.server.util.SQLBuilder;
 import stroom.entity.server.util.SQLUtil;
+import stroom.entity.shared.DocRef;
+import stroom.entity.shared.DocumentType;
 import stroom.feed.shared.Feed;
 import stroom.feed.shared.FeedService;
 import stroom.feed.shared.FindFeedCriteria;
+import stroom.logging.EntityEventLog;
 import stroom.security.SecurityContext;
 import stroom.streamstore.shared.StreamType;
 import stroom.util.config.StroomProperties;
@@ -42,8 +45,13 @@ public class FeedServiceImpl extends DocumentEntityServiceImpl<Feed, FindFeedCri
     public static final String FEED_NAME_PATTERN_VALUE = "^[A-Z0-9_\\-]{3,}$";
 
     @Inject
-    FeedServiceImpl(final StroomEntityManager entityManager, final SecurityContext securityContext) {
-        super(entityManager, securityContext);
+    FeedServiceImpl(final StroomEntityManager entityManager, final SecurityContext securityContext, final EntityEventLog entityEventLog) {
+        super(entityManager, securityContext, entityEventLog);
+    }
+
+    @Override
+    public DocumentType getDocumentType() {
+        return getDocumentType(3, "Feed", "Feed");
     }
 
     @SuppressWarnings("unchecked")
@@ -66,7 +74,7 @@ public class FeedServiceImpl extends DocumentEntityServiceImpl<Feed, FindFeedCri
         }
 
         if (feed != null) {
-            checkReadPermission(feed);
+            checkReadPermission(DocRef.create(feed));
         }
 
         return feed;
