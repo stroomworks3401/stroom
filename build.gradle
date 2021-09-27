@@ -3,7 +3,10 @@ import de.undercouch.gradle.tasks.download.Download
 buildscript {
     repositories {
         mavenLocal()
-        jcenter()
+        mavenCentral()
+//        maven {
+//            url "https://repo1.maven.org/maven2"
+//        }
     }
     dependencies {
         classpath 'ca.cutterslade.gradle:gradle-dependency-analyze:1.2.0'
@@ -67,14 +70,14 @@ ext.versions = [
 
     //------Stroom-repos---------------
 //    stroomProxyRepo: 'v5.1-beta.8',
-    eventLogging: 'v3.1.2_schema-v3.1.2',
-    hadoopCommonShaded: 'v2.6.4-5',
-    hadoopHdfsShaded: 'v2.6.4-4',
-    stroomAuth: 'v6.0.25-1', // Needed for the correct version of the client API
-    stroomExpression: 'v1.5.10',
-    stroomQuery: 'v2.2.21', // Same version for both stroom-query-api and stroom-query-common
-    stroomStats: 'v0.6.0-alpha.2',
-    stroomProxyApi: 'v5.1.2',
+    eventLogging: '3.3.1_schema-v3.3.1',
+    hadoopCommonShaded: '2.6.4-9',
+    hadoopHdfsShaded: '2.6.4-7',
+    stroomAuth: '6.0.32', // Needed for the correct version of the client API
+    stroomExpression: '1.5.15',
+    stroomQuery: '2.2.24', // Same version for both stroom-query-api and stroom-query-common
+    stroomStats: '1.0-alpha.6',
+    stroomProxyApi: '5.1.6',
 
     //------------3rd-party------------
     curator: '4.2.0', // Curator 4 works with ZK 3.4.x in soft compatibility mode, i.e. you must exlude its dep on ZK and explicitly add one for 3.4.x
@@ -100,16 +103,16 @@ ext.versions = [
 //dependency strings for use in sub projects
 ext.libs = [
     //------Stroom-libs---------------
-    eventLogging: "event-logging:event-logging:$versions.eventLogging",
-    stroomQueryApi: "stroom:stroom-query-api:$versions.stroomQuery",
-    stroomQueryAudit: "stroom:stroom-query-audit:$versions.stroomQuery",
-    stroomQueryCommon: "stroom:stroom-query-common:$versions.stroomQuery",
-    stroomExpression: "stroom:stroom-expression:$versions.stroomExpression",
-    stroomStatsSchema: "stroom:stroom-stats-schema:$versions.stroomStats",
-    stroomAuthApi: "stroom:stroom-auth-service-api:$versions.stroomAuth",
-    stroomProxyRemoteApi: "stroom:stroom-proxy-remote-api:$versions.stroomProxyApi",
-    hadoopCommonShaded: "stroom:hadoop-common-shaded:$versions.hadoopCommonShaded",
-    hadoopHdfsShaded: "stroom:hadoop-hdfs-shaded:$versions.hadoopHdfsShaded",
+    eventLogging: "uk.gov.gchq.eventlogging:event-logging:$versions.eventLogging",
+    stroomQueryApi: "uk.gov.gchq.stroom.query:stroom-query-api:$versions.stroomQuery",
+    stroomQueryAudit: "uk.gov.gchq.stroom.query:stroom-query-audit:$versions.stroomQuery",
+    stroomQueryCommon: "uk.gov.gchq.stroom.query:stroom-query-common:$versions.stroomQuery",
+    stroomExpression: "uk.gov.gchq.stroom.expression:stroom-expression:$versions.stroomExpression",
+    stroomStatsSchema: "uk.gov.gchq.stroom.stats:stroom-stats-schema:$versions.stroomStats",
+    stroomAuthApi: "uk.gov.gchq.stroom.auth:stroom-auth-service-api:$versions.stroomAuth",
+    stroomProxyRemoteApi: "uk.gov.gchq.stroom.proxy:stroom-proxy-remote-api:$versions.stroomProxyApi",
+    hadoopCommonShaded: "uk.gov.gchq.stroom.hadoop.commons:hadoop-common-shaded:$versions.hadoopCommonShaded",
+    hadoopHdfsShaded: "uk.gov.gchq.stroom.hadoop.hdfs:hadoop-hdfs-shaded:$versions.hadoopHdfsShaded",
 
     //------3rd Party-libs---------------
     aopalliance: "aopalliance:aopalliance:1.0",
@@ -333,10 +336,10 @@ subprojects {
 
     repositories {
         mavenLocal()
-        jcenter()
-        maven { url "https://dl.bintray.com/stroom/event-logging" }
-        maven { url "https://dl.bintray.com/stroom/stroom" }
-        maven { url "https://dl.bintray.com/stroom/stroom-proxy" }
+        mavenCentral()
+//        maven {
+//            url "https://repo1.maven.org/maven2"
+//        }
     }
 
     test {
