@@ -78,6 +78,12 @@ public class HTTPAppender extends AbstractAppender {
     private String requestMethod = "POST";
     private String contentType = "application/json";
 
+    private boolean httpHeadersIncludeStreamMetaData = true;
+    private String httpHeadersUserDefinedHeader1;
+    private String httpHeadersUserDefinedHeader2;
+    private String httpHeadersUserDefinedHeader3;
+
+
     @Inject
     public HTTPAppender(final ErrorReceiverProxy errorReceiverProxy,
                         final MetaDataHolder metaDataHolder) {
@@ -97,15 +103,42 @@ public class HTTPAppender extends AbstractAppender {
         super.returnDestination(destination);
     }
 
+    private void addAttributeIfHeaderDefined(final MetaMap metaMap, final String headerText) {
+        if (headerText == null || headerText.length() < 3) {
+            return;
+        }
+        if (!headerText.contains(":")) {
+            throw new IllegalArgumentException("Additional Headers must be specified as 'Name: Value', but '"
+                    + headerText + "' supplied.");
+        }
+
+        int delimiterPos = headerText.indexOf(':');
+        metaMap.put(headerText.substring(0, delimiterPos), headerText.substring(delimiterPos + 1));
+    }
+
+
     @Override
     protected OutputStream createOutputStream() throws IOException {
         try {
             OutputStream outputStream;
-            final MetaMap metaMap = metaDataHolder.getMetaData();
+            final MetaMap sendHeader;
+            if (httpHeadersIncludeStreamMetaData) {
+                final MetaMap metaMap = metaDataHolder.getMetaData();
 
-            LOGGER.info(() -> "createOutputStream() - " + forwardUrl + " Sending request " + metaMap);
-            startTimeMs = System.currentTimeMillis();
-            metaMap.computeIfAbsent(StroomHeaderArguments.GUID, k -> UUID.randomUUID().toString());
+
+                startTimeMs = System.currentTimeMillis();
+                metaMap.computeIfAbsent(StroomHeaderArguments.GUID, k -> UUID.randomUUID().toString());
+
+                sendHeader = MetaMapFactory.cloneAllowable(metaMap);
+            } else {
+                sendHeader = new MetaMap();
+            }
+
+            addAttributeIfHeaderDefined(sendHeader, httpHeadersUserDefinedHeader1);
+            addAttributeIfHeaderDefined(sendHeader, httpHeadersUserDefinedHeader2);
+            addAttributeIfHeaderDefined(sendHeader, httpHeadersUserDefinedHeader3);
+
+            LOGGER.info(() -> "createOutputStream() - " + forwardUrl + " Sending request " + sendHeader);
 
             URL url = new URL(forwardUrl);
             connection = (HttpURLConnection) url.openConnection();
@@ -139,7 +172,6 @@ public class HTTPAppender extends AbstractAppender {
                 connection.addRequestProperty(StroomHeaderArguments.COMPRESSION, StroomHeaderArguments.COMPRESSION_ZIP);
             }
 
-            MetaMap sendHeader = MetaMapFactory.cloneAllowable(metaMap);
             for (Entry<String, String> entry : sendHeader.entrySet()) {
                 connection.addRequestProperty(entry.getKey(), entry.getValue());
             }
@@ -161,8 +193,8 @@ public class HTTPAppender extends AbstractAppender {
             byteCountOutputStream = new ByteCountOutputStream(outputStream) {
                 @Override
                 public void close() throws IOException {
-                    super.close();
                     closeConnection();
+                    super.close();
                 }
             };
 
@@ -362,5 +394,26 @@ public class HTTPAppender extends AbstractAppender {
     @PipelineProperty(description = "The content type", defaultValue = "application/json")
     public void setContentType(String contentType) {
         this.contentType = contentType;
+    }
+
+    @PipelineProperty(description = "Provide stream metadata as HTTP headers",
+            defaultValue = "true")
+    public void setHttpHeadersIncludeStreamMetaData(final boolean newValue) {
+        this.httpHeadersIncludeStreamMetaData = newValue;
+    }
+
+    @PipelineProperty(description = "Additional HTTP Header 1, format is 'HeaderName: HeaderValue'")
+    public void setHttpHeadersUserDefinedHeader1(final String headerText) {
+        this.httpHeadersUserDefinedHeader1 = headerText;
+    }
+
+    @PipelineProperty(description = "Additional HTTP Header 2, format is 'HeaderName: HeaderValue'")
+    public void setHttpHeadersUserDefinedHeader2(final String headerText) {
+        this.httpHeadersUserDefinedHeader2 = headerText;
+    }
+
+    @PipelineProperty(description = "Additional HTTP Header 3, format is 'HeaderName: HeaderValue'")
+    public void setHttpHeadersUserDefinedHeader3(final String headerText) {
+        this.httpHeadersUserDefinedHeader3 = headerText;
     }
 }
