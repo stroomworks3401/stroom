@@ -12,6 +12,7 @@ import stroom.pipeline.shared.TextConverterDoc;
 import stroom.pipeline.shared.XsltDoc;
 import stroom.query.shared.QueryDoc;
 import stroom.search.elastic.shared.ElasticIndexDoc;
+import stroom.template.set.shared.TemplateSetDoc;
 import stroom.util.shared.NullSafe;
 import stroom.view.shared.ViewDoc;
 
@@ -110,6 +111,7 @@ public class KeyBinding {
         addCreateDocKeySequence(Action.CREATE_QUERY, KeyCodes.KEY_Q);
         addCreateDocKeySequence(Action.CREATE_ANALYTIC_RULE, KeyCodes.KEY_R);
         addCreateDocKeySequence(Action.CREATE_TEXT_CONVERTER, KeyCodes.KEY_T);
+        addCreateDocKeySequence(Action.CREATE_TEMPLATE_SET, KeyCodes.KEY_S);
         addCreateDocKeySequence(Action.CREATE_VIEW, KeyCodes.KEY_V);
         addCreateDocKeySequence(Action.CREATE_XSLT, KeyCodes.KEY_X);
 
@@ -121,6 +123,7 @@ public class KeyBinding {
         DOC_TYPE_TO_ACTION_MAP.put(DictionaryDoc.TYPE, Action.CREATE_DICTIONARY);
         DOC_TYPE_TO_ACTION_MAP.put(LuceneIndexDoc.TYPE, Action.CREATE_LUCENE_INDEX);
         DOC_TYPE_TO_ACTION_MAP.put(DocumentationDoc.TYPE, Action.CREATE_DOCUMENTATION);
+        DOC_TYPE_TO_ACTION_MAP.put(TemplateSetDoc.TYPE, Action.CREATE_TEMPLATE_SET);
         DOC_TYPE_TO_ACTION_MAP.put(PipelineDoc.TYPE, Action.CREATE_PIPELINE);
         DOC_TYPE_TO_ACTION_MAP.put(QueryDoc.TYPE, Action.CREATE_QUERY);
         DOC_TYPE_TO_ACTION_MAP.put(AnalyticRuleDoc.TYPE, Action.CREATE_ANALYTIC_RULE);
@@ -552,6 +555,7 @@ public class KeyBinding {
         CREATE_QUERY, // Q
         CREATE_ANALYTIC_RULE, // R
         CREATE_TEXT_CONVERTER, // T
+        CREATE_TEMPLATE_SET, // S
         CREATE_VIEW, // V
         CREATE_XSLT, // X
     }

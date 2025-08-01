@@ -105,6 +105,8 @@ import stroom.statistics.impl.sql.client.gin.StatisticsGinjector;
 import stroom.statistics.impl.sql.client.gin.StatisticsModule;
 import stroom.task.client.gin.TaskGinjector;
 import stroom.task.client.gin.TaskModule;
+import stroom.template.set.client.gin.TemplateSetGinjector;
+import stroom.template.set.client.gin.TemplateSetModule;
 import stroom.view.client.gin.ViewGinjector;
 import stroom.view.client.gin.ViewModule;
 import stroom.visualisation.client.gin.VisualisationGinjector;
@@ -161,6 +163,7 @@ import com.gwtplatform.mvp.client.proxy.PlaceManager;
         StreamStoreModule.class,
         StroomStatsStoreModule.class,
         TaskModule.class,
+        TemplateSetModule.class,
         VisModule.class,
         EmbeddedQueryModule.class,
         VisualisationModule.class,
@@ -207,6 +210,7 @@ public interface AppGinjectorUser extends
         StreamStoreGinjector,
         StroomStatsStoreGinjector,
         TaskGinjector,
+        TemplateSetGinjector,
         ViewGinjector,
         VisGinjector,
         EmbeddedQueryGinjector,

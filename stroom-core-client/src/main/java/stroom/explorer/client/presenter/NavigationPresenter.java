@@ -32,6 +32,7 @@ import stroom.docref.DocRef;
 import stroom.document.client.DocumentTabData;
 import stroom.document.client.event.OpenDocumentEvent;
 import stroom.documentation.shared.DocumentationDoc;
+import stroom.template.set.shared.TemplateSetDoc;
 import stroom.explorer.client.event.CreateNewDocumentEvent;
 import stroom.explorer.client.event.ExplorerEndTaskEvent;
 import stroom.explorer.client.event.ExplorerStartTaskEvent;
@@ -250,6 +251,8 @@ public class NavigationPresenter extends MyPresenter<NavigationView, NavigationP
                 CreateNewDocumentEvent.fire(this, LuceneIndexDoc.TYPE));
         KeyBinding.addCommand(Action.CREATE_DOCUMENTATION, () ->
                 CreateNewDocumentEvent.fire(this, DocumentationDoc.TYPE));
+        KeyBinding.addCommand(Action.CREATE_TEMPLATE_SET, () ->
+                CreateNewDocumentEvent.fire(this, TemplateSetDoc.TYPE));
         KeyBinding.addCommand(Action.CREATE_PIPELINE, () ->
                 CreateNewDocumentEvent.fire(this, PipelineDoc.TYPE));
         KeyBinding.addCommand(Action.CREATE_QUERY, () ->
