@@ -7573,6 +7573,68 @@ paths:
       summary: Lists tasks for a node
       tags:
       - Tasks
+  /templateset/v1/download:
+    post:
+      operationId: downloadTemplateSet
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DocRef"
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResourceGeneration"
+          description: default response
+      summary: Download a template set doc
+      tags:
+        - TemplateSet (v1)
+  /templateset/v1/{uuid}:
+    get:
+      operationId: fetchTemplateSet_1
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TemplateSetDoc"
+          description: default response
+      summary: Fetch a template set doc by its UUID
+      tags:
+        - TemplateSet (v1)
+    put:
+      operationId: updateTemplateSet
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TemplateSetDoc"
+        description: doc
+        required: true
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TemplateSetDoc"
+          description: default response
+      summary: Update a template set doc
+      tags:
+        - TemplateSet (v1)
   /textConverter/v1/{uuid}:
     get:
       operationId: fetchTextConverter
