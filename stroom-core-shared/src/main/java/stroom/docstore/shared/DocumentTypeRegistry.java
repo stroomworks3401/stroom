@@ -147,6 +147,11 @@ public class DocumentTypeRegistry {
             "S3Config",
             "S3 Configuration",
             SvgImage.DOCUMENT_S3);
+    public static final DocumentType TEMPLATE_SET_DOCUMENT_TYPE = new DocumentType(
+            DocumentTypeGroup.TRANSFORMATION,
+            "TemplateSet",
+            "Template Set",
+            SvgImage.DOCUMENT_TEXT_CONVERTER);
     public static final DocumentType GIT_REPO_DOCUMENT_TYPE = new DocumentType(
             DocumentTypeGroup.CONFIGURATION,
             "GitRepo",
@@ -259,6 +264,7 @@ public class DocumentTypeRegistry {
         put(STATE_STORE_DOCUMENT_TYPE);
         put(PLAN_B_DOCUMENT_TYPE);
         put(STATISTIC_STORE_DOCUMENT_TYPE);
+        put(TEMPLATE_SET_DOCUMENT_TYPE);
         put(STROOM_STATS_STORE_DOCUMENT_TYPE);
         put(SYSTEM_DOCUMENT_TYPE);
         put(TEXT_CONVERTER_DOCUMENT_TYPE);
