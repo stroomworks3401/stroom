@@ -56,10 +56,4 @@ public interface TemplateSetResource extends RestResource, DirectRestService, Fe
     TemplateSetDoc update(@PathParam("uuid") String uuid,
                           @Parameter(description = "doc", required = true) TemplateSetDoc doc);
 
-    @POST
-    @Path("/download")
-    @Operation(
-            summary = "Download a template doc",
-            operationId = "downloadTemplate")
-    ResourceGeneration download(DocRef templateRef);
 }

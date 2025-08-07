@@ -22,25 +22,16 @@ import stroom.event.logging.rs.api.AutoLogged;
 import stroom.resource.api.ResourceStore;
 import stroom.template.set.shared.TemplateSetDoc;
 import stroom.template.set.shared.TemplateSetResource;
-import stroom.util.io.StreamUtil;
 import stroom.util.shared.EntityServiceException;
 import stroom.util.shared.FetchWithUuid;
-import stroom.util.shared.ResourceGeneration;
-import stroom.util.shared.ResourceKey;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-
 @AutoLogged
-class TemplateSetResourceImpl implements TemplateSetResource, FetchWithUuid<TemplateSetDoc> {
+public class TemplateSetResourceImpl implements TemplateSetResource, FetchWithUuid<TemplateSetDoc> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TemplateSetResourceImpl.class);
 
@@ -49,10 +40,10 @@ class TemplateSetResourceImpl implements TemplateSetResource, FetchWithUuid<Temp
     private final Provider<ResourceStore> resourceStoreProvider;
 
     @Inject
-    TemplateSetResourceImpl(final Provider<TemplateSetStore> TemplateSetStoreProvider,
-                              final Provider<DocumentResourceHelper> documentResourceHelperProvider,
-                              final Provider<ResourceStore> resourceStoreProvider) {
-        this.templateSetStoreProvider = TemplateSetStoreProvider;
+    public TemplateSetResourceImpl(final Provider<TemplateSetStore> templateSetStoreProvider,
+                                   final Provider<DocumentResourceHelper> documentResourceHelperProvider,
+                                   final Provider<ResourceStore> resourceStoreProvider) {
+        this.templateSetStoreProvider = templateSetStoreProvider;
         this.documentResourceHelperProvider = documentResourceHelperProvider;
         this.resourceStoreProvider = resourceStoreProvider;
     }
@@ -68,32 +59,16 @@ class TemplateSetResourceImpl implements TemplateSetResource, FetchWithUuid<Temp
         if (doc.getUuid() == null || !doc.getUuid().equals(uuid)) {
             throw new EntityServiceException("The document UUID must match the update UUID");
         }
-        return documentResourceHelperProvider.get().update(templateSetStoreProvider.get(), doc);
+        return documentResourceHelperProvider.get()
+                .update(templateSetStoreProvider.get(), doc);
     }
 
     private DocRef getDocRef(final String uuid) {
         return DocRef.builder()
                 .uuid(uuid)
-                .type(TemplateSetDoc.TYPE)
+                .type(TemplateSetDoc.TYPE)  // make sure this constant exists in TemplateSetDoc
                 .build();
     }
-
-    @Override
-    public ResourceGeneration download(final DocRef dictionaryRef) {
-        // Get dictionary.
-        final TemplateSetDoc templateSetDoc = templateSetStoreProvider.get().readDocument(dictionaryRef);
-        if (templateSetDoc == null) {
-            throw new EntityServiceException("Unable to find dictionary");
-        }
-
-        final ResourceKey resourceKey = resourceStoreProvider.get().createTempFile("dictionary.txt");
-        final Path tempFile = resourceStoreProvider.get().getTempFile(resourceKey);
-        try {
-            Files.writeString(tempFile, templateSetDoc.getData(), StreamUtil.DEFAULT_CHARSET);
-        } catch (final IOException e) {
-            LOGGER.error("Unable to download Dictionary", e);
-            throw new UncheckedIOException(e);
-        }
-        return new ResourceGeneration(resourceKey, new ArrayList<>());
-    }
 }
+
+

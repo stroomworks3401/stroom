@@ -28,6 +28,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import java.util.List;
 import java.util.Objects;
 
 @Description(
@@ -43,7 +44,7 @@ import java.util.Objects;
         "createUser",
         "updateUser",
         "description",
-        "data"})
+        "fields"})
 @JsonInclude(Include.NON_NULL)
 public class TemplateSetDoc extends Doc {
 
@@ -53,7 +54,7 @@ public class TemplateSetDoc extends Doc {
     @JsonProperty
     private String description;
     @JsonProperty
-    private String data;
+    private List<TemplateSetField> fields;
 
     public TemplateSetDoc() {
     }
@@ -68,10 +69,10 @@ public class TemplateSetDoc extends Doc {
                           @JsonProperty("createUser") final String createUser,
                           @JsonProperty("updateUser") final String updateUser,
                           @JsonProperty("description") final String description,
-                          @JsonProperty("data") final String data) {
+                          @JsonProperty("fields") final List<TemplateSetField> fields) {
         super(type, uuid, name, version, createTimeMs, updateTimeMs, createUser, updateUser);
         this.description = description;
-        this.data = data;
+        this.fields = fields;
     }
 
     /**
@@ -98,12 +99,12 @@ public class TemplateSetDoc extends Doc {
         this.description = description;
     }
 
-    public String getData() {
-        return data;
+    public List<TemplateSetField> getFields() {
+        return fields;
     }
 
-    public void setData(final String data) {
-        this.data = data;
+    public void setFields(final List<TemplateSetField> fields) {
+        this.fields = fields;
     }
 
     @Override
@@ -119,11 +120,11 @@ public class TemplateSetDoc extends Doc {
         }
         final TemplateSetDoc that = (TemplateSetDoc) o;
         return Objects.equals(description, that.description) &&
-               Objects.equals(data, that.data);
+               Objects.equals(fields, that.fields);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), description, data);
+        return Objects.hash(super.hashCode(), description, fields);
     }
 }

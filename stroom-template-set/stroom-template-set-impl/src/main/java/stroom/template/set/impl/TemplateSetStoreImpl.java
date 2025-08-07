@@ -2,7 +2,6 @@ package stroom.template.set.impl;
 
 import stroom.docref.DocRef;
 import stroom.docref.DocRefInfo;
-import stroom.docstore.api.AuditFieldFilter;
 import stroom.docstore.api.Store;
 import stroom.docstore.api.StoreFactory;
 import stroom.docstore.api.UniqueNameUtil;
@@ -14,24 +13,21 @@ import stroom.util.shared.Message;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 
 @Singleton
 public class TemplateSetStoreImpl implements TemplateSetStore {
-
     private final Store<TemplateSetDoc> store;
 
     @Inject
     public TemplateSetStoreImpl(final StoreFactory storeFactory,
-                                  final TemplateSetSerialiser documentationSerialiser) {
-        this.store = storeFactory.createStore(documentationSerialiser, TemplateSetDoc.TYPE, TemplateSetDoc.class);
+                                final TemplateSetSerialiser serialiser) {
+        this.store = storeFactory.createStore(serialiser, TemplateSetDoc.TYPE, TemplateSetDoc.class);
     }
 
     ////////////////////////////////////////////////////////////////////////
-    // START OF ExplorerActionHandler
+    // START OF DocumentActionHandler
     ////////////////////////////////////////////////////////////////////////
 
     @Override
@@ -68,40 +64,6 @@ public class TemplateSetStoreImpl implements TemplateSetStore {
         return store.info(docRef);
     }
 
-    ////////////////////////////////////////////////////////////////////////
-    // END OF ExplorerActionHandler
-    ////////////////////////////////////////////////////////////////////////
-
-    ////////////////////////////////////////////////////////////////////////
-    // START OF HasDependencies
-    ////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public Map<DocRef, Set<DocRef>> getDependencies() {
-        // TemplateSet has no deps forwards or backwards
-        return Collections.emptyMap();
-    }
-
-    @Override
-    public Set<DocRef> getDependencies(final DocRef docRef) {
-        // TemplateSet has no deps forwards or backwards
-        return Collections.emptySet();
-    }
-
-    @Override
-    public void remapDependencies(final DocRef docRef,
-                                  final Map<DocRef, DocRef> remappings) {
-        // TemplateSet has no deps forwards or backwards
-    }
-
-    ////////////////////////////////////////////////////////////////////////
-    // END OF HasDependencies
-    ////////////////////////////////////////////////////////////////////////
-
-    ////////////////////////////////////////////////////////////////////////
-    // START OF DocumentActionHandler
-    ////////////////////////////////////////////////////////////////////////
-
     @Override
     public TemplateSetDoc readDocument(final DocRef docRef) {
         return store.readDocument(docRef);
@@ -112,6 +74,16 @@ public class TemplateSetStoreImpl implements TemplateSetStore {
         return store.writeDocument(document);
     }
 
+    @Override
+    public Set<DocRef> listDocuments() {
+        return store.listDocuments();
+    }
+
+    @Override
+    public List<DocRef> findByNames(final List<String> names, final boolean allowWildCards) {
+        return store.findByNames(names, allowWildCards);
+    }
+
     ////////////////////////////////////////////////////////////////////////
     // END OF DocumentActionHandler
     ////////////////////////////////////////////////////////////////////////
@@ -119,11 +91,6 @@ public class TemplateSetStoreImpl implements TemplateSetStore {
     ////////////////////////////////////////////////////////////////////////
     // START OF ImportExportActionHandler
     ////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public Set<DocRef> listDocuments() {
-        return store.listDocuments();
-    }
 
     @Override
     public DocRef importDocument(final DocRef docRef,
@@ -137,11 +104,16 @@ public class TemplateSetStoreImpl implements TemplateSetStore {
     public Map<String, byte[]> exportDocument(final DocRef docRef,
                                               final boolean omitAuditFields,
                                               final List<Message> messageList) {
-        if (omitAuditFields) {
-            return store.exportDocument(docRef, messageList, new AuditFieldFilter<>());
-        }
-        return store.exportDocument(docRef, messageList, d -> d);
+        return store.exportDocument(docRef, messageList, Function.identity());
     }
+
+    ////////////////////////////////////////////////////////////////////////
+    // END OF ImportExportActionHandler
+    ////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////
+    // START OF DocumentEntityService
+    ////////////////////////////////////////////////////////////////////////
 
     @Override
     public String getType() {
@@ -149,21 +121,40 @@ public class TemplateSetStoreImpl implements TemplateSetStore {
     }
 
     @Override
-    public Set<DocRef> findAssociatedNonExplorerDocRefs(final DocRef docRef) {
-        return null;
+    public Map<DocRef, Set<DocRef>> getDependencies() {
+        return Map.of();
     }
 
-    ////////////////////////////////////////////////////////////////////////
-    // END OF ImportExportActionHandler
-    ////////////////////////////////////////////////////////////////////////
+    @Override
+    public Set<DocRef> getDependencies(final DocRef docRef) {
+        return store.getDependencies(docRef, null);
+    }
 
     @Override
-    public List<DocRef> findByNames(final List<String> names, final boolean allowWildCards) {
-        return store.findByNames(names, allowWildCards);
+    public void remapDependencies(final DocRef docRef,
+                                  final Map<DocRef, DocRef> remappings) {
+        store.remapDependencies(docRef, remappings, null);
     }
 
     @Override
     public Map<String, String> getIndexableData(final DocRef docRef) {
         return store.getIndexableData(docRef);
     }
+
+    ////////////////////////////////////////////////////////////////////////
+    // END OF DocumentEntityService
+    ////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////
+    // START OF HasNonExplorerDocRefs
+    ////////////////////////////////////////////////////////////////////////
+
+    @Override
+    public Set<DocRef> findAssociatedNonExplorerDocRefs(final DocRef docRef) {
+        return null;
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // END OF HasNonExplorerDocRefs
+    ////////////////////////////////////////////////////////////////////////
 }
