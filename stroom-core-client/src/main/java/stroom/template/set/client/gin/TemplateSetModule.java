@@ -19,15 +19,34 @@ package stroom.template.set.client.gin;
 import stroom.core.client.gin.PluginModule;
 import stroom.template.set.client.TemplateSetPlugin;
 import stroom.template.set.client.presenter.TemplateSetPresenter;
+import stroom.template.set.client.presenter.TemplateSetSettingsPresenter;
+import stroom.template.set.client.presenter.TemplateSetSettingsPresenter.TemplateSetSettingsView;
+import stroom.template.set.client.presenter.TemplateSetFieldListPresenter;
+import stroom.template.set.client.presenter.TemplateSetFieldListPresenter.TemplateSetFieldListView;
+import stroom.template.set.client.presenter.TemplateSetFieldEditPresenter;
+import stroom.template.set.client.presenter.TemplateSetFieldEditPresenter.TemplateSetFieldEditView;
+import stroom.template.set.client.view.TemplateSetSettingsViewImpl;
+import stroom.template.set.client.view.TemplateSetFieldListViewImpl;
+import stroom.template.set.client.view.TemplateSetFieldEditViewImpl;
 
 public class TemplateSetModule extends PluginModule {
 
     @Override
     protected void configure() {
+        // Main plugin & presenter
         bindPlugin(TemplateSetPlugin.class);
         bind(TemplateSetPresenter.class);
-//        bindPresenterWidget(DictionarySettingsPresenter.class,
-//                DictionarySettingsView.class,
-//                DictionarySettingsViewImpl.class);
+
+        // Settings presenter & view
+        bind(TemplateSetSettingsPresenter.class);
+        bind(TemplateSetSettingsView.class).to(TemplateSetSettingsViewImpl.class);
+
+        // Field list presenter & view
+        bind(TemplateSetFieldListPresenter.class);
+        bind(TemplateSetFieldListView.class).to(TemplateSetFieldListViewImpl.class);
+
+        // Field edit presenter & view
+        bind(TemplateSetFieldEditPresenter.class);
+        bind(TemplateSetFieldEditView.class).to(TemplateSetFieldEditViewImpl.class);
     }
 }

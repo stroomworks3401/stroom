@@ -179,7 +179,7 @@ public class TemplateSetFieldListPresenter
 
         final List<String> fieldTypes = Arrays.stream(FieldType.values())
                 .map(Enum::name) // gives TEXT, NUMERIC, DATE, etc.
-                .toList();
+                .collect(Collectors.toList());
 
         fieldEditPresenter.read(
                 TemplateSetField.builder().build(),
@@ -216,7 +216,7 @@ public class TemplateSetFieldListPresenter
 
             final List<String> fieldTypes = Arrays.stream(FieldType.values())
                     .map(Enum::name) // or FieldType::toString if UI expects nicer labels
-                    .toList();
+                    .collect(Collectors.toList());
 
             fieldEditPresenter.read(existing, otherNames, fieldTypes);
             fieldEditPresenter.show("Edit Template Field", e -> {

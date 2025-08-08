@@ -17,7 +17,9 @@
 package stroom.template.set.client.gin;
 
 import stroom.template.set.client.TemplateSetPlugin;
+import stroom.template.set.client.presenter.TemplateSetFieldEditPresenter;
 import stroom.template.set.client.presenter.TemplateSetPresenter;
+import stroom.template.set.client.presenter.TemplateSetSettingsPresenter;
 
 import com.google.gwt.inject.client.AsyncProvider;
 
@@ -26,4 +28,8 @@ public interface TemplateSetGinjector {
     AsyncProvider<TemplateSetPlugin> getTemplateSetPlugin();
 
     AsyncProvider<TemplateSetPresenter> getTemplateSetPresenter();
+
+    AsyncProvider<TemplateSetSettingsPresenter> getTemplateSetSettingsPresenter();
+
+    AsyncProvider<TemplateSetFieldEditPresenter> getTemplateSetFieldEditPresenter();
 }
