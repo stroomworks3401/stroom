@@ -16,100 +16,60 @@
 
 package stroom.template.set.client.presenter;
 
-import stroom.core.client.LocationManager;
-import stroom.dispatch.client.ExportFileCompleteUtil;
-import stroom.dispatch.client.RestFactory;
 import stroom.docref.DocRef;
-import stroom.template.set.shared.TemplateSetDoc;
-import stroom.template.set.shared.TemplateSetResource;
 import stroom.entity.client.presenter.DocumentEditTabPresenter;
+import stroom.entity.client.presenter.DocumentEditTabProvider;
 import stroom.entity.client.presenter.LinkTabPanelView;
 import stroom.entity.client.presenter.MarkdownEditPresenter;
 import stroom.entity.client.presenter.MarkdownTabProvider;
 import stroom.security.client.presenter.DocumentUserPermissionsTabProvider;
-import stroom.svg.client.SvgPresets;
-import stroom.widget.button.client.ButtonView;
-import stroom.widget.button.client.SvgButton;
+import stroom.template.set.shared.TemplateSetDoc;
 import stroom.widget.tab.client.presenter.TabData;
 import stroom.widget.tab.client.presenter.TabDataImpl;
 
-import com.google.gwt.core.client.GWT;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
 import javax.inject.Provider;
 
-public class TemplateSetPresenter
-        extends DocumentEditTabPresenter<LinkTabPanelView, TemplateSetDoc> {
+public class TemplateSetPresenter extends DocumentEditTabPresenter<LinkTabPanelView, TemplateSetDoc> {
 
-    private static final TemplateSetResource TEMPLATE_SET_RESOURCE = GWT.create(TemplateSetResource.class);
-
+    private static final TabData FIELDS = new TabDataImpl("Templates");
+    private static final TabData SETTINGS = new TabDataImpl("Settings");
     private static final TabData DOCUMENTATION = new TabDataImpl("Documentation");
     private static final TabData PERMISSIONS = new TabDataImpl("Permissions");
-
-    private final ButtonView downloadButton;
-    private final RestFactory restFactory;
-    private final LocationManager locationManager;
-
-    private DocRef docRef;
 
     @Inject
     public TemplateSetPresenter(final EventBus eventBus,
                                 final LinkTabPanelView view,
+                                final Provider<TemplateSetSettingsPresenter> settingsPresenterProvider,
+                                final Provider<TemplateSetFieldListPresenter> fieldListPresenterProvider,
                                 final Provider<MarkdownEditPresenter> markdownEditPresenterProvider,
                                 final DocumentUserPermissionsTabProvider<TemplateSetDoc>
-                                          documentUserPermissionsTabProvider,
-                                final RestFactory restFactory,
-                                final LocationManager locationManager) {
+                                        documentUserPermissionsTabProvider) {
         super(eventBus, view);
-        this.restFactory = restFactory;
-        this.locationManager = locationManager;
 
-        downloadButton = SvgButton.create(SvgPresets.DOWNLOAD);
-        toolbar.addButton(downloadButton);
-
+        addTab(FIELDS, new DocumentEditTabProvider<>(fieldListPresenterProvider::get));
+        addTab(SETTINGS, new DocumentEditTabProvider<>(settingsPresenterProvider::get));
         addTab(DOCUMENTATION, new MarkdownTabProvider<TemplateSetDoc>(eventBus, markdownEditPresenterProvider) {
             @Override
             public void onRead(final MarkdownEditPresenter presenter,
                                final DocRef docRef,
                                final TemplateSetDoc document,
                                final boolean readOnly) {
-                presenter.setText(document.getData());
+                presenter.setText(document.getDescription());
                 presenter.setReadOnly(readOnly);
-                // Select the tab here to ensure the markdown editor toolbar display state (based
-                // on the readOnly value) is updated.
-                selectTab(DOCUMENTATION);
             }
 
             @Override
             public TemplateSetDoc onWrite(final MarkdownEditPresenter presenter,
-                                            final TemplateSetDoc document) {
-                document.setData(presenter.getText());
+                                          final TemplateSetDoc document) {
+                document.setDescription(presenter.getText());
                 return document;
             }
         });
         addTab(PERMISSIONS, documentUserPermissionsTabProvider);
-        selectTab(DOCUMENTATION);
-    }
-
-    @Override
-    protected void onBind() {
-        super.onBind();
-        registerHandler(downloadButton.addClickHandler(clickEvent -> {
-            restFactory
-                    .create(TEMPLATE_SET_RESOURCE)
-                    .method(res -> res.download(docRef))
-                    .onSuccess(result -> ExportFileCompleteUtil.onSuccess(locationManager, this, result))
-                    .taskMonitorFactory(this)
-                    .exec();
-        }));
-    }
-
-    @Override
-    public void onRead(final DocRef docRef, final TemplateSetDoc doc, final boolean readOnly) {
-        super.onRead(docRef, doc, readOnly);
-        this.docRef = docRef;
-        downloadButton.setEnabled(true);
+        selectTab(FIELDS);
     }
 
     @Override
