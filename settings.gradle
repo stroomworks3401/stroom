@@ -281,6 +281,9 @@ include 'stroom-test-common'
 
 // Template Set
 include 'stroom-template-set:stroom-template-set-impl'
+include 'stroom-template-set:stroom-template-set-impl-db'
+include 'stroom-template-set:stroom-template-set-impl-db-jooq'
+include 'stroom-template-set:stroom-template-set-api'
 
 // Util
 include 'stroom-util'

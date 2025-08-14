@@ -1,0 +1,53 @@
+apply plugin: 'nu.studer.jooq'
+
+ext.moduleName = 'stroom.template.set.impl.db.jooq'
+
+dependencies {
+    implementation libs.jakarta.annotation.api
+
+    implementation libs.jooq
+
+    runtimeOnly libs.mysql.connector.java
+    jooqGenerator libs.mysql.connector.java
+}
+
+// Configure jOOQ plugin to generate code
+jooq {
+    version = versions.jooq
+    edition = nu.studer.gradle.jooq.JooqEdition.OSS  // default (can be omitted)
+
+    configurations {
+        main {  // name of the jOOQ configuration
+
+            // Disable JOOQ code generation on build
+            generateSchemaSourceOnCompilation = false
+
+            generationTool {
+                logging = org.jooq.meta.jaxb.Logging.WARN
+                jdbc {
+                    driver = 'com.mysql.cj.jdbc.Driver'
+                    // Parsed from local.yml
+                    url = jdbcUrl
+                    user = 'stroomuser'
+                    password = 'stroompassword1'
+                }
+                generator {
+                    name = 'org.jooq.codegen.JavaGenerator'
+                    database {
+                        name = 'org.jooq.meta.mysql.MySQLDatabase'
+                        inputSchema = dbSchema
+                        outputSchema = 'stroom'
+                        includes = 'template_set'          // <-- update table name(s)
+                        excludes = 'template_set_schema_history' // <-- if you have Flyway history
+                        recordVersionFields = 'version'    // keep if you use optimistic locking
+                        //forcedTypes { ... }               // add if you need boolean conversions
+                    }
+                    target {
+                        packageName = 'stroom.template.set.impl.db.jooq'
+                        directory = 'src/main/java'
+                    }
+                }
+            }
+        }
+    }
+}
