@@ -4,6 +4,12 @@
 package stroom.data.store.impl.fs.db.jooq;
 
 
+import org.jooq.ForeignKey;
+import org.jooq.TableField;
+import org.jooq.UniqueKey;
+import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
+
 import stroom.data.store.impl.fs.db.jooq.tables.FsFeedPath;
 import stroom.data.store.impl.fs.db.jooq.tables.FsMetaVolume;
 import stroom.data.store.impl.fs.db.jooq.tables.FsOrphanedMetaTracker;
@@ -19,18 +25,12 @@ import stroom.data.store.impl.fs.db.jooq.tables.records.FsVolumeGroupRecord;
 import stroom.data.store.impl.fs.db.jooq.tables.records.FsVolumeRecord;
 import stroom.data.store.impl.fs.db.jooq.tables.records.FsVolumeStateRecord;
 
-import org.jooq.ForeignKey;
-import org.jooq.TableField;
-import org.jooq.UniqueKey;
-import org.jooq.impl.DSL;
-import org.jooq.impl.Internal;
-
 
 /**
  * A class modelling foreign key relationships and constraints of tables in
  * stroom.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Keys {
 
     // -------------------------------------------------------------------------

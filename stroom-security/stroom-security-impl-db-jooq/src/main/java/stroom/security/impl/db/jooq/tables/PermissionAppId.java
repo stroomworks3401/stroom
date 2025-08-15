@@ -4,20 +4,24 @@
 package stroom.security.impl.db.jooq.tables;
 
 
-import stroom.security.impl.db.jooq.Keys;
-import stroom.security.impl.db.jooq.Stroom;
-import stroom.security.impl.db.jooq.tables.records.PermissionAppIdRecord;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function2;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row2;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -27,9 +31,11 @@ import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.UByte;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
+import stroom.security.impl.db.jooq.Keys;
+import stroom.security.impl.db.jooq.Stroom;
+import stroom.security.impl.db.jooq.tables.PermissionApp.PermissionAppPath;
+import stroom.security.impl.db.jooq.tables.StroomUser.StroomUserPath;
+import stroom.security.impl.db.jooq.tables.records.PermissionAppIdRecord;
 
 
 /**
@@ -64,11 +70,11 @@ public class PermissionAppId extends TableImpl<PermissionAppIdRecord> {
     public final TableField<PermissionAppIdRecord, String> PERMISSION = createField(DSL.name("permission"), SQLDataType.VARCHAR(255).nullable(false), this, "");
 
     private PermissionAppId(Name alias, Table<PermissionAppIdRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private PermissionAppId(Name alias, Table<PermissionAppIdRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private PermissionAppId(Name alias, Table<PermissionAppIdRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -92,8 +98,35 @@ public class PermissionAppId extends TableImpl<PermissionAppIdRecord> {
         this(DSL.name("permission_app_id"), null);
     }
 
-    public <O extends Record> PermissionAppId(Table<O> child, ForeignKey<O, PermissionAppIdRecord> key) {
-        super(child, key, PERMISSION_APP_ID);
+    public <O extends Record> PermissionAppId(Table<O> path, ForeignKey<O, PermissionAppIdRecord> childPath, InverseForeignKey<O, PermissionAppIdRecord> parentPath) {
+        super(path, childPath, parentPath, PERMISSION_APP_ID);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class PermissionAppIdPath extends PermissionAppId implements Path<PermissionAppIdRecord> {
+        public <O extends Record> PermissionAppIdPath(Table<O> path, ForeignKey<O, PermissionAppIdRecord> childPath, InverseForeignKey<O, PermissionAppIdRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private PermissionAppIdPath(Name alias, Table<PermissionAppIdRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public PermissionAppIdPath as(String alias) {
+            return new PermissionAppIdPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public PermissionAppIdPath as(Name alias) {
+            return new PermissionAppIdPath(alias, this);
+        }
+
+        @Override
+        public PermissionAppIdPath as(Table<?> alias) {
+            return new PermissionAppIdPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -114,6 +147,27 @@ public class PermissionAppId extends TableImpl<PermissionAppIdRecord> {
     @Override
     public List<UniqueKey<PermissionAppIdRecord>> getUniqueKeys() {
         return Arrays.asList(Keys.KEY_PERMISSION_APP_ID_PERMISSION_APP_ID_PERMISSION_IDX);
+    }
+
+    private transient PermissionAppPath _permissionApp;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>stroom.permission_app</code> table
+     */
+    public PermissionAppPath permissionApp() {
+        if (_permissionApp == null)
+            _permissionApp = new PermissionAppPath(this, null, Keys.PERMISSION_APP_PERMISSION_ID.getInverseKey());
+
+        return _permissionApp;
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the
+     * <code>stroom.stroom_user</code> table
+     */
+    public StroomUserPath stroomUser() {
+        return permissionApp().stroomUser();
     }
 
     @Override
@@ -155,27 +209,87 @@ public class PermissionAppId extends TableImpl<PermissionAppIdRecord> {
         return new PermissionAppId(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row2 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row2<UByte, String> fieldsRow() {
-        return (Row2) super.fieldsRow();
+    public PermissionAppId where(Condition condition) {
+        return new PermissionAppId(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function2<? super UByte, ? super String, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public PermissionAppId where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function2<? super UByte, ? super String, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public PermissionAppId where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public PermissionAppId where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public PermissionAppId where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public PermissionAppId where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public PermissionAppId where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public PermissionAppId where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public PermissionAppId whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public PermissionAppId whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

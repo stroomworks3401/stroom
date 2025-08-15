@@ -4,14 +4,14 @@
 package stroom.security.impl.db.jooq;
 
 
-import stroom.security.impl.db.jooq.tables.ApiKey;
-import stroom.security.impl.db.jooq.tables.PermissionDoc;
-import stroom.security.impl.db.jooq.tables.PermissionDocCreate;
-
 import org.jooq.Index;
 import org.jooq.OrderField;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+
+import stroom.security.impl.db.jooq.tables.ApiKey;
+import stroom.security.impl.db.jooq.tables.PermissionDoc;
+import stroom.security.impl.db.jooq.tables.PermissionDocCreate;
 
 
 /**

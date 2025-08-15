@@ -4,23 +4,23 @@
 package stroom.job.impl.db.jooq;
 
 
-import stroom.job.impl.db.jooq.tables.Job;
-import stroom.job.impl.db.jooq.tables.JobNode;
-import stroom.job.impl.db.jooq.tables.records.JobNodeRecord;
-import stroom.job.impl.db.jooq.tables.records.JobRecord;
-
 import org.jooq.ForeignKey;
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
 
+import stroom.job.impl.db.jooq.tables.Job;
+import stroom.job.impl.db.jooq.tables.JobNode;
+import stroom.job.impl.db.jooq.tables.records.JobNodeRecord;
+import stroom.job.impl.db.jooq.tables.records.JobRecord;
+
 
 /**
  * A class modelling foreign key relationships and constraints of tables in
  * stroom.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Keys {
 
     // -------------------------------------------------------------------------

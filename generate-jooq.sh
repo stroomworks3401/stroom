@@ -28,6 +28,9 @@ cd -
 cd stroom-activity/stroom-activity-impl-db-jooq
 ../../gradlew generateJooq
 cd -
+cd stroom-template-set/stroom-template-set-impl-db-jooq
+../../gradlew generateJooq
+cd -
 cd stroom-processor/stroom-processor-impl-db-jooq
 ../../gradlew generateJooq
 cd -

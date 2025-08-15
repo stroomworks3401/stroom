@@ -6,7 +6,11 @@ import stroom.db.util.DataSourceProxy;
 import java.util.List;
 import javax.sql.DataSource;
 
-public class TemplateSetDbModule extends AbstractFlyWayDbModule <TemplateSetDbConnProvider> {
+/**
+ * Guice module for the TemplateSet database.
+ * Uses FlyWay for schema migration.
+ */
+public class TemplateSetDbModule extends AbstractFlyWayDbModule<TemplateSetConfig, TemplateSetDbConnProvider> {
 
     private static final String MODULE = "stroom-template-set";
     private static final String FLYWAY_LOCATIONS = "stroom/template/set/impl/db/migration";
@@ -34,13 +38,18 @@ public class TemplateSetDbModule extends AbstractFlyWayDbModule <TemplateSetDbCo
 
     @Override
     protected TemplateSetDbConnProvider createConnectionProvider(final DataSource dataSource) {
-        return new DataSourceImpl(dataSource);
+        return new TemplateSetDataSource(dataSource);
     }
 
-    private static class DataSourceImpl extends DataSourceProxy implements TemplateSetDbConnProvider {
+    /**
+     * Concrete DataSource implementation.
+     * Wraps the real DataSource and associates it with this module.
+     */
+    private static class TemplateSetDataSource extends DataSourceProxy implements TemplateSetDbConnProvider {
 
-        private DataSourceImpl(final DataSource dataSource) {
+        private TemplateSetDataSource(final DataSource dataSource) {
             super(dataSource, MODULE);
         }
     }
 }
+

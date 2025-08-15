@@ -4,20 +4,24 @@
 package stroom.security.impl.db.jooq.tables;
 
 
-import stroom.security.impl.db.jooq.Keys;
-import stroom.security.impl.db.jooq.Stroom;
-import stroom.security.impl.db.jooq.tables.records.PermissionDocTypeIdRecord;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function2;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row2;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -27,9 +31,10 @@ import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.UByte;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
+import stroom.security.impl.db.jooq.Keys;
+import stroom.security.impl.db.jooq.Stroom;
+import stroom.security.impl.db.jooq.tables.PermissionDocCreate.PermissionDocCreatePath;
+import stroom.security.impl.db.jooq.tables.records.PermissionDocTypeIdRecord;
 
 
 /**
@@ -64,11 +69,11 @@ public class PermissionDocTypeId extends TableImpl<PermissionDocTypeIdRecord> {
     public final TableField<PermissionDocTypeIdRecord, String> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(255).nullable(false), this, "");
 
     private PermissionDocTypeId(Name alias, Table<PermissionDocTypeIdRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private PermissionDocTypeId(Name alias, Table<PermissionDocTypeIdRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private PermissionDocTypeId(Name alias, Table<PermissionDocTypeIdRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -94,8 +99,35 @@ public class PermissionDocTypeId extends TableImpl<PermissionDocTypeIdRecord> {
         this(DSL.name("permission_doc_type_id"), null);
     }
 
-    public <O extends Record> PermissionDocTypeId(Table<O> child, ForeignKey<O, PermissionDocTypeIdRecord> key) {
-        super(child, key, PERMISSION_DOC_TYPE_ID);
+    public <O extends Record> PermissionDocTypeId(Table<O> path, ForeignKey<O, PermissionDocTypeIdRecord> childPath, InverseForeignKey<O, PermissionDocTypeIdRecord> parentPath) {
+        super(path, childPath, parentPath, PERMISSION_DOC_TYPE_ID);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class PermissionDocTypeIdPath extends PermissionDocTypeId implements Path<PermissionDocTypeIdRecord> {
+        public <O extends Record> PermissionDocTypeIdPath(Table<O> path, ForeignKey<O, PermissionDocTypeIdRecord> childPath, InverseForeignKey<O, PermissionDocTypeIdRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private PermissionDocTypeIdPath(Name alias, Table<PermissionDocTypeIdRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public PermissionDocTypeIdPath as(String alias) {
+            return new PermissionDocTypeIdPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public PermissionDocTypeIdPath as(Name alias) {
+            return new PermissionDocTypeIdPath(alias, this);
+        }
+
+        @Override
+        public PermissionDocTypeIdPath as(Table<?> alias) {
+            return new PermissionDocTypeIdPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -116,6 +148,19 @@ public class PermissionDocTypeId extends TableImpl<PermissionDocTypeIdRecord> {
     @Override
     public List<UniqueKey<PermissionDocTypeIdRecord>> getUniqueKeys() {
         return Arrays.asList(Keys.KEY_PERMISSION_DOC_TYPE_ID_PERMISSION_DOC_TYPE_ID_TYPE_IDX);
+    }
+
+    private transient PermissionDocCreatePath _permissionDocCreate;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>stroom.permission_doc_create</code> table
+     */
+    public PermissionDocCreatePath permissionDocCreate() {
+        if (_permissionDocCreate == null)
+            _permissionDocCreate = new PermissionDocCreatePath(this, null, Keys.PERMISSION_DOC_CREATE_DOC_TYPE_ID.getInverseKey());
+
+        return _permissionDocCreate;
     }
 
     @Override
@@ -157,27 +202,87 @@ public class PermissionDocTypeId extends TableImpl<PermissionDocTypeIdRecord> {
         return new PermissionDocTypeId(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row2 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row2<UByte, String> fieldsRow() {
-        return (Row2) super.fieldsRow();
+    public PermissionDocTypeId where(Condition condition) {
+        return new PermissionDocTypeId(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function2<? super UByte, ? super String, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public PermissionDocTypeId where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function2<? super UByte, ? super String, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public PermissionDocTypeId where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public PermissionDocTypeId where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public PermissionDocTypeId where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public PermissionDocTypeId where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public PermissionDocTypeId where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public PermissionDocTypeId where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public PermissionDocTypeId whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public PermissionDocTypeId whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

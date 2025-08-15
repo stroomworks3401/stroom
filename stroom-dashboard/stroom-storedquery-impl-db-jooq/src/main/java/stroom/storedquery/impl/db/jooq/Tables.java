@@ -10,7 +10,7 @@ import stroom.storedquery.impl.db.jooq.tables.Query;
 /**
  * Convenience access to all tables in stroom.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Tables {
 
     /**

@@ -119,6 +119,7 @@ public class CoreModule extends AbstractModule {
         install(new stroom.task.impl.TaskModule());
         install(new stroom.template.set.impl.TemplateSetHandlerModule());
         install(new stroom.template.set.impl.TemplateSetModule());
+        install(new stroom.template.set.impl.db.TemplateSetDaoModule());
         install(new stroom.util.pipeline.scope.PipelineScopeModule());
         install(new stroom.view.impl.ViewModule());
     }

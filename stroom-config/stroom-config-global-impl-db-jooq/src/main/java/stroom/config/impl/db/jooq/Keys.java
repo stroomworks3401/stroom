@@ -4,6 +4,11 @@
 package stroom.config.impl.db.jooq;
 
 
+import org.jooq.TableField;
+import org.jooq.UniqueKey;
+import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
+
 import stroom.config.impl.db.jooq.tables.Config;
 import stroom.config.impl.db.jooq.tables.ConfigUpdateTracker;
 import stroom.config.impl.db.jooq.tables.Preferences;
@@ -11,17 +16,12 @@ import stroom.config.impl.db.jooq.tables.records.ConfigRecord;
 import stroom.config.impl.db.jooq.tables.records.ConfigUpdateTrackerRecord;
 import stroom.config.impl.db.jooq.tables.records.PreferencesRecord;
 
-import org.jooq.TableField;
-import org.jooq.UniqueKey;
-import org.jooq.impl.DSL;
-import org.jooq.impl.Internal;
-
 
 /**
  * A class modelling foreign key relationships and constraints of tables in
  * stroom.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Keys {
 
     // -------------------------------------------------------------------------

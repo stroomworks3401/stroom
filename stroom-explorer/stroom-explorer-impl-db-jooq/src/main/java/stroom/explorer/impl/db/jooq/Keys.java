@@ -4,6 +4,12 @@
 package stroom.explorer.impl.db.jooq;
 
 
+import org.jooq.ForeignKey;
+import org.jooq.TableField;
+import org.jooq.UniqueKey;
+import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
+
 import stroom.explorer.impl.db.jooq.tables.ExplorerFavourite;
 import stroom.explorer.impl.db.jooq.tables.ExplorerNode;
 import stroom.explorer.impl.db.jooq.tables.ExplorerPath;
@@ -11,18 +17,12 @@ import stroom.explorer.impl.db.jooq.tables.records.ExplorerFavouriteRecord;
 import stroom.explorer.impl.db.jooq.tables.records.ExplorerNodeRecord;
 import stroom.explorer.impl.db.jooq.tables.records.ExplorerPathRecord;
 
-import org.jooq.ForeignKey;
-import org.jooq.TableField;
-import org.jooq.UniqueKey;
-import org.jooq.impl.DSL;
-import org.jooq.impl.Internal;
-
 
 /**
  * A class modelling foreign key relationships and constraints of tables in
  * stroom.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Keys {
 
     // -------------------------------------------------------------------------

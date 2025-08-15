@@ -4,14 +4,14 @@
 package stroom.activity.impl.db.jooq;
 
 
-import stroom.activity.impl.db.jooq.tables.Activity;
+import java.util.Arrays;
+import java.util.List;
 
 import org.jooq.Catalog;
 import org.jooq.Table;
 import org.jooq.impl.SchemaImpl;
 
-import java.util.Arrays;
-import java.util.List;
+import stroom.activity.impl.db.jooq.tables.Activity;
 
 
 /**

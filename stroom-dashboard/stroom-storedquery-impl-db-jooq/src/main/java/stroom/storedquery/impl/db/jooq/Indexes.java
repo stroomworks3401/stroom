@@ -4,18 +4,18 @@
 package stroom.storedquery.impl.db.jooq;
 
 
-import stroom.storedquery.impl.db.jooq.tables.Query;
-
 import org.jooq.Index;
 import org.jooq.OrderField;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
 
+import stroom.storedquery.impl.db.jooq.tables.Query;
+
 
 /**
  * A class modelling indexes of tables in stroom.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Indexes {
 
     // -------------------------------------------------------------------------
