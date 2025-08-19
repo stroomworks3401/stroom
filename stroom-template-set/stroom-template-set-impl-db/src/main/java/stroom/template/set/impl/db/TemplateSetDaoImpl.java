@@ -35,7 +35,7 @@ import java.util.stream.Stream;
 
 import static stroom.template.set.impl.db.jooq.tables.TemplateSet.TEMPLATE_SET;
 
-public abstract class TemplateSetDaoImpl implements TemplateSetDao {
+public class TemplateSetDaoImpl implements TemplateSetDao {
 
     private static final LambdaLogger LOGGER = LambdaLoggerFactory.getLogger(TemplateSetDaoImpl.class);
 
@@ -120,6 +120,11 @@ public abstract class TemplateSetDaoImpl implements TemplateSetDao {
     }
 
     @Override
+    public Optional<TemplateSetDoc> fetch(final int id) {
+        return Optional.empty();
+    }
+
+    @Override
     public TemplateSetDoc update(final TemplateSetDoc templateSetDoc) {
         final String fieldsJson = getFieldsJson(templateSetDoc);
 
@@ -140,6 +145,11 @@ public abstract class TemplateSetDaoImpl implements TemplateSetDao {
         }
 
         return templateSetDoc;
+    }
+
+    @Override
+    public boolean delete(final int id) {
+        return false;
     }
 
     public boolean delete(final UUID uuid) {

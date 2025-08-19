@@ -34,54 +34,54 @@ public class V07_06_00_200__template_set_pre_migration_checks extends BaseJavaMi
 
     @Override
     public void migrate(final Context context) throws Exception {
-        if (stroomUserExists(context)) {
-            boolean error = false;
-
-            // Detect any template sets that we can't find users for.
-            try (final PreparedStatement preparedStatement = context.getConnection().prepareStatement(
-                    """
-                            SELECT DISTINCT(ts.user_uuid)
-                            FROM template_set ts
-                            WHERE NOT EXISTS (
-                                SELECT NULL
-                                FROM stroom_user su
-                                WHERE su.uuid = ts.user_uuid);""")) {
-                try (final ResultSet resultSet = preparedStatement.executeQuery()) {
-                    while (resultSet.next()) {
-                        try {
-                            final String userUuid = resultSet.getString(1);
-                            LOGGER.error(() ->
-                                    "Pre migration check failure:\n`template_set.user_uuid` '" +
-                                    userUuid +
-                                    "' not found in `stroom_user`");
-                            error = true;
-                        } catch (final RuntimeException e) {
-                            LOGGER.error(e.getMessage(), e);
-                        }
-                    }
-                }
-            }
-
-            if (error) {
-                throw new RuntimeException("Pre migration check failure");
-            }
-        }
+//        if (stroomUserExists(context)) {
+//            boolean error = false;
+//
+//            // Detect any template sets that we can't find users for.
+//            try (final PreparedStatement preparedStatement = context.getConnection().prepareStatement(
+//                    """
+//                            SELECT DISTINCT(ts.user_uuid)
+//                            FROM template_set ts
+//                            WHERE NOT EXISTS (
+//                                SELECT NULL
+//                                FROM stroom_user su
+//                                WHERE su.uuid = ts.user_uuid);""")) {
+//                try (final ResultSet resultSet = preparedStatement.executeQuery()) {
+//                    while (resultSet.next()) {
+//                        try {
+//                            final String userUuid = resultSet.getString(1);
+//                            LOGGER.error(() ->
+//                                    "Pre migration check failure:\n`template_set.user_uuid` '" +
+//                                    userUuid +
+//                                    "' not found in `stroom_user`");
+//                            error = true;
+//                        } catch (final RuntimeException e) {
+//                            LOGGER.error(e.getMessage(), e);
+//                        }
+//                    }
+//                }
+//            }
+//
+//            if (error) {
+//                throw new RuntimeException("Pre migration check failure");
+//            }
+//        }
     }
 
-    private boolean stroomUserExists(final Context context) throws SQLException {
-        try (final PreparedStatement preparedStatement = context.getConnection().prepareStatement(
-                """
-                        SELECT COUNT(1)
-                        FROM information_schema.tables
-                        WHERE table_schema = database()
-                        AND table_name = 'stroom_user';""")) {
-            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return resultSet.getInt(1) > 0;
-                } else {
-                    return false;
-                }
-            }
-        }
-    }
+//    private boolean stroomUserExists(final Context context) throws SQLException {
+//        try (final PreparedStatement preparedStatement = context.getConnection().prepareStatement(
+//                """
+//                        SELECT COUNT(1)
+//                        FROM information_schema.tables
+//                        WHERE table_schema = database()
+//                        AND table_name = 'stroom_user';""")) {
+//            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
+//                if (resultSet.next()) {
+//                    return resultSet.getInt(1) > 0;
+//                } else {
+//                    return false;
+//                }
+//            }
+//        }
+//    }
 }
