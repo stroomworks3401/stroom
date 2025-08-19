@@ -17,6 +17,9 @@
 package stroom.template.set.shared;
 
 import stroom.docref.DocRef;
+import stroom.docref.HasName;
+import stroom.docref.HasType;
+import stroom.docref.HasUuid;
 import stroom.docs.shared.Description;
 import stroom.docstore.shared.Doc;
 import stroom.docstore.shared.DocumentType;
@@ -46,7 +49,7 @@ import java.util.Objects;
         "description",
         "fields"})
 @JsonInclude(Include.NON_NULL)
-public class TemplateSetDoc extends Doc {
+public class TemplateSetDoc extends Doc implements HasType, HasUuid, HasName {
 
     public static final String TYPE = "TemplateSet";
     public static final DocumentType DOCUMENT_TYPE = DocumentTypeRegistry.TEMPLATE_SET_DOCUMENT_TYPE;

@@ -1,7 +1,7 @@
 ext.moduleName = 'stroom.template.set.impl.db'
 
 dependencies {
-    implementation project(':stroom-template-set:stroom-template-set-api')
+//    implementation project(':stroom-template-set:stroom-template-set-api')
     implementation project(':stroom-template-set:stroom-template-set-impl')
     implementation project(':stroom-template-set:stroom-template-set-impl-db-jooq')
     implementation project(':stroom-config:stroom-config-common')
@@ -11,6 +11,7 @@ dependencies {
     implementation project(':stroom-query:stroom-query-common')
     implementation project(':stroom-util')
     implementation project(':stroom-util-shared')
+    implementation project(':stroom-docref')
 
     implementation libs.flyway.core
     implementation libs.flyway.mysql
