@@ -31,6 +31,7 @@ import stroom.template.set.shared.TemplateSetField;
 import stroom.template.set.shared.TemplateSetResource;
 import stroom.svg.client.SvgPresets;
 
+import stroom.util.shared.NullSafe;
 import stroom.widget.button.client.ButtonView;
 import stroom.widget.util.client.MouseUtil;
 import stroom.widget.util.client.MultiSelectionModelImpl;
@@ -44,6 +45,7 @@ import com.gwtplatform.mvp.client.View;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -275,11 +277,9 @@ public class TemplateSetFieldListPresenter
     @Override
     protected void onRead(final DocRef docRef, final TemplateSetDoc document, final boolean readOnly) {
         this.templateSet = document;
-        if (document != null) {
-            fields = document.getFields().stream()
-                    .sorted(Comparator.comparing(TemplateSetField::getFldName, String.CASE_INSENSITIVE_ORDER))
+        final List<TemplateSetField> list = NullSafe.getOrElse(document, TemplateSetDoc::getFields, Collections.emptyList());
+        fields = list.stream().sorted(Comparator.comparing(TemplateSetField::getFldName, String.CASE_INSENSITIVE_ORDER))
                     .collect(Collectors.toList());
-        }
         refresh();
         enableButtons();
     }

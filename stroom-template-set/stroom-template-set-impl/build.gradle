@@ -18,4 +18,10 @@ dependencies {
     implementation libs.jakarta.inject
     implementation libs.slf4j.api
     implementation libs.ws.rs.api
+
+    testImplementation project(':stroom-test-common')
+    testImplementation libs.dropwizard.jersey
+
+    testImplementation libs.bundles.common.test.implementation
+    testRuntimeOnly libs.bundles.common.test.runtime
 }

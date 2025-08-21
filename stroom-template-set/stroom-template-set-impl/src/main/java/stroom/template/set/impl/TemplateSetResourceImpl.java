@@ -20,6 +20,7 @@ import stroom.docref.DocRef;
 import stroom.docstore.api.DocumentResourceHelper;
 import stroom.event.logging.rs.api.AutoLogged;
 import stroom.resource.api.ResourceStore;
+import stroom.security.shared.CheckDocumentPermissionRequest;
 import stroom.template.set.shared.TemplateSetDoc;
 import stroom.template.set.shared.TemplateSetResource;
 import stroom.util.shared.EntityServiceException;
@@ -62,6 +63,11 @@ public class TemplateSetResourceImpl implements TemplateSetResource, FetchWithUu
         return documentResourceHelperProvider.get()
                 .update(templateSetStoreProvider.get(), doc);
     }
+
+//    @Override
+//    public Boolean checkDocumentPermission(final CheckDocumentPermissionRequest request) {
+//        return null;
+//    }
 
     private DocRef getDocRef(final String uuid) {
         return DocRef.builder()

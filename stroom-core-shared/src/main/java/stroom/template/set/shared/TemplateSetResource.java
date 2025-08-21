@@ -17,6 +17,7 @@
 package stroom.template.set.shared;
 
 import stroom.docref.DocRef;
+import stroom.security.shared.CheckDocumentPermissionRequest;
 import stroom.util.shared.FetchWithUuid;
 import stroom.util.shared.ResourceGeneration;
 import stroom.util.shared.ResourcePaths;
@@ -36,7 +37,7 @@ import jakarta.ws.rs.core.MediaType;
 import org.fusesource.restygwt.client.DirectRestService;
 
 @Tag(name = "Templates")
-@Path("/template" + ResourcePaths.V1)
+@Path("/template/set" + ResourcePaths.V1)
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public interface TemplateSetResource extends RestResource, DirectRestService, FetchWithUuid<TemplateSetDoc> {
@@ -55,5 +56,15 @@ public interface TemplateSetResource extends RestResource, DirectRestService, Fe
             operationId = "updateTemplate")
     TemplateSetDoc update(@PathParam("uuid") String uuid,
                           @Parameter(description = "doc", required = true) TemplateSetDoc doc);
+
+//    @POST
+//    @Path("/checkDocumentPermission")
+//    @Operation(
+//            summary = "Check document permission",
+//            operationId = "checkDocumentPermission")
+//    Boolean checkDocumentPermission(
+//            @Parameter(description = "request", required = true)
+//            CheckDocumentPermissionRequest request);
+
 
 }
