@@ -1,6 +1,6 @@
 package stroom.template.set.client.view;
 
-import stroom.template.set.client.presenter.TemplateSetFieldListPresenter.TemplateSetFieldListView;
+import stroom.template.set.client.presenter.TemplateSetTemplateListPresenter.TemplateSetTemplateListView;
 
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -12,7 +12,7 @@ import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.ViewImpl;
 
-public class TemplateSetFieldListViewImpl extends ViewImpl implements TemplateSetFieldListView {
+public class TemplateSetTemplateListViewImpl extends ViewImpl implements TemplateSetTemplateListView {
 
     private final Widget widget;
 
@@ -22,7 +22,7 @@ public class TemplateSetFieldListViewImpl extends ViewImpl implements TemplateSe
     HTML syncState;
 
     @Inject
-    public TemplateSetFieldListViewImpl(final Binder binder) {
+    public TemplateSetTemplateListViewImpl(final Binder binder) {
         widget = binder.createAndBindUi(this);
     }
 
@@ -36,6 +36,6 @@ public class TemplateSetFieldListViewImpl extends ViewImpl implements TemplateSe
         dataGrid.setWidget(view.asWidget());
     }
 
-    public interface Binder extends UiBinder<Widget, TemplateSetFieldListViewImpl> {
+    public interface Binder extends UiBinder<Widget, TemplateSetTemplateListViewImpl> {
     }
 }

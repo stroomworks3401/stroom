@@ -2,7 +2,8 @@
  * Copyright 2017 Crown Copyright
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ *
+ * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -20,8 +21,8 @@ import stroom.docref.DocRef;
 import stroom.docstore.api.DocumentResourceHelper;
 import stroom.event.logging.rs.api.AutoLogged;
 import stroom.resource.api.ResourceStore;
-import stroom.security.shared.CheckDocumentPermissionRequest;
 import stroom.template.set.shared.TemplateSetDoc;
+import stroom.template.set.shared.TemplateSetItem;
 import stroom.template.set.shared.TemplateSetResource;
 import stroom.util.shared.EntityServiceException;
 import stroom.util.shared.FetchWithUuid;
@@ -31,6 +32,8 @@ import jakarta.inject.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 @AutoLogged
 public class TemplateSetResourceImpl implements TemplateSetResource, FetchWithUuid<TemplateSetDoc> {
 
@@ -39,14 +42,17 @@ public class TemplateSetResourceImpl implements TemplateSetResource, FetchWithUu
     private final Provider<TemplateSetStore> templateSetStoreProvider;
     private final Provider<DocumentResourceHelper> documentResourceHelperProvider;
     private final Provider<ResourceStore> resourceStoreProvider;
+    private final TemplateSetService templateSetService;
 
     @Inject
     public TemplateSetResourceImpl(final Provider<TemplateSetStore> templateSetStoreProvider,
                                    final Provider<DocumentResourceHelper> documentResourceHelperProvider,
-                                   final Provider<ResourceStore> resourceStoreProvider) {
+                                   final Provider<ResourceStore> resourceStoreProvider,
+                                   final TemplateSetService templateSetService) {
         this.templateSetStoreProvider = templateSetStoreProvider;
         this.documentResourceHelperProvider = documentResourceHelperProvider;
         this.resourceStoreProvider = resourceStoreProvider;
+        this.templateSetService = templateSetService;
     }
 
     @Override
@@ -64,17 +70,18 @@ public class TemplateSetResourceImpl implements TemplateSetResource, FetchWithUu
                 .update(templateSetStoreProvider.get(), doc);
     }
 
-//    @Override
-//    public Boolean checkDocumentPermission(final CheckDocumentPermissionRequest request) {
-//        return null;
-//    }
+    @Override
+    public List<TemplateSetItem> getTemplatesForSet(final String setUuid) {
+        if (setUuid == null) {
+            return List.of();
+        }
+        return templateSetService.getTemplatesForSet(setUuid);
+    }
 
     private DocRef getDocRef(final String uuid) {
         return DocRef.builder()
                 .uuid(uuid)
-                .type(TemplateSetDoc.TYPE)  // make sure this constant exists in TemplateSetDoc
+                .type(TemplateSetDoc.TYPE)
                 .build();
     }
 }
-
-

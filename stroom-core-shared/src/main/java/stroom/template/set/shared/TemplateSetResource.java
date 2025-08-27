@@ -36,6 +36,8 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.fusesource.restygwt.client.DirectRestService;
 
+import java.util.List;
+
 @Tag(name = "Templates")
 @Path("/template/set" + ResourcePaths.V1)
 @Produces(MediaType.APPLICATION_JSON)
@@ -57,14 +59,9 @@ public interface TemplateSetResource extends RestResource, DirectRestService, Fe
     TemplateSetDoc update(@PathParam("uuid") String uuid,
                           @Parameter(description = "doc", required = true) TemplateSetDoc doc);
 
-//    @POST
-//    @Path("/checkDocumentPermission")
-//    @Operation(
-//            summary = "Check document permission",
-//            operationId = "checkDocumentPermission")
-//    Boolean checkDocumentPermission(
-//            @Parameter(description = "request", required = true)
-//            CheckDocumentPermissionRequest request);
-
+    @GET
+    @Path("/{uuid}/templates")
+    @Operation(summary = "Fetch templates in a template set")
+    List<TemplateSetItem> getTemplatesForSet(@PathParam("uuid") String uuid);
 
 }

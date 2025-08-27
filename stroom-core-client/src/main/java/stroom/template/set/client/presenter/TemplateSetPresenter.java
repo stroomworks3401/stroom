@@ -1,19 +1,3 @@
-/*
- * Copyright 2017 Crown Copyright
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package stroom.template.set.client.presenter;
 
 import stroom.docref.DocRef;
@@ -23,7 +7,9 @@ import stroom.entity.client.presenter.LinkTabPanelView;
 import stroom.entity.client.presenter.MarkdownEditPresenter;
 import stroom.entity.client.presenter.MarkdownTabProvider;
 import stroom.security.client.presenter.DocumentUserPermissionsTabProvider;
+import stroom.template.set.impl.TemplateSetService;
 import stroom.template.set.shared.TemplateSetDoc;
+import stroom.template.set.shared.TemplateSetItem;
 import stroom.widget.tab.client.presenter.TabData;
 import stroom.widget.tab.client.presenter.TabDataImpl;
 
@@ -31,26 +17,39 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
 import javax.inject.Provider;
+import java.util.Collections;
+import java.util.List;
 
 public class TemplateSetPresenter extends DocumentEditTabPresenter<LinkTabPanelView, TemplateSetDoc> {
 
-    private static final TabData FIELDS = new TabDataImpl("Templates");
+    private static final TabData TEMPLATES = new TabDataImpl("Templates");
     private static final TabData SETTINGS = new TabDataImpl("Settings");
     private static final TabData DOCUMENTATION = new TabDataImpl("Documentation");
     private static final TabData PERMISSIONS = new TabDataImpl("Permissions");
+
+    private final TemplateSetTemplateListPresenter templateListPresenter;
+    private final TemplateSetService templateSetService;
 
     @Inject
     public TemplateSetPresenter(final EventBus eventBus,
                                 final LinkTabPanelView view,
                                 final Provider<TemplateSetSettingsPresenter> settingsPresenterProvider,
-                                final Provider<TemplateSetFieldListPresenter> fieldListPresenterProvider,
+                                final Provider<TemplateSetTemplateListPresenter> templateListPresenterProvider,
                                 final Provider<MarkdownEditPresenter> markdownEditPresenterProvider,
-                                final DocumentUserPermissionsTabProvider<TemplateSetDoc>
-                                        documentUserPermissionsTabProvider) {
+                                final DocumentUserPermissionsTabProvider<TemplateSetDoc> documentUserPermissionsTabProvider,
+                                final TemplateSetService templateSetService) {
         super(eventBus, view);
 
-        addTab(FIELDS, new DocumentEditTabProvider<>(fieldListPresenterProvider::get));
+        this.templateListPresenter = templateListPresenterProvider.get();
+        this.templateSetService = templateSetService;
+
+        // Templates tab
+        addTab(TEMPLATES, new DocumentEditTabProvider<>(() -> templateListPresenter));
+
+        // Settings tab
         addTab(SETTINGS, new DocumentEditTabProvider<>(settingsPresenterProvider::get));
+
+        // Documentation tab
         addTab(DOCUMENTATION, new MarkdownTabProvider<TemplateSetDoc>(eventBus, markdownEditPresenterProvider) {
             @Override
             public void onRead(final MarkdownEditPresenter presenter,
@@ -68,8 +67,11 @@ public class TemplateSetPresenter extends DocumentEditTabPresenter<LinkTabPanelV
                 return document;
             }
         });
+
+        // Permissions tab
         addTab(PERMISSIONS, documentUserPermissionsTabProvider);
-        selectTab(FIELDS);
+
+        selectTab(TEMPLATES);
     }
 
     @Override
@@ -86,4 +88,16 @@ public class TemplateSetPresenter extends DocumentEditTabPresenter<LinkTabPanelV
     protected TabData getDocumentationTab() {
         return DOCUMENTATION;
     }
+
+    @Override
+    protected void onRead(final DocRef docRef, final TemplateSetDoc document, final boolean readOnly) {
+        super.onRead(docRef, document, readOnly);
+
+        final List<TemplateSetItem> templates = document.getSetUuid() != null
+                ? templateSetService.getTemplatesForSet(document.getSetUuid())
+                : Collections.emptyList();
+
+        templateListPresenter.setTemplates(templates);
+    }
+
 }

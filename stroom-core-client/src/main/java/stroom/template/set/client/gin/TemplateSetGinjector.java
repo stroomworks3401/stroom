@@ -17,7 +17,6 @@
 package stroom.template.set.client.gin;
 
 import stroom.template.set.client.TemplateSetPlugin;
-import stroom.template.set.client.presenter.TemplateSetFieldEditPresenter;
 import stroom.template.set.client.presenter.TemplateSetPresenter;
 import stroom.template.set.client.presenter.TemplateSetSettingsPresenter;
 
@@ -31,5 +30,4 @@ public interface TemplateSetGinjector {
 
     AsyncProvider<TemplateSetSettingsPresenter> getTemplateSetSettingsPresenter();
 
-    AsyncProvider<TemplateSetFieldEditPresenter> getTemplateSetFieldEditPresenter();
 }

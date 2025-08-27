@@ -26,10 +26,22 @@ public class TemplateSetService {
 
     public TemplateSetDoc createDoc(final TemplateSetDoc doc) {
         Objects.requireNonNull(doc);
+
         if (doc.getUuid() == null) {
             doc.setUuid(UUID.randomUUID().toString());
         }
-        return store.writeDocument(doc);
+        if (doc.getSetUuid() == null) {
+            // generate a new UUID for the DB row (template set)
+            doc.setSetUuid(UUID.randomUUID().toString());
+        }
+
+        // create the doc in the doc store
+        final TemplateSetDoc created = store.writeDocument(doc);
+
+        // optionally create an empty set row in the DB so it exists
+        // dao.createEmptySetRow(doc.getSetUuid(), doc.getName());
+
+        return created;
     }
 
     public TemplateSetDoc updateDoc(final TemplateSetDoc doc) {
