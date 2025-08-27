@@ -25,4 +25,5 @@ public class Keys {
     // -------------------------------------------------------------------------
 
     public static final UniqueKey<TemplateSetRecord> KEY_TEMPLATE_SET_PRIMARY = Internal.createUniqueKey(TemplateSet.TEMPLATE_SET, DSL.name("KEY_template_set_PRIMARY"), new TableField[] { TemplateSet.TEMPLATE_SET.UUID }, true);
+    public static final UniqueKey<TemplateSetRecord> KEY_TEMPLATE_SET_UQ_TEMPLATE_SET_UUID = Internal.createUniqueKey(TemplateSet.TEMPLATE_SET, DSL.name("KEY_template_set_uq_template_set_uuid"), new TableField[] { TemplateSet.TEMPLATE_SET.UUID }, true);
 }

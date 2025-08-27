@@ -10,5 +10,4 @@ import java.util.stream.Stream;
 
 public interface TemplateSetDao extends HasIntCrud<TemplateSetDoc> {
 
-    int deleteAllByOwner(UserRef ownerRef);
 }

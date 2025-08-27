@@ -34,115 +34,129 @@ public class TemplateSetRecord extends UpdatableRecordImpl<TemplateSetRecord> {
     }
 
     /**
+     * Setter for <code>stroom.template_set.set_uuid</code>.
+     */
+    public void setSetUuid(String value) {
+        set(1, value);
+    }
+
+    /**
+     * Getter for <code>stroom.template_set.set_uuid</code>.
+     */
+    public String getSetUuid() {
+        return (String) get(1);
+    }
+
+    /**
      * Setter for <code>stroom.template_set.name</code>.
      */
     public void setName(String value) {
-        set(1, value);
+        set(2, value);
     }
 
     /**
      * Getter for <code>stroom.template_set.name</code>.
      */
     public String getName() {
-        return (String) get(1);
+        return (String) get(2);
     }
 
     /**
      * Setter for <code>stroom.template_set.version</code>.
      */
     public void setVersion(String value) {
-        set(2, value);
+        set(3, value);
     }
 
     /**
      * Getter for <code>stroom.template_set.version</code>.
      */
     public String getVersion() {
-        return (String) get(2);
+        return (String) get(3);
     }
 
     /**
      * Setter for <code>stroom.template_set.create_time_ms</code>.
      */
     public void setCreateTimeMs(Long value) {
-        set(3, value);
+        set(4, value);
     }
 
     /**
      * Getter for <code>stroom.template_set.create_time_ms</code>.
      */
     public Long getCreateTimeMs() {
-        return (Long) get(3);
+        return (Long) get(4);
     }
 
     /**
      * Setter for <code>stroom.template_set.update_time_ms</code>.
      */
     public void setUpdateTimeMs(Long value) {
-        set(4, value);
+        set(5, value);
     }
 
     /**
      * Getter for <code>stroom.template_set.update_time_ms</code>.
      */
     public Long getUpdateTimeMs() {
-        return (Long) get(4);
+        return (Long) get(5);
     }
 
     /**
      * Setter for <code>stroom.template_set.create_user</code>.
      */
     public void setCreateUser(String value) {
-        set(5, value);
+        set(6, value);
     }
 
     /**
      * Getter for <code>stroom.template_set.create_user</code>.
      */
     public String getCreateUser() {
-        return (String) get(5);
+        return (String) get(6);
     }
 
     /**
      * Setter for <code>stroom.template_set.update_user</code>.
      */
     public void setUpdateUser(String value) {
-        set(6, value);
+        set(7, value);
     }
 
     /**
      * Getter for <code>stroom.template_set.update_user</code>.
      */
     public String getUpdateUser() {
-        return (String) get(6);
+        return (String) get(7);
     }
 
     /**
      * Setter for <code>stroom.template_set.description</code>.
      */
     public void setDescription(String value) {
-        set(7, value);
+        set(8, value);
     }
 
     /**
      * Getter for <code>stroom.template_set.description</code>.
      */
     public String getDescription() {
-        return (String) get(7);
+        return (String) get(8);
     }
 
     /**
      * Setter for <code>stroom.template_set.fields</code>.
      */
     public void setFields(JSON value) {
-        set(8, value);
+        set(9, value);
     }
 
     /**
      * Getter for <code>stroom.template_set.fields</code>.
      */
     public JSON getFields() {
-        return (JSON) get(8);
+        return (JSON) get(9);
     }
 
     // -------------------------------------------------------------------------
@@ -168,10 +182,11 @@ public class TemplateSetRecord extends UpdatableRecordImpl<TemplateSetRecord> {
     /**
      * Create a detached, initialised TemplateSetRecord
      */
-    public TemplateSetRecord(String uuid, String name, String version, Long createTimeMs, Long updateTimeMs, String createUser, String updateUser, String description, JSON fields) {
+    public TemplateSetRecord(String uuid, String setUuid, String name, String version, Long createTimeMs, Long updateTimeMs, String createUser, String updateUser, String description, JSON fields) {
         super(TemplateSet.TEMPLATE_SET);
 
         setUuid(uuid);
+        setSetUuid(setUuid);
         setName(name);
         setVersion(version);
         setCreateTimeMs(createTimeMs);

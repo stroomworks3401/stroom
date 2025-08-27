@@ -167,18 +167,4 @@ public class TemplateSetDaoImpl implements TemplateSetDao {
                         .fetchOptional())
                 .map(RECORD_TO_TEMPLATE_SET_MAPPER);
     }
-
-    @Override
-    public int deleteAllByOwner(final UserRef ownerRef) {
-        Objects.requireNonNull(ownerRef);
-        final int delCount = JooqUtil.contextResult(templateSetDbConnProvider, dslContext -> dslContext
-                .deleteFrom(TEMPLATE_SET)
-                .where(TEMPLATE_SET.CREATE_USER.eq(ownerRef.getUuid()))
-                .execute());
-
-        LOGGER.debug(() -> LogUtil.message("Deleted {} {} records for user {}",
-                delCount, TEMPLATE_SET.getName(), ownerRef.toInfoString()));
-
-        return delCount;
-    }
 }

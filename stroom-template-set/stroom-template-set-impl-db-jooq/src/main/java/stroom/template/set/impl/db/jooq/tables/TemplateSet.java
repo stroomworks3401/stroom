@@ -4,10 +4,13 @@
 package stroom.template.set.impl.db.jooq.tables;
 
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.Index;
 import org.jooq.JSON;
 import org.jooq.Name;
 import org.jooq.PlainSQL;
@@ -24,6 +27,7 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
+import stroom.template.set.impl.db.jooq.Indexes;
 import stroom.template.set.impl.db.jooq.Keys;
 import stroom.template.set.impl.db.jooq.Stroom;
 import stroom.template.set.impl.db.jooq.tables.records.TemplateSetRecord;
@@ -54,6 +58,11 @@ public class TemplateSet extends TableImpl<TemplateSetRecord> {
      * The column <code>stroom.template_set.uuid</code>.
      */
     public final TableField<TemplateSetRecord, String> UUID = createField(DSL.name("uuid"), SQLDataType.CHAR(36).nullable(false), this, "");
+
+    /**
+     * The column <code>stroom.template_set.set_uuid</code>.
+     */
+    public final TableField<TemplateSetRecord, String> SET_UUID = createField(DSL.name("set_uuid"), SQLDataType.CHAR(36).nullable(false), this, "");
 
     /**
      * The column <code>stroom.template_set.name</code>.
@@ -130,8 +139,18 @@ public class TemplateSet extends TableImpl<TemplateSetRecord> {
     }
 
     @Override
+    public List<Index> getIndexes() {
+        return Arrays.asList(Indexes.TEMPLATE_SET_IDX_TEMPLATE_SET_SET_UUID);
+    }
+
+    @Override
     public UniqueKey<TemplateSetRecord> getPrimaryKey() {
         return Keys.KEY_TEMPLATE_SET_PRIMARY;
+    }
+
+    @Override
+    public List<UniqueKey<TemplateSetRecord>> getUniqueKeys() {
+        return Arrays.asList(Keys.KEY_TEMPLATE_SET_UQ_TEMPLATE_SET_UUID);
     }
 
     @Override
