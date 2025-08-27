@@ -23,6 +23,10 @@ public class TemplateSetModule extends AbstractModule {
 
     @Override
     protected void configure() {
+        // Document store binding
         bind(TemplateSetStore.class).to(TemplateSetStoreImpl.class);
+
+        // Service binding
+        bind(TemplateSetService.class);
     }
 }

@@ -280,7 +280,6 @@ include 'stroom-task:stroom-task-mock'
 include 'stroom-template-set:stroom-template-set-impl'
 include 'stroom-template-set:stroom-template-set-impl-db'
 include 'stroom-template-set:stroom-template-set-impl-db-jooq'
-include 'stroom-template-set:stroom-template-set-api'
 
 // Test project
 include 'stroom-test-common'

@@ -1,37 +1,19 @@
 package stroom.template.set.impl.db;
 
 import stroom.db.util.JooqUtil;
-import org.jooq.impl.DSL;
 import stroom.template.set.impl.TemplateSetDao;
-import stroom.template.set.impl.db.jooq.tables.TemplateSet;
 import stroom.template.set.impl.db.jooq.tables.records.TemplateSetRecord;
-import stroom.template.set.shared.TemplateSetDoc;
 import stroom.template.set.shared.TemplateSetField;
-import stroom.util.exception.DataChangedException;
+import stroom.template.set.shared.TemplateSetItem;
 import stroom.util.json.JsonUtil;
 import stroom.util.logging.LambdaLogger;
 import stroom.util.logging.LambdaLoggerFactory;
-import stroom.util.logging.LogUtil;
-import stroom.util.shared.NullSafe;
-import stroom.util.shared.UserRef;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.inject.Inject;
-import org.jooq.Condition;
-import org.jooq.Record;
 import org.jooq.JSON;
-import org.jooq.RecordMapper;
-import org.jooq.impl.SQLDataType;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Function;
-import java.util.stream.Stream;
 
 import static stroom.template.set.impl.db.jooq.tables.TemplateSet.TEMPLATE_SET;
 
@@ -39,132 +21,129 @@ public class TemplateSetDaoImpl implements TemplateSetDao {
 
     private static final LambdaLogger LOGGER = LambdaLoggerFactory.getLogger(TemplateSetDaoImpl.class);
 
-    private final TemplateSetDbConnProvider templateSetDbConnProvider;
-
-    private static final Function<Record, TemplateSetDoc> RECORD_TO_TEMPLATE_SET_MAPPER = record -> {
-        TemplateSetDoc doc = new TemplateSetDoc();
-
-        doc.setUuid(record.get(TemplateSet.TEMPLATE_SET.UUID));
-        doc.setName(record.get(TemplateSet.TEMPLATE_SET.NAME));
-        doc.setVersion(record.get(TemplateSet.TEMPLATE_SET.VERSION));
-        doc.setCreateTimeMs(record.get(TemplateSet.TEMPLATE_SET.CREATE_TIME_MS));
-        doc.setUpdateTimeMs(record.get(TemplateSet.TEMPLATE_SET.UPDATE_TIME_MS));
-        doc.setCreateUser(record.get(TemplateSet.TEMPLATE_SET.CREATE_USER));
-        doc.setUpdateUser(record.get(TemplateSet.TEMPLATE_SET.UPDATE_USER));
-        doc.setDescription(record.get(TemplateSet.TEMPLATE_SET.DESCRIPTION));
-
-        // Map the JSON fields column if it's not null
-        final JSON fieldsJson = record.get(TemplateSet.TEMPLATE_SET.FIELDS);
-        if (fieldsJson != null) {
-            doc.setFields(List.of(JsonUtil.readValue(fieldsJson.data(), TemplateSetField[].class)));
-        }
-
-        return doc;
-    };
+    private final TemplateSetDbConnProvider dbConnProvider;
 
     @Inject
-    TemplateSetDaoImpl(final TemplateSetDbConnProvider templateSetDbConnProvider) {
-        this.templateSetDbConnProvider = templateSetDbConnProvider;
-    }
-
-    private String getFieldsJson(final TemplateSetDoc templateSetDoc) {
-        return templateSetDoc.getFields() != null ? JsonUtil.writeValueAsString(templateSetDoc.getFields()) : null;
+    public TemplateSetDaoImpl(final TemplateSetDbConnProvider dbConnProvider) {
+        this.dbConnProvider = dbConnProvider;
     }
 
     @Override
-    public TemplateSetDoc create(final TemplateSetDoc templateSetDoc) {
-        final String fieldsJson = getFieldsJson(templateSetDoc);
-        final UUID uuid = UUID.randomUUID();
+    public void addTemplate(final TemplateSetItem item) {
+        final String fieldsJson = item.getFields() != null
+                ? JsonUtil.writeValueAsString(item.getFields())
+                : null;
 
-
-
-        JooqUtil.context(templateSetDbConnProvider, context -> context
+        JooqUtil.context(dbConnProvider, ctx -> ctx
                 .insertInto(TEMPLATE_SET)
                 .columns(
-                        TEMPLATE_SET.UUID,
+                        TEMPLATE_SET.SET_UUID,
+                        TEMPLATE_SET.UUID,           // template UUID
                         TEMPLATE_SET.NAME,
-                        TEMPLATE_SET.VERSION,
-                        TEMPLATE_SET.CREATE_TIME_MS,
-                        TEMPLATE_SET.CREATE_USER,
-                        TEMPLATE_SET.UPDATE_TIME_MS,
-                        TEMPLATE_SET.UPDATE_USER,
                         TEMPLATE_SET.DESCRIPTION,
-                        TEMPLATE_SET.FIELDS
+                        TEMPLATE_SET.FIELDS,
+                        TEMPLATE_SET.CREATE_TIME_MS,
+                        TEMPLATE_SET.UPDATE_TIME_MS,
+                        TEMPLATE_SET.CREATE_USER,
+                        TEMPLATE_SET.UPDATE_USER
                 )
                 .values(
-                        uuid.toString(),
-                        templateSetDoc.getName(),
-                        templateSetDoc.getVersion(),
-                        templateSetDoc.getCreateTimeMs(),
-                        templateSetDoc.getCreateUser(),
-                        templateSetDoc.getUpdateTimeMs(),
-                        templateSetDoc.getUpdateUser(),
-                        templateSetDoc.getDescription(),
-                        JSON.valueOf(fieldsJson)
+                        item.getSetUuid(),
+                        item.getUuid(),
+                        item.getName(),
+                        item.getDescription(),
+                        fieldsJson != null ? JSON.valueOf(fieldsJson) : null,
+                        item.getCreateTimeMs(),
+                        item.getUpdateTimeMs(),
+                        item.getCreateUser(),
+                        item.getUpdateUser()
                 )
-                .execute()
-        );
-
-        return new TemplateSetDoc(
-                templateSetDoc.getType(),
-                uuid.toString(),
-                templateSetDoc.getName(),
-                templateSetDoc.getVersion(),
-                templateSetDoc.getCreateTimeMs(),
-                templateSetDoc.getUpdateTimeMs(),
-                templateSetDoc.getCreateUser(),
-                templateSetDoc.getUpdateUser(),
-                templateSetDoc.getDescription(),
-                templateSetDoc.getFields()
-        );
+                .onDuplicateKeyUpdate()
+                .set(TEMPLATE_SET.SET_UUID, item.getSetUuid())
+                .set(TEMPLATE_SET.NAME, item.getName())
+                .set(TEMPLATE_SET.DESCRIPTION, item.getDescription())
+                .set(TEMPLATE_SET.FIELDS, fieldsJson != null ? JSON.valueOf(fieldsJson) : null)
+                .set(TEMPLATE_SET.UPDATE_TIME_MS, item.getUpdateTimeMs())
+                .set(TEMPLATE_SET.UPDATE_USER, item.getUpdateUser())
+                .execute());
     }
 
     @Override
-    public Optional<TemplateSetDoc> fetch(final int id) {
-        return Optional.empty();
+    public Optional<TemplateSetItem> getTemplateByUuid(final String templateUuid) {
+        return JooqUtil.contextResult(dbConnProvider, ctx -> ctx
+                        .selectFrom(TEMPLATE_SET)
+                        .where(TEMPLATE_SET.UUID.eq(templateUuid))
+                        .fetchOptional())
+                .map(this::mapRecord);
     }
 
     @Override
-    public TemplateSetDoc update(final TemplateSetDoc templateSetDoc) {
-        final String fieldsJson = getFieldsJson(templateSetDoc);
+    public List<TemplateSetItem> getTemplatesForSet(final String setUuid) {
+        return JooqUtil.contextResult(dbConnProvider, ctx -> ctx
+                .selectFrom(TEMPLATE_SET)
+                .where(TEMPLATE_SET.SET_UUID.eq(setUuid))
+                .orderBy(TEMPLATE_SET.NAME.asc())
+                .fetch(this::mapRecord));
+    }
 
-        final int count = JooqUtil.contextResult(templateSetDbConnProvider, context -> context
+    @Override
+    public boolean updateTemplate(final TemplateSetItem item) {
+        final String fieldsJson = item.getFields() != null
+                ? JsonUtil.writeValueAsString(item.getFields())
+                : null;
+
+        final int updated = JooqUtil.contextResult(dbConnProvider, ctx -> ctx
                 .update(TEMPLATE_SET)
-                .set(TEMPLATE_SET.NAME, templateSetDoc.getName())
-                .set(TEMPLATE_SET.VERSION, templateSetDoc.getVersion())
-                .set(TEMPLATE_SET.UPDATE_TIME_MS, templateSetDoc.getUpdateTimeMs())
-                .set(TEMPLATE_SET.UPDATE_USER, templateSetDoc.getUpdateUser())
-                .set(TEMPLATE_SET.DESCRIPTION, templateSetDoc.getDescription())
-                .set(TEMPLATE_SET.FIELDS, JSON.valueOf(fieldsJson))
-                .where(TEMPLATE_SET.UUID.eq(templateSetDoc.getUuid()))
-                .execute()
-        );
+                .set(TEMPLATE_SET.SET_UUID, item.getSetUuid())
+                .set(TEMPLATE_SET.NAME, item.getName())
+                .set(TEMPLATE_SET.DESCRIPTION, item.getDescription())
+                .set(TEMPLATE_SET.FIELDS, fieldsJson != null ? JSON.valueOf(fieldsJson) : null)
+                .set(TEMPLATE_SET.UPDATE_TIME_MS, item.getUpdateTimeMs())
+                .set(TEMPLATE_SET.UPDATE_USER, item.getUpdateUser())
+                .where(TEMPLATE_SET.UUID.eq(item.getUuid()))
+                .execute());
 
-        if (count == 0) {
-            throw new DataChangedException("Unable to update TemplateSetDoc with UUID " + templateSetDoc.getUuid());
+        return updated > 0;
+    }
+
+    @Override
+    public boolean deleteTemplate(final String templateUuid) {
+        final int count = JooqUtil.contextResult(dbConnProvider, ctx -> ctx
+                .deleteFrom(TEMPLATE_SET)
+                .where(TEMPLATE_SET.UUID.eq(templateUuid))
+                .execute());
+        return count > 0;
+    }
+
+    @Override
+    public int deleteAllTemplatesForSet(final String setUuid) {
+        return JooqUtil.contextResult(dbConnProvider, ctx -> ctx
+                .deleteFrom(TEMPLATE_SET)
+                .where(TEMPLATE_SET.SET_UUID.eq(setUuid))
+                .execute());
+    }
+
+    private TemplateSetItem mapRecord(final TemplateSetRecord r) {
+        final TemplateSetItem item = new TemplateSetItem();
+        item.setUuid(r.get(TEMPLATE_SET.UUID));
+        item.setSetUuid(r.get(TEMPLATE_SET.SET_UUID));
+        item.setName(r.get(TEMPLATE_SET.NAME));
+        item.setDescription(r.get(TEMPLATE_SET.DESCRIPTION));
+
+        final JSON json = r.get(TEMPLATE_SET.FIELDS);
+        if (json != null) {
+            // Deserialize JSON to TemplateSetField[] internally
+            TemplateSetField[] fieldsArray = JsonUtil.readValue(json.data(), TemplateSetField[].class);
+            // Store as JSON string in the TemplateSetItem object
+            String fieldsJson = JsonUtil.writeValueAsString(fieldsArray);
+            item.setFields(fieldsJson);
         }
 
-        return templateSetDoc;
-    }
+        item.setCreateTimeMs(r.get(TEMPLATE_SET.CREATE_TIME_MS));
+        item.setUpdateTimeMs(r.get(TEMPLATE_SET.UPDATE_TIME_MS));
+        item.setCreateUser(r.get(TEMPLATE_SET.CREATE_USER));
+        item.setUpdateUser(r.get(TEMPLATE_SET.UPDATE_USER));
 
-    @Override
-    public boolean delete(final int id) {
-        return false;
-    }
-
-    public boolean delete(final UUID uuid) {
-        return JooqUtil.contextResult(templateSetDbConnProvider, context -> context
-                .deleteFrom(TEMPLATE_SET)
-                .where(TEMPLATE_SET.UUID.eq(String.valueOf(uuid)))
-                .execute()) > 0;
-    }
-
-    public Optional<TemplateSetDoc> fetch(final UUID uuid) {
-        return JooqUtil.contextResult(templateSetDbConnProvider, context -> context
-                        .select()
-                        .from(TEMPLATE_SET)
-                        .where(TEMPLATE_SET.UUID.eq(String.valueOf(uuid)))
-                        .fetchOptional())
-                .map(RECORD_TO_TEMPLATE_SET_MAPPER);
+        return item;
     }
 }
