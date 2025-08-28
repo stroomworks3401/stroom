@@ -1,11 +1,14 @@
 package stroom.template.set.client.presenter;
 
+import stroom.alert.client.event.ConfirmEvent;
+import stroom.dispatch.client.RestFactory;
 import stroom.docref.DocRef;
 import stroom.entity.client.presenter.DocumentEditPresenter;
 import stroom.template.set.shared.TemplateSetItem;
 import stroom.template.set.shared.TemplateSetDoc;
 import stroom.data.grid.client.MyDataGrid;
 import stroom.data.grid.client.PagerView;
+import stroom.template.set.shared.TemplateSetResource;
 import stroom.widget.util.client.MultiSelectionModelImpl;
 import stroom.widget.button.client.ButtonView;
 import stroom.svg.client.SvgPresets;
@@ -25,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class TemplateSetTemplateListPresenter
         extends DocumentEditPresenter<TemplateSetTemplateListPresenter.TemplateSetTemplateListView, TemplateSetDoc> {
@@ -37,13 +42,22 @@ public class TemplateSetTemplateListPresenter
 
     private List<TemplateSetItem> templates;
     private TemplateSetTemplateDataProvider dataProvider;
+    private final TemplateSetResource templateSetResource;
+    private TemplateSetDoc templateSet;
+    private final RestFactory restFactory;
+    private final TemplateSetTemplateEditPresenter templateSetTemplateEditPresenter;
 
     @Inject
     public TemplateSetTemplateListPresenter(final EventBus eventBus,
                                             final TemplateSetTemplateListView view,
-                                            final PagerView pagerView) {
+                                            final PagerView pagerView, final TemplateSetResource templateSetResource,
+                                            final RestFactory restFactory,
+                                            final TemplateSetTemplateEditPresenter templateSetTemplateEditPresenter) {
         super(eventBus, view);
         this.pagerView = pagerView;
+        this.templateSetResource = templateSetResource;
+        this.restFactory = restFactory;
+        this.templateSetTemplateEditPresenter = templateSetTemplateEditPresenter;
 
         dataGrid = new MyDataGrid<>(this);
         selectionModel = dataGrid.addDefaultSelectionModel(true);
@@ -91,17 +105,65 @@ public class TemplateSetTemplateListPresenter
     }
 
     private void onAdd() {
-        // TODO: implement template creation dialog
+        if (templateSet == null) return;
+
+        // Create a new TemplateSetItem using the builder
+        TemplateSetItem item = TemplateSetItem.builder().build();
+
+        // Open the edit presenter
+        templateSetTemplateEditPresenter.read(item);
+        templateSetTemplateEditPresenter.show("New Template", e -> {
+            if (e.isOk()) {
+                TemplateSetItem newItem = templateSetTemplateEditPresenter.write();
+                if (newItem != null) {
+                    // Save the template using the resource
+                    restFactory
+                            .create(templateSetResource)
+                            .method(res -> res.addTemplateToSet(templateSet.getSetUuid(), newItem))
+                            .onSuccess(savedItem -> {
+                                // Add to the local list and refresh the data provider
+                                templates.add(savedItem);
+                                dataProvider.setList(templates);
+                                dataProvider.refresh();
+
+                                e.hide();
+                                DirtyEvent.fire(this, true);
+                            })
+                            .taskMonitorFactory(pagerView)
+                            .exec();
+                } else {
+                    e.reset();
+                }
+            } else {
+                e.hide();
+            }
+        });
     }
 
     private void onRemove() {
         final List<TemplateSetItem> selected = selectionModel.getSelectedItems();
-        if (selected != null && !selected.isEmpty()) {
-            templates.removeAll(selected);
-            selectionModel.clear();
-            refreshDataGrid();
-            DirtyEvent.fire(this, true);
-        }
+        if (selected == null || selected.isEmpty()) return;
+
+        ConfirmEvent.fire(this, "Are you sure you want to delete the selected templates?", result -> {
+            if (result) {
+                for (TemplateSetItem item : selected) {
+                    restFactory.create(templateSetResource)
+                            .method(res -> {
+                                res.deleteTemplate(item.getUuid());
+                                return null;
+                            })
+                            .onSuccess(v -> {
+                                templates.remove(item);
+                                dataProvider.setList(templates);
+                                dataProvider.refresh();
+                                DirtyEvent.fire(this, true);
+                            })
+                            .taskMonitorFactory(pagerView, "Deleting template")
+                            .exec();
+                }
+                selectionModel.clear();
+            }
+        });
     }
 
     public void setTemplates(final List<TemplateSetItem> templates) {
@@ -124,6 +186,20 @@ public class TemplateSetTemplateListPresenter
 
     @Override
     protected void onRead(final DocRef docRef, final TemplateSetDoc document, final boolean readOnly) {
+        this.templateSet = document;
+
+        if (document.getSetUuid() != null) {
+            restFactory
+                    .create(templateSetResource)
+                    .method(res -> res.getTemplatesForSet(document.getSetUuid()))
+                    .onSuccess(items -> setTemplates(items))
+                    .onFailure(caught -> setTemplates(Collections.emptyList()))
+                    .taskMonitorFactory(null, "Fetching templates")
+                    .exec();
+        } else {
+            setTemplates(Collections.emptyList());
+        }
+        enableButtons();
     }
 
     @Override

@@ -90,4 +90,67 @@ public class TemplateSetItem {
     public int hashCode() {
         return Objects.hash(uuid);
     }
+
+    // --- Builder ---
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public Builder copy() {
+        return new Builder(this);
+    }
+
+    public static final class Builder {
+        private String uuid;
+        private String setUuid;
+        private String name;
+        private String version;
+        private Long createTimeMs;
+        private Long updateTimeMs;
+        private String createUser;
+        private String updateUser;
+        private String description;
+        private String fields;
+
+        private Builder() {}
+
+        private Builder(TemplateSetItem item) {
+            this.uuid = item.uuid;
+            this.setUuid = item.setUuid;
+            this.name = item.name;
+            this.version = item.version;
+            this.createTimeMs = item.createTimeMs;
+            this.updateTimeMs = item.updateTimeMs;
+            this.createUser = item.createUser;
+            this.updateUser = item.updateUser;
+            this.description = item.description;
+            this.fields = item.fields;
+        }
+
+        public Builder uuid(String uuid) { this.uuid = uuid; return this; }
+        public Builder setUuid(String setUuid) { this.setUuid = setUuid; return this; }
+        public Builder name(String name) { this.name = name; return this; }
+        public Builder version(String version) { this.version = version; return this; }
+        public Builder createTimeMs(Long createTimeMs) { this.createTimeMs = createTimeMs; return this; }
+        public Builder updateTimeMs(Long updateTimeMs) { this.updateTimeMs = updateTimeMs; return this; }
+        public Builder createUser(String createUser) { this.createUser = createUser; return this; }
+        public Builder updateUser(String updateUser) { this.updateUser = updateUser; return this; }
+        public Builder description(String description) { this.description = description; return this; }
+        public Builder fields(String fields) { this.fields = fields; return this; }
+
+        public TemplateSetItem build() {
+            return new TemplateSetItem(
+                    uuid,
+                    setUuid,
+                    name,
+                    version,
+                    createTimeMs,
+                    updateTimeMs,
+                    createUser,
+                    updateUser,
+                    description,
+                    fields
+            );
+        }
+    }
 }

@@ -27,6 +27,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
@@ -62,5 +63,17 @@ public interface TemplateSetResource extends RestResource, DirectRestService, Fe
     @GET
     @Path("/{uuid}/templates")
     List<TemplateSetItem> getTemplatesForSet(@PathParam("uuid") String uuid);
+
+    @POST
+    @Path("/{uuid}/template")
+    TemplateSetItem addTemplateToSet(@PathParam("uuid") String setUuid, TemplateSetItem item);
+
+    @DELETE
+    @Path("/template/{uuid}")
+    @Operation(
+            summary = "Delete a template from a template set",
+            operationId = "deleteTemplate")
+    void deleteTemplate(@PathParam("uuid") String templateUuid);
+
 
 }

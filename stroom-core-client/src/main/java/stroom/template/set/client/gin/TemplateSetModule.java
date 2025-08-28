@@ -5,9 +5,12 @@ import stroom.template.set.client.TemplateSetPlugin;
 import stroom.template.set.client.presenter.TemplateSetPresenter;
 import stroom.template.set.client.presenter.TemplateSetSettingsPresenter;
 import stroom.template.set.client.presenter.TemplateSetSettingsPresenter.TemplateSetSettingsView;
+import stroom.template.set.client.presenter.TemplateSetTemplateEditPresenter;
+import stroom.template.set.client.presenter.TemplateSetTemplateEditPresenter.TemplateSetTemplateEditView;
 import stroom.template.set.client.presenter.TemplateSetTemplateListPresenter;
 import stroom.template.set.client.presenter.TemplateSetTemplateListPresenter.TemplateSetTemplateListView;
 import stroom.template.set.client.view.TemplateSetSettingsViewImpl;
+import stroom.template.set.client.view.TemplateSetTemplateEditViewImpl;
 import stroom.template.set.client.view.TemplateSetTemplateListViewImpl;
 
 public class TemplateSetModule extends PluginModule {
@@ -25,5 +28,9 @@ public class TemplateSetModule extends PluginModule {
         // Template list presenter & view
         bind(TemplateSetTemplateListPresenter.class);
         bind(TemplateSetTemplateListView.class).to(TemplateSetTemplateListViewImpl.class);
+
+        bind(TemplateSetTemplateEditPresenter.class);
+        bind(TemplateSetTemplateEditView.class).to(TemplateSetTemplateEditViewImpl.class);
+
     }
 }

@@ -78,6 +78,35 @@ public class TemplateSetResourceImpl implements TemplateSetResource, FetchWithUu
         return templateSetService.getTemplatesForSet(setUuid);
     }
 
+    @Override
+    public TemplateSetItem addTemplateToSet(final String setUuid, final TemplateSetItem item) {
+        if (setUuid == null || item == null) {
+            throw new EntityServiceException("Set UUID and item must not be null");
+        }
+
+        // You can pass a system username or get from security context
+        final String user = "system";
+        TemplateSetItem createdItem = templateSetService.addTemplateToSet(setUuid, item, user);
+
+        LOGGER.info("Added template '{}' to set '{}'", createdItem.getName(), setUuid);
+        return createdItem;
+    }
+
+    @Override
+    public void deleteTemplate(final String templateUuid) {
+        if (templateUuid == null) {
+            throw new EntityServiceException("Template UUID must not be null");
+        }
+
+        boolean deleted = templateSetService.deleteTemplate(templateUuid);
+        if (!deleted) {
+            throw new EntityServiceException("Failed to delete template with UUID: " + templateUuid);
+        }
+
+        LOGGER.info("Deleted template '{}'", templateUuid);
+    }
+
+
     private DocRef getDocRef(final String uuid) {
         return DocRef.builder()
                 .uuid(uuid)
