@@ -2,7 +2,7 @@ package stroom.template.set.client.view;
 
 import stroom.template.set.client.presenter.TemplateSetTemplateEditPresenter.TemplateSetTemplateEditView;
 import com.google.gwt.user.client.ui.TextBox;
-
+import com.google.gwt.user.client.ui.TextArea;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -16,6 +16,9 @@ public class TemplateSetTemplateEditViewImpl extends ViewImpl implements Templat
 
     @UiField
     TextBox templateName;
+
+    @UiField
+    TextArea fieldsJson;  // new field for JSON editing
 
     @Inject
     public TemplateSetTemplateEditViewImpl(final Binder binder) {
@@ -40,6 +43,16 @@ public class TemplateSetTemplateEditViewImpl extends ViewImpl implements Templat
     @Override
     public String getTemplateName() {
         return templateName.getText();
+    }
+
+    @Override
+    public void setFieldsJson(final String json) {
+        fieldsJson.setText(json);
+    }
+
+    @Override
+    public String getFieldsJson() {
+        return fieldsJson.getText();
     }
 
     @Override

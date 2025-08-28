@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class TemplateSetTemplateListPresenter
@@ -106,17 +107,23 @@ public class TemplateSetTemplateListPresenter
 
     private void onAdd() {
         if (templateSet == null) return;
-
-        // Create a new TemplateSetItem using the builder
-        TemplateSetItem item = TemplateSetItem.builder().build();
+        // Create a new TemplateSetItem linked to the parent set
+        final TemplateSetItem item = TemplateSetItem.builder()
+                .uuid(UUID.randomUUID().toString())
+                .setUuid(templateSet.getSetUuid())
+                .build();
 
         // Open the edit presenter
         templateSetTemplateEditPresenter.read(item);
         templateSetTemplateEditPresenter.show("New Template", e -> {
             if (e.isOk()) {
-                TemplateSetItem newItem = templateSetTemplateEditPresenter.write();
+                // Read the edited template including name and JSON fields
+                final TemplateSetItem newItem = templateSetTemplateEditPresenter.write();
                 if (newItem != null) {
-                    // Save the template using the resource
+                    // Ensure parent set UUID is set
+                    newItem.setSetUuid(templateSet.getSetUuid());
+
+                    // Save the template using the server resource
                     restFactory
                             .create(templateSetResource)
                             .method(res -> res.addTemplateToSet(templateSet.getSetUuid(), newItem))
@@ -132,10 +139,10 @@ public class TemplateSetTemplateListPresenter
                             .taskMonitorFactory(pagerView)
                             .exec();
                 } else {
-                    e.reset();
+                    e.reset(); // keep popup open if validation failed
                 }
             } else {
-                e.hide();
+                e.hide(); // user cancelled
             }
         });
     }
@@ -146,7 +153,7 @@ public class TemplateSetTemplateListPresenter
 
         ConfirmEvent.fire(this, "Are you sure you want to delete the selected templates?", result -> {
             if (result) {
-                for (TemplateSetItem item : selected) {
+                for (final TemplateSetItem item : selected) {
                     restFactory.create(templateSetResource)
                             .method(res -> {
                                 res.deleteTemplate(item.getUuid());
@@ -192,7 +199,7 @@ public class TemplateSetTemplateListPresenter
             restFactory
                     .create(templateSetResource)
                     .method(res -> res.getTemplatesForSet(document.getSetUuid()))
-                    .onSuccess(items -> setTemplates(items))
+                    .onSuccess(this::setTemplates)
                     .onFailure(caught -> setTemplates(Collections.emptyList()))
                     .taskMonitorFactory(null, "Fetching templates")
                     .exec();

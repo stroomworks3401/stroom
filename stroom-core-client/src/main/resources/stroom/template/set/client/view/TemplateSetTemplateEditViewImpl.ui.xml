@@ -5,6 +5,9 @@
     <g:FlowPanel styleName="popup-content-vertical">
         <g:Label>Template Name</g:Label>
         <g:TextBox ui:field="templateName"/>
+
+        <g:Label>Template JSON</g:Label>
+        <g:TextArea ui:field="fieldsJson" visibleLines="10" width="100%"/>
     </g:FlowPanel>
 
 </ui:UiBinder>

@@ -133,9 +133,9 @@ public class TemplateSetDaoImpl implements TemplateSetDao {
         final JSON json = r.get(TEMPLATE_SET.FIELDS);
         if (json != null) {
             // Deserialize JSON to TemplateSetField[] internally
-            TemplateSetField[] fieldsArray = JsonUtil.readValue(json.data(), TemplateSetField[].class);
+            final TemplateSetField[] fieldsArray = JsonUtil.readValue(json.data(), TemplateSetField[].class);
             // Store as JSON string in the TemplateSetItem object
-            String fieldsJson = JsonUtil.writeValueAsString(fieldsArray);
+            final String fieldsJson = JsonUtil.writeValueAsString(fieldsArray);
             item.setFields(fieldsJson);
         }
 
