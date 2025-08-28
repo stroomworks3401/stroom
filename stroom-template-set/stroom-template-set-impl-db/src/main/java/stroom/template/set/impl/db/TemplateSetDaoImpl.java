@@ -3,7 +3,6 @@ package stroom.template.set.impl.db;
 import stroom.db.util.JooqUtil;
 import stroom.template.set.impl.TemplateSetDao;
 import stroom.template.set.impl.db.jooq.tables.records.TemplateSetRecord;
-import stroom.template.set.shared.TemplateSetField;
 import stroom.template.set.shared.TemplateSetItem;
 import stroom.util.json.JsonUtil;
 import stroom.util.logging.LambdaLogger;
@@ -131,13 +130,16 @@ public class TemplateSetDaoImpl implements TemplateSetDao {
         item.setDescription(r.get(TEMPLATE_SET.DESCRIPTION));
 
         final JSON json = r.get(TEMPLATE_SET.FIELDS);
-        if (json != null) {
-            // Deserialize JSON to TemplateSetField[] internally
-            final TemplateSetField[] fieldsArray = JsonUtil.readValue(json.data(), TemplateSetField[].class);
-            // Store as JSON string in the TemplateSetItem object
-            final String fieldsJson = JsonUtil.writeValueAsString(fieldsArray);
-            item.setFields(fieldsJson);
+        try {
+            if (json != null) {
+                item.setFields(json.data());
+            }
+        } catch (final Exception ex) {
+            LOGGER.error("Bad JSON in TEMPLATE_SET.FIELDS for uuid {}: {}",
+                    r.get(TEMPLATE_SET.UUID), json, ex);
+            item.setFields("[]"); // fallback
         }
+
 
         item.setCreateTimeMs(r.get(TEMPLATE_SET.CREATE_TIME_MS));
         item.setUpdateTimeMs(r.get(TEMPLATE_SET.UPDATE_TIME_MS));
