@@ -2,9 +2,12 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
              xmlns:g="urn:import:com.google.gwt.user.client.ui">
     <g:FlowPanel styleName="dock-container-vertical">
+        <!-- Main data grid for templates -->
         <g:SimplePanel ui:field="dataGrid" styleName="dock-max"/>
+
+        <!-- Optional status or sync panel -->
         <g:ScrollPanel styleName="dock-min">
-            <g:HTML ui:field="syncState" styleName="templateSetFieldListViewImpl-syncState"/>
+            <g:HTML ui:field="syncState" styleName="templateSetTemplateListViewImpl-syncState"/>
         </g:ScrollPanel>
     </g:FlowPanel>
 </ui:UiBinder>

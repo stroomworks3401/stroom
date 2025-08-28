@@ -61,7 +61,6 @@ public interface TemplateSetResource extends RestResource, DirectRestService, Fe
 
     @GET
     @Path("/{uuid}/templates")
-    @Operation(summary = "Fetch templates in a template set")
     List<TemplateSetItem> getTemplatesForSet(@PathParam("uuid") String uuid);
 
 }
