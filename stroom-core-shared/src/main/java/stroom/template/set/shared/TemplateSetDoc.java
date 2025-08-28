@@ -17,6 +17,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Description(
         "My epic new feature which allows you to use templates for event enriching among other things."
@@ -44,7 +45,9 @@ public class TemplateSetDoc extends Doc implements HasType, HasUuid, HasName {
     @JsonProperty
     private String setUuid;  // link to the template set row
 
-    public TemplateSetDoc() {}
+    public TemplateSetDoc() {
+        this.setUuid = UUID.randomUUID().toString();
+    }
 
     @JsonCreator
     public TemplateSetDoc(@JsonProperty("type") final String type,
@@ -59,7 +62,9 @@ public class TemplateSetDoc extends Doc implements HasType, HasUuid, HasName {
                           @JsonProperty("setUuid") final String setUuid) {
         super(type, uuid, name, version, createTimeMs, updateTimeMs, createUser, updateUser);
         this.description = description;
-        this.setUuid = setUuid;
+        this.setUuid = setUuid != null
+                ? setUuid
+                : UUID.randomUUID().toString();
     }
 
     public String getDescription() { return description; }
@@ -73,7 +78,7 @@ public class TemplateSetDoc extends Doc implements HasType, HasUuid, HasName {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
-        TemplateSetDoc that = (TemplateSetDoc) o;
+        final TemplateSetDoc that = (TemplateSetDoc) o;
         return Objects.equals(description, that.description) &&
                Objects.equals(setUuid, that.setUuid);
     }

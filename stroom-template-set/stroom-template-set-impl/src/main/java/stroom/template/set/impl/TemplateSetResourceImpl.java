@@ -86,7 +86,7 @@ public class TemplateSetResourceImpl implements TemplateSetResource, FetchWithUu
 
         // You can pass a system username or get from security context
         final String user = "system";
-        TemplateSetItem createdItem = templateSetService.addTemplateToSet(setUuid, item, user);
+        final TemplateSetItem createdItem = templateSetService.addTemplateToSet(setUuid, item, user);
 
         LOGGER.info("Added template '{}' to set '{}'", createdItem.getName(), setUuid);
         return createdItem;
@@ -98,7 +98,7 @@ public class TemplateSetResourceImpl implements TemplateSetResource, FetchWithUu
             throw new EntityServiceException("Template UUID must not be null");
         }
 
-        boolean deleted = templateSetService.deleteTemplate(templateUuid);
+        final boolean deleted = templateSetService.deleteTemplate(templateUuid);
         if (!deleted) {
             throw new EntityServiceException("Failed to delete template with UUID: " + templateUuid);
         }
