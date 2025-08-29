@@ -14,6 +14,7 @@ import org.jooq.JSON;
 import java.util.List;
 import java.util.Optional;
 
+//TODO actually use the TemplateSetFields to build proper objects from the db col
 import static stroom.template.set.impl.db.jooq.tables.TemplateSet.TEMPLATE_SET;
 
 public class TemplateSetDaoImpl implements TemplateSetDao {
