@@ -1,7 +1,5 @@
 package stroom.template.set.impl;
 
-import stroom.docref.DocRef;
-import stroom.template.set.shared.TemplateSetDoc;
 import stroom.template.set.shared.TemplateSetItem;
 
 import jakarta.inject.Inject;
@@ -11,49 +9,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class TemplateSetService {
-
-    private final TemplateSetStore store;   // <-- use your store instead of raw DocStore
     private final TemplateSetDao dao;
 
     @Inject
-    public TemplateSetService(final TemplateSetStore store,
-                              final TemplateSetDao dao) {
-        this.store = store;
+    public TemplateSetService(final TemplateSetDao dao) {
         this.dao = dao;
-    }
-
-    // ---- Doc operations ----
-
-    public TemplateSetDoc createDoc(final TemplateSetDoc doc) {
-        Objects.requireNonNull(doc);
-
-        if (doc.getUuid() == null) {
-            doc.setUuid(UUID.randomUUID().toString());
-        }
-        if (doc.getSetUuid() == null) {
-            // generate a new UUID for the DB row (template set)
-            doc.setSetUuid(UUID.randomUUID().toString());
-        }
-
-        // create the doc in the doc store
-        final TemplateSetDoc created = store.writeDocument(doc);
-
-        // optionally create an empty set row in the DB so it exists
-        // dao.createEmptySetRow(doc.getSetUuid(), doc.getName());
-
-        return created;
-    }
-
-    public TemplateSetDoc updateDoc(final TemplateSetDoc doc) {
-        Objects.requireNonNull(doc);
-        return store.writeDocument(doc);
-    }
-
-    public Optional<TemplateSetDoc> readDoc(final String uuid) {
-        return Optional.ofNullable(
-                store.readDocument(DocRef.builder(TemplateSetDoc.TYPE)
-                        .uuid(uuid)
-                        .build()));
     }
 
     // ---- Template row operations ----
