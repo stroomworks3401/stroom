@@ -13,6 +13,81 @@ DO NOT ADD CHANGES HERE - ADD THEM USING log_change.sh
 ~~~
 
 
+* Issue **#5042** : Allow the import of processor filters when the existing processor filter is in a logically deleted state. Add validation to the import confirm dialog to ensure the parent doc is selected when a processor filter is selected.
+
+* Change DocRef Info Cache to evict entries on document creation to stop stroom saying that a document doesn't exist after import.
+
+* Issue **#5077** : Fix bug in user full name templating where it is always re-using the first value, i.e. setting every user to have the full name of the first user to log in.
+
+* Issue **#5047** : Replace the property `stroom.security.authentication.openid.validateAudience` with `stroom.security.authentication.openid.allowedAudiences` (defaults to empty) and `stroom.security.authentication.openid.audienceClaimRequired` (defaults to false). If the IDP is known to provide the `aud` claim (often populated with the `clientId`) then set `allowedAudiences` to contain that value and set `audienceClaimRequired` to `true`.
+
+* Issue **#5068** : Add the config prop `stroom.security.authentication.openId.fullNameClaimTemplate` to allow the user's full name to be formed from a template containing a mixture of static text and claim variables, e.g. `${firstName} ${lastName}`. Unknown variables are replaced with an empty string. Default is `${name}`.
+
+* Issue **#5066** : Change template syntax of `openid.publicKeyUriPattern` prop from positional variables (`{}`) to named variables (`${awsRegion}`). Default value has changed to `https://public-keys.auth.elb.${awsRegion}.amazonaws.com/${keyId}`. If this prop has been explicitly set, its value will need to be changed to named variables.
+
+* Issue **#5073** : Trim the unique identity, display name and full name values for a user to ensure no leading/trailing spaces are stored. Includes DB migration `V07_10_00_005__trim_user_identities.sql` that trims existing values in the `name`, `display_name` and `full_name` columns of the `stroom_user` table.
+
+
+## [v7.11-beta.5] - 2025-08-14
+
+* Issue **#2279** : Drag and drop tabs.
+
+* Issue **#2584** : Close all tabs to right/left.
+
+* Issue **#5013** : Add row data to annotations.
+
+* Issue **#3049** : Check for full/inactive/closed index volumes.
+
+* Issue **#4070** : Show column information on hover tip.
+
+* Issue **#3815** : Add selected tab colour property.
+
+* Issue **#4790** : Add copy option for property names.
+
+* Issue **#4121** : Add rename option for pipeline elements.
+
+* Issue **#2823** : Add `autoImport` servlet to simplify importing content.
+
+* Issue **#5013** : Add data to existing annotations.
+
+* Issue **#5013** : Add links to other annotations and allow comments to make references to events and other annotations.
+
+* Issue **#2374** : Add pipeline element descriptions.
+
+* Issue **#2374** : Add description is now editable for pipeline elements.
+
+* Issue **#4048** : Add query csv API.
+
+* Issue **#5064** : Fix ref data store discovery.
+
+* Issue **#5065** : Make public key URI configurable.
+
+* Issue **#5046** : Stop feeds being auto-created when there is no content template match.
+
+* Issue **#5062** : Fix permissions issue loading scheduled executors.
+
+* Allow clientSecret to be null/empty for mTLS auth.
+
+
+## [v7.11-beta.4] - 2025-07-29
+
+* Change the proxy config properties `forwardUrl`, `livenessCheckUrl`, `apiKeyVerificationUrl` and `feedStatusUrl` to be empty by default and to allow them to be populated with either just a path or a full URL. `downstreamHost` config will be used to provide the host details if these properties are empty or only contain a path. Added the property `livenessCheckEnabled` to `forwardHttpDestinations` to control whether the forward destination liveness is checked (defaults to true).
+
+
+## [v7.11-beta.3] - 2025-07-21
+
+* Issue **#5028** : Add build info metrics `buildVersion`, `buildDate` and `upTime`.
+
+* Add admin port servlets for Prometheus to scrape metrics from stroom and proxy. Servlet is available as `http://host:<admin port>/(stroom|proxy)Admin/prometheusMetrics`.
+
+* Issue **#4735** : Add expand/collapse to result tables.
+
+* Issue **#5013** : Allow annotation status update without requery.
+
+* Issue **#5022** : Fix weird spinner behaviour.
+
+* Issue **#259** : Maximise dashboard panes.
+
 * Issue **#5027** : Allow users to choose run as user for processing.
 
 * Issue **#4959** : Remove terms with field `Status` from re-process filter expressions.
@@ -1617,7 +1692,10 @@ DO NOT ADD CHANGES HERE - ADD THEM USING log_change.sh
 * Issue **#3830** : Add S3 data storage option.
 
 
-[Unreleased]: https://github.com/gchq/stroom/compare/v7.11-beta.2...HEAD
+[Unreleased]: https://github.com/gchq/stroom/compare/v7.11-beta.5...HEAD
+[v7.11-beta.5]: https://github.com/gchq/stroom/compare/v7.11-beta.4...v7.11-beta.5
+[v7.11-beta.4]: https://github.com/gchq/stroom/compare/v7.11-beta.3...v7.11-beta.4
+[v7.11-beta.3]: https://github.com/gchq/stroom/compare/v7.11-beta.2...v7.11-beta.3
 [v7.11-beta.2]: https://github.com/gchq/stroom/compare/v7.11-beta.1...v7.11-beta.2
 [v7.11-beta.1]: https://github.com/gchq/stroom/compare/v7.10-beta.6...v7.11-beta.1
 [v7.10-beta.6]: https://github.com/gchq/stroom/compare/v7.10-beta.5...v7.10-beta.6

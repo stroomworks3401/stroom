@@ -56,6 +56,7 @@ import stroom.query.client.presenter.SearchErrorListener;
 import stroom.query.client.presenter.SearchStateListener;
 import stroom.svg.shared.SvgImage;
 import stroom.task.client.HasTaskMonitorFactory;
+import stroom.util.shared.ErrorMessage;
 import stroom.util.shared.NullSafe;
 import stroom.util.shared.Version;
 import stroom.widget.button.client.ButtonPanel;
@@ -94,7 +95,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@SuppressWarnings("PatternVariableCanBeUsed") // Cos GWT
 public class DashboardPresenter
         extends DocumentEditPresenter<DashboardView, DashboardDoc>
         implements
@@ -543,8 +543,7 @@ public class DashboardPresenter
             if (externalLinkParameters != null) {
                 // Try to find a Key/Value component to put the params in called "Params".
                 for (final Component component : components.getComponents()) {
-                    if (component instanceof KeyValueInputPresenter) {
-                        final KeyValueInputPresenter keyValueInputPresenter = (KeyValueInputPresenter) component;
+                    if (component instanceof final KeyValueInputPresenter keyValueInputPresenter) {
                         if (keyValueInputPresenter.getLabel().equals(DEFAULT_PARAMS_INPUT)) {
                             keyValueInputPresenter.setValue(externalLinkParameters);
                             // If we found one then we don't need to treat external parameters as a special case.
@@ -583,8 +582,7 @@ public class DashboardPresenter
             }
 
             // Set params on the component if it needs them.
-            if (component instanceof Queryable) {
-                final Queryable queryable = (Queryable) component;
+            if (component instanceof final Queryable queryable) {
                 queryable.addSearchStateListener(this);
                 queryable.addSearchErrorListener(this);
                 queryable.setTaskMonitorFactory(this);
@@ -618,8 +616,8 @@ public class DashboardPresenter
         return combinedMode;
     }
 
-    private List<String> getCombinedErrors() {
-        final List<String> errors = new ArrayList<>();
+    private List<ErrorMessage> getCombinedErrors() {
+        final List<ErrorMessage> errors = new ArrayList<>();
         final List<Queryable> queryableComponents = getQueryableComponents();
         for (final Queryable queryable : queryableComponents) {
             if (queryable.getCurrentErrors() != null) {
@@ -709,24 +707,21 @@ public class DashboardPresenter
         final List<ComponentConfig> modifiedComponents = new ArrayList<>();
         for (final ComponentConfig componentConfig : newComponents) {
             ComponentSettings settings = componentConfig.getSettings();
-            if (settings instanceof TableComponentSettings) {
-                final TableComponentSettings tableComponentSettings = (TableComponentSettings) settings;
+            if (settings instanceof final TableComponentSettings tableComponentSettings) {
                 if (tableComponentSettings.getQueryId() != null
                     && idMapping.containsKey(tableComponentSettings.getQueryId())) {
                     settings = tableComponentSettings.copy()
                             .queryId(idMapping.get(tableComponentSettings.getQueryId()))
                             .build();
                 }
-            } else if (settings instanceof VisComponentSettings) {
-                final VisComponentSettings visComponentSettings = (VisComponentSettings) settings;
+            } else if (settings instanceof final VisComponentSettings visComponentSettings) {
                 if (visComponentSettings.getTableId() != null
                     && idMapping.containsKey(visComponentSettings.getTableId())) {
                     settings = visComponentSettings.copy()
                             .tableId(idMapping.get(visComponentSettings.getTableId()))
                             .build();
                 }
-            } else if (settings instanceof TextComponentSettings) {
-                final TextComponentSettings textComponentSettings = (TextComponentSettings) settings;
+            } else if (settings instanceof final TextComponentSettings textComponentSettings) {
                 if (textComponentSettings.getTableId() != null
                     && idMapping.containsKey(textComponentSettings.getTableId())) {
                     settings = textComponentSettings.copy()
@@ -805,8 +800,7 @@ public class DashboardPresenter
                         layoutPresenter.closeTab(tab);
                         final Component component = components.get(tab.getId());
                         if (component != null) {
-                            if (component instanceof Queryable) {
-                                final Queryable queryable = (Queryable) component;
+                            if (component instanceof final Queryable queryable) {
                                 queryable.removeSearchStateListener(this);
                                 queryable.removeSearchErrorListener(this);
                             }
@@ -984,8 +978,7 @@ public class DashboardPresenter
 
     private TabConfig getFirstTabConfig(final LayoutConfig layoutConfig) {
         if (layoutConfig != null) {
-            if (layoutConfig instanceof SplitLayoutConfig) {
-                final SplitLayoutConfig splitLayoutConfig = (SplitLayoutConfig) layoutConfig;
+            if (layoutConfig instanceof final SplitLayoutConfig splitLayoutConfig) {
                 final List<LayoutConfig> list = splitLayoutConfig.getChildren();
                 if (list != null) {
                     for (final LayoutConfig child : list) {
@@ -996,8 +989,7 @@ public class DashboardPresenter
                     }
                 }
 
-            } else if (layoutConfig instanceof TabLayoutConfig) {
-                final TabLayoutConfig tabLayoutConfig = (TabLayoutConfig) layoutConfig;
+            } else if (layoutConfig instanceof final TabLayoutConfig tabLayoutConfig) {
                 if (!tabLayoutConfig.getTabs().isEmpty()) {
                     if (tabLayoutConfig.getSelected() >= 0 &&
                         tabLayoutConfig.getSelected() < tabLayoutConfig.getTabs().size()) {
@@ -1174,13 +1166,17 @@ public class DashboardPresenter
     }
 
     @Override
-    public void onError(final List<String> errors) {
+    public void onError(final List<ErrorMessage> errors) {
         queryToolbarPresenter.onError(getCombinedErrors());
     }
 
     @Override
     public DocRef getDocRef() {
         return docRef;
+    }
+
+    public void onContentTabVisible(final boolean visible) {
+        components.getComponents().forEach(component -> component.onContentTabVisible(visible));
     }
 
 
